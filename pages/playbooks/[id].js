@@ -4,6 +4,27 @@ import Layout from '../../components/Layout';
 import { playbooks } from '../../data/services-catalog';
 import { playbookContent } from '../../data/playbook-content';
 
+function formatInlineText(text) {
+  if (!text) return text;
+  const parts = [];
+  let remaining = text;
+  let keyIdx = 0;
+  
+  while (remaining.length > 0) {
+    const boldMatch = remaining.match(/\*\*(.+?)\*\*/);
+    if (boldMatch) {
+      const beforeBold = remaining.slice(0, boldMatch.index);
+      if (beforeBold) parts.push(beforeBold);
+      parts.push(<strong key={keyIdx++}>{boldMatch[1]}</strong>);
+      remaining = remaining.slice(boldMatch.index + boldMatch[0].length);
+    } else {
+      parts.push(remaining);
+      break;
+    }
+  }
+  return parts.length === 1 ? parts[0] : parts;
+}
+
 function renderMarkdownContent(text) {
   if (!text) return null;
   
@@ -18,7 +39,7 @@ function renderMarkdownContent(text) {
         elements.push(
           <ul key={elements.length} style={{ paddingLeft: '1.5rem', margin: '0.5rem 0' }}>
             {currentList.map((item, i) => (
-              <li key={i} style={{ marginBottom: '0.25rem', lineHeight: 1.6 }}>{item}</li>
+              <li key={i} style={{ marginBottom: '0.25rem', lineHeight: 1.6 }}>{formatInlineText(item)}</li>
             ))}
           </ul>
         );
@@ -26,7 +47,7 @@ function renderMarkdownContent(text) {
         elements.push(
           <ol key={elements.length} style={{ paddingLeft: '1.5rem', margin: '0.5rem 0' }}>
             {currentList.map((item, i) => (
-              <li key={i} style={{ marginBottom: '0.25rem', lineHeight: 1.6 }}>{item}</li>
+              <li key={i} style={{ marginBottom: '0.25rem', lineHeight: 1.6 }}>{formatInlineText(item)}</li>
             ))}
           </ol>
         );
@@ -39,7 +60,16 @@ function renderMarkdownContent(text) {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     
-    if (line.startsWith('### Part') || line.startsWith('### Step')) {
+    if (line.match(/^---+$/)) {
+      flushList();
+      elements.push(
+        <hr key={elements.length} style={{ 
+          border: 'none',
+          borderTop: '1px solid #e5e7eb',
+          margin: '1.5rem 0',
+        }} />
+      );
+    } else if (line.startsWith('### ')) {
       flushList();
       elements.push(
         <h3 key={elements.length} style={{ 
@@ -65,9 +95,21 @@ function renderMarkdownContent(text) {
           {line.replace(/^####\s*/, '')}
         </h4>
       );
-    } else if (line.startsWith('**Step Overview:**') || line.startsWith('**End State:**')) {
+    } else if (line.startsWith('##### ')) {
       flushList();
-      const content = line.replace(/\*\*/g, '');
+      elements.push(
+        <h5 key={elements.length} style={{ 
+          fontSize: '0.9rem', 
+          fontWeight: 600, 
+          marginTop: '0.75rem',
+          marginBottom: '0.25rem',
+          color: '#4b5563',
+        }}>
+          {line.replace(/^#####\s*/, '')}
+        </h5>
+      );
+    } else if (line.match(/^\*\*[^*]+:\*\*/) || line.startsWith('**Step Overview:**') || line.startsWith('**End State:**')) {
+      flushList();
       elements.push(
         <p key={elements.length} style={{ 
           margin: '0.5rem 0', 
@@ -75,7 +117,7 @@ function renderMarkdownContent(text) {
           fontStyle: 'italic',
           color: '#4b5563',
         }}>
-          {content}
+          {formatInlineText(line)}
         </p>
       );
     } else if (line.match(/^[-*]\s/)) {
@@ -83,18 +125,18 @@ function renderMarkdownContent(text) {
         flushList();
         listType = 'ul';
       }
-      currentList.push(line.replace(/^[-*]\s/, '').replace(/\*\*/g, ''));
+      currentList.push(line.replace(/^[-*]\s/, ''));
     } else if (line.match(/^\d+\.\s/)) {
       if (listType !== 'ol') {
         flushList();
         listType = 'ol';
       }
-      currentList.push(line.replace(/^\d+\.\s/, '').replace(/\*\*/g, ''));
+      currentList.push(line.replace(/^\d+\.\s/, ''));
     } else if (line.trim()) {
       flushList();
       elements.push(
         <p key={elements.length} style={{ margin: '0.5rem 0', lineHeight: 1.6 }}>
-          {line.replace(/\*\*/g, '')}
+          {formatInlineText(line)}
         </p>
       );
     }

@@ -27,14 +27,15 @@ A Next.js-based sales portal for LeanScale, a company providing fractional GTM O
 - `/buy-leanscale` - Investor perks and engagement calculator
 
 ## Services Catalog
-- **79 Strategic Projects** (One-Time Projects)
+- **68 Strategic Projects** (One-Time Projects)
 - **11 Managed Services**
 - **69 Tool Implementations**
+- **148 Total Services**
 - Organized by function: Cross Functional, Marketing, Sales, Customer Success, Partnerships
-- 68 services link to detailed playbooks with full implementation procedures
+- All 68 strategic projects link to detailed playbooks with full implementation procedures
 
 ## Key Data Files
-- `data/services-catalog.js` - All 159 services, 68 playbook links, function categories
+- `data/services-catalog.js` - All 148 services, 68 playbook links, function categories
 - `data/playbook-content.js` - Detailed content for 68 playbooks (1MB+, imported from GitHub)
 - `data/diagnostic-data.js` - GTM diagnostic questions and scoring
 - `data/all-playbooks.json` - Raw playbook data fetched from GitHub

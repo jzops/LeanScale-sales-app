@@ -10,10 +10,15 @@ import {
   categoryLabels 
 } from '../../data/services-catalog';
 
+const strategicCount = Object.values(strategicProjects).flat().length;
+const managedCount = managedServices.length;
+const toolsCount = Object.values(toolImplementations).flat().length;
+const allServicesCount = strategicCount + managedCount + toolsCount;
+
 const tabs = [
-  { id: 'strategic', label: 'One-Time Projects', count: 79 },
-  { id: 'managed', label: 'Managed Services', count: 11 },
-  { id: 'tools', label: 'Tool Implementations', count: 69 },
+  { id: 'strategic', label: 'One-Time Projects', count: strategicCount },
+  { id: 'managed', label: 'Managed Services', count: managedCount },
+  { id: 'tools', label: 'Tool Implementations', count: toolsCount },
 ];
 
 const functionOptions = ['all', 'crossFunctional', 'marketing', 'sales', 'customerSuccess', 'partnerships'];
@@ -86,7 +91,7 @@ export default function ServicesCatalog() {
             <span>🛠️</span> LeanScale Services Catalog
           </h1>
           <p style={{ color: '#666', maxWidth: 700, margin: '0 auto', lineHeight: 1.6 }}>
-            159 services across Strategic Projects, Managed Services, and Tool Implementations. 
+            {allServicesCount} services across Strategic Projects, Managed Services, and Tool Implementations. 
             Browse by category and function to find the right solution for your GTM operations.
           </p>
         </div>
