@@ -14,7 +14,7 @@ const customerConfig = {
   intakeFormLink: "https://forms.fillout.com/t/nqEbrHoL5Eus",
 
   // Embedded content
-  youtubeVideoId: "YOUR_YOUTUBE_VIDEO_ID", // Main overview video
+  youtubeVideoId: "M7oECb8xsy0", // Main overview video
   googleSlidesEmbedUrl: "https://docs.google.com/presentation/d/e/2PACX-1vSGSLvHvPn9Cus6N3BpGnK6AkZsUiEdh8cARVVBiZ4w54uUCjHHJ-lHfymW8wfPPraAXMfgXtePxIwf/pubembed?start=true&loop=true&delayms=3000",
   clayVideoWistiaId: "YOUR_WISTIA_VIDEO_ID",
 
