@@ -2,7 +2,7 @@ import Layout from '../../components/Layout';
 
 const values = ['Integrity', 'Humility', 'Taking action', 'Challenging yourself and others'];
 
-const oldDifferentiators = [
+const differentiators = [
   {
     title: 'Startup Operator Experience',
     description: 'Our team has built and scaled GTM operations at startups from Series A to IPO.',
@@ -11,17 +11,6 @@ const oldDifferentiators = [
     title: 'Proactive Approach',
     description: "We don't wait for problems—we anticipate them and build solutions before they become blockers.",
   },
-  {
-    title: 'Assigned Team Members',
-    description: 'You work with dedicated team members who know your business, not a rotating cast of consultants.',
-  },
-  {
-    title: 'Broad Scope and Capabilities',
-    description: 'From strategy to implementation, we cover the full spectrum of GTM operations needs.',
-  },
-];
-
-const differentiators = [
   {
     title: 'Assigned Team Members',
     description: "Because business context matters. Your team gets better and better as they spend more time with you and your business. We don't switch consultants from project to project, we know business context matters and you don't need to waste your time getting someone new up to speed.",
@@ -99,18 +88,6 @@ export default function AboutUs() {
         {/* What Sets Us Apart */}
         <section style={{ marginBottom: '3rem' }}>
           <h2 style={{ marginBottom: '1.5rem' }}>What Sets Us Apart</h2>
-          <div className="card-grid">
-            {oldDifferentiators.map((item) => (
-              <div key={item.title} className="card">
-                <h3 className="card-title">{item.title}</h3>
-                <p className="card-subtitle">{item.description}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Detailed Differentiators */}
-        <section style={{ marginBottom: '3rem' }}>
           <div style={{ 
             display: 'grid', 
             gridTemplateColumns: 'repeat(2, 1fr)', 
