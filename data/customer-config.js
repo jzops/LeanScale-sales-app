@@ -15,7 +15,7 @@ const customerConfig = {
 
   // Embedded content
   youtubeVideoId: "YOUR_YOUTUBE_VIDEO_ID", // Main overview video
-  googleSlidesEmbedUrl: "YOUR_GOOGLE_SLIDES_EMBED_URL",
+  googleSlidesEmbedUrl: "https://docs.google.com/presentation/d/e/2PACX-1vSGSLvHvPn9Cus6N3BpGnK6AkZsUiEdh8cARVVBiZ4w54uUCjHHJ-lHfymW8wfPPraAXMfgXtePxIwf/pubembed?start=true&loop=true&delayms=3000",
   clayVideoWistiaId: "YOUR_WISTIA_VIDEO_ID",
 
   // Available start dates (managed by LeanScale)
