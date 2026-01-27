@@ -10,7 +10,7 @@ export const strategicProjects = {
     { id: 'hubspot-to-salesforce', name: 'Hubspot to Salesforce CRM Migration', icon: '🚚', hasPlaybook: false },
     { id: 'crm-deduplication-ongoing', name: 'CRM Deduplication Ongoing Tool', icon: '🧹', hasPlaybook: true },
     { id: 'fed-pubsec-partitioning', name: 'Fed/PubSec CRM Partitioning', icon: '🏛️', hasPlaybook: true },
-    { id: 'org-chart-hiring-plan', name: 'Org Chart/Roles and Responsibilities & Hiring Plan', icon: '🏢', hasPlaybook: true },
+    { id: 'org-chart-hiring', name: 'Org Chart/Roles and Responsibilities & Hiring Plan', icon: '🏢', hasPlaybook: true },
     { id: 'enrichment-setup', name: 'Enrichment Set Up', icon: '🧬', hasPlaybook: false },
     { id: 'activity-capture', name: 'Activity Capture', icon: '🏃‍♂️', hasPlaybook: false },
     { id: 'plg-gtm-design', name: 'PLG GTM Design', icon: '🚀', hasPlaybook: false },
