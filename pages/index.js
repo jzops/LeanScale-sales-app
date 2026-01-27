@@ -103,7 +103,16 @@ export default function Home() {
             <p style={{ fontStyle: 'italic', marginBottom: '1rem', lineHeight: 1.6 }}>
               &quot;LeanScale is constantly improving and bringing new ideas to our team. They become part of your team, trustworthy partners.&quot;
             </p>
-            <p style={{ fontWeight: 600 }}>— Rafael, Wealth CEO</p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <img 
+                src="https://unavatar.io/linkedin/rafaelloureiro" 
+                alt="Rafael Loureiro"
+                style={{ width: 50, height: 50, borderRadius: '50%', objectFit: 'cover' }}
+              />
+              <p style={{ fontWeight: 600, margin: 0 }}>
+                — <a href="https://www.linkedin.com/in/rafaelloureiro/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--ls-purple)', textDecoration: 'none' }}>Rafael</a>, Wealth CEO
+              </p>
+            </div>
           </div>
         </section>
       </div>
