@@ -101,10 +101,9 @@ export default function Home() {
         <section style={{ marginBottom: '3rem' }}>
           <div className="card" style={{ maxWidth: 600 }}>
             <p style={{ fontStyle: 'italic', marginBottom: '1rem', lineHeight: 1.6 }}>
-              &quot;LeanScale helped us build a scalable revenue engine that supported our growth from Series A to Series C.
-              Their team became an extension of ours.&quot;
+              &quot;LeanScale is constantly improving and bringing new ideas to our team. They become part of your team, trustworthy partners.&quot;
             </p>
-            <p style={{ fontWeight: 600 }}>— VP of Revenue Operations, Series B SaaS</p>
+            <p style={{ fontWeight: 600 }}>— Rafael, Wealth CEO</p>
           </div>
         </section>
       </div>
