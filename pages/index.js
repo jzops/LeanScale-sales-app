@@ -67,21 +67,23 @@ export default function Home() {
         </section>
 
         {/* Video Section */}
-        <section style={{ marginBottom: '3rem' }}>
-          <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>LeanScale Overview</h2>
-          <div className="video-container">
-            <iframe
-              src={`https://www.youtube.com/embed/${customerConfig.youtubeVideoId || 'dQw4w9WgXcQ'}`}
-              title="LeanScale Overview"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
-          </div>
-        </section>
+        {customerConfig.youtubeVideoId && !customerConfig.youtubeVideoId.includes('YOUR_') && (
+          <section style={{ marginBottom: '3rem' }}>
+            <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>LeanScale Overview</h2>
+            <div className="video-container">
+              <iframe
+                src={`https://www.youtube.com/embed/${customerConfig.youtubeVideoId}`}
+                title="LeanScale Overview"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          </section>
+        )}
 
         {/* Google Slides Embed */}
-        {customerConfig.googleSlidesEmbedUrl && (
+        {customerConfig.googleSlidesEmbedUrl && !customerConfig.googleSlidesEmbedUrl.includes('YOUR_') && (
           <section style={{ marginBottom: '3rem' }}>
             <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>LeanScale Deck</h2>
             <div className="video-container">
