@@ -4,6 +4,106 @@ import Layout from '../../components/Layout';
 import { playbooks } from '../../data/services-catalog';
 import { playbookContent } from '../../data/playbook-content';
 
+function renderMarkdownContent(text) {
+  if (!text) return null;
+  
+  const lines = text.split('\n');
+  const elements = [];
+  let currentList = [];
+  let listType = null;
+  
+  const flushList = () => {
+    if (currentList.length > 0) {
+      if (listType === 'ul') {
+        elements.push(
+          <ul key={elements.length} style={{ paddingLeft: '1.5rem', margin: '0.5rem 0' }}>
+            {currentList.map((item, i) => (
+              <li key={i} style={{ marginBottom: '0.25rem', lineHeight: 1.6 }}>{item}</li>
+            ))}
+          </ul>
+        );
+      } else {
+        elements.push(
+          <ol key={elements.length} style={{ paddingLeft: '1.5rem', margin: '0.5rem 0' }}>
+            {currentList.map((item, i) => (
+              <li key={i} style={{ marginBottom: '0.25rem', lineHeight: 1.6 }}>{item}</li>
+            ))}
+          </ol>
+        );
+      }
+      currentList = [];
+      listType = null;
+    }
+  };
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    
+    if (line.startsWith('### Part') || line.startsWith('### Step')) {
+      flushList();
+      elements.push(
+        <h3 key={elements.length} style={{ 
+          fontSize: '1rem', 
+          fontWeight: 600, 
+          marginTop: '1.5rem',
+          marginBottom: '0.5rem',
+          color: '#7c3aed',
+        }}>
+          {line.replace(/^###\s*/, '')}
+        </h3>
+      );
+    } else if (line.startsWith('#### ')) {
+      flushList();
+      elements.push(
+        <h4 key={elements.length} style={{ 
+          fontSize: '0.95rem', 
+          fontWeight: 600, 
+          marginTop: '1rem',
+          marginBottom: '0.5rem',
+          color: '#374151',
+        }}>
+          {line.replace(/^####\s*/, '')}
+        </h4>
+      );
+    } else if (line.startsWith('**Step Overview:**') || line.startsWith('**End State:**')) {
+      flushList();
+      const content = line.replace(/\*\*/g, '');
+      elements.push(
+        <p key={elements.length} style={{ 
+          margin: '0.5rem 0', 
+          lineHeight: 1.6,
+          fontStyle: 'italic',
+          color: '#4b5563',
+        }}>
+          {content}
+        </p>
+      );
+    } else if (line.match(/^[-*]\s/)) {
+      if (listType !== 'ul') {
+        flushList();
+        listType = 'ul';
+      }
+      currentList.push(line.replace(/^[-*]\s/, '').replace(/\*\*/g, ''));
+    } else if (line.match(/^\d+\.\s/)) {
+      if (listType !== 'ol') {
+        flushList();
+        listType = 'ol';
+      }
+      currentList.push(line.replace(/^\d+\.\s/, '').replace(/\*\*/g, ''));
+    } else if (line.trim()) {
+      flushList();
+      elements.push(
+        <p key={elements.length} style={{ margin: '0.5rem 0', lineHeight: 1.6 }}>
+          {line.replace(/\*\*/g, '')}
+        </p>
+      );
+    }
+  }
+  
+  flushList();
+  return elements;
+}
+
 export default function PlaybookDetail() {
   const router = useRouter();
   const { id } = router.query;
@@ -60,26 +160,24 @@ export default function PlaybookDetail() {
           <div style={{
             display: 'inline-block',
             padding: '0.25rem 0.75rem',
-            background: '#ede9fe',
-            color: '#7c3aed',
-            borderRadius: '4px',
+            background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)',
+            color: 'white',
+            borderRadius: '1rem',
             fontSize: '0.75rem',
             fontWeight: 600,
             marginBottom: '0.75rem',
           }}>
             ONE-TIME PROJECT
           </div>
-          <h1 className="page-title" style={{ textAlign: 'left' }}>
-            {playbook.name}
-          </h1>
-          <p style={{ color: '#666', fontSize: '1.1rem', lineHeight: 1.6 }}>
+          <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>{playbook.name}</h1>
+          <p style={{ fontSize: '1.1rem', color: '#666', lineHeight: 1.5 }}>
             {playbook.description}
           </p>
         </div>
 
-        {content ? (
-          <div className="playbook-content">
-            {content.definition && (
+        {content && (
+          <>
+            {content.definition && (content.definition.whatItIs || content.definition.whatItIsNot) && (
               <section className="card" style={{ marginBottom: '1.5rem', padding: '1.5rem' }}>
                 <h2 style={{ 
                   fontSize: '1.1rem', 
@@ -91,16 +189,30 @@ export default function PlaybookDetail() {
                 }}>
                   <span style={{ fontSize: '1.25rem' }}>📋</span> Definition
                 </h2>
-                <div style={{ color: '#374151', lineHeight: 1.7 }}>
-                  <p><strong>What it is:</strong> {content.definition.whatItIs}</p>
-                  {content.definition.whatItIsNot && (
-                    <p><strong>What it is NOT:</strong> {content.definition.whatItIsNot}</p>
-                  )}
-                </div>
+                {content.definition.whatItIs && (
+                  <div style={{ marginBottom: '1rem' }}>
+                    <h3 style={{ fontSize: '0.9rem', fontWeight: 600, color: '#10b981', marginBottom: '0.5rem' }}>
+                      What it is:
+                    </h3>
+                    <p style={{ color: '#374151', lineHeight: 1.6, margin: 0 }}>
+                      {content.definition.whatItIs}
+                    </p>
+                  </div>
+                )}
+                {content.definition.whatItIsNot && (
+                  <div>
+                    <h3 style={{ fontSize: '0.9rem', fontWeight: 600, color: '#ef4444', marginBottom: '0.5rem' }}>
+                      What it is NOT:
+                    </h3>
+                    <p style={{ color: '#374151', lineHeight: 1.6, margin: 0 }}>
+                      {content.definition.whatItIsNot}
+                    </p>
+                  </div>
+                )}
               </section>
             )}
 
-            {content.valueProp && (
+            {content.icpValueProp && (content.icpValueProp.painSolves || content.icpValueProp.outcome) && (
               <section className="card" style={{ marginBottom: '1.5rem', padding: '1.5rem' }}>
                 <h2 style={{ 
                   fontSize: '1.1rem', 
@@ -112,15 +224,40 @@ export default function PlaybookDetail() {
                 }}>
                   <span style={{ fontSize: '1.25rem' }}>💎</span> ICP Value Proposition
                 </h2>
-                <div style={{ color: '#374151', lineHeight: 1.7 }}>
-                  <p><strong>Pain it solves:</strong> {content.valueProp.pain}</p>
-                  <p><strong>Outcome delivered:</strong> {content.valueProp.outcome}</p>
-                  <p><strong>Who owns it:</strong> {content.valueProp.owner}</p>
-                </div>
+                {content.icpValueProp.painSolves && (
+                  <div style={{ marginBottom: '1rem' }}>
+                    <h3 style={{ fontSize: '0.9rem', fontWeight: 600, color: '#f59e0b', marginBottom: '0.5rem' }}>
+                      Pain it solves:
+                    </h3>
+                    <p style={{ color: '#374151', lineHeight: 1.6, margin: 0 }}>
+                      {content.icpValueProp.painSolves}
+                    </p>
+                  </div>
+                )}
+                {content.icpValueProp.outcome && (
+                  <div style={{ marginBottom: '1rem' }}>
+                    <h3 style={{ fontSize: '0.9rem', fontWeight: 600, color: '#10b981', marginBottom: '0.5rem' }}>
+                      Outcome delivered:
+                    </h3>
+                    <p style={{ color: '#374151', lineHeight: 1.6, margin: 0 }}>
+                      {content.icpValueProp.outcome}
+                    </p>
+                  </div>
+                )}
+                {content.icpValueProp.whoOwns && (
+                  <div>
+                    <h3 style={{ fontSize: '0.9rem', fontWeight: 600, color: '#6366f1', marginBottom: '0.5rem' }}>
+                      Who owns it:
+                    </h3>
+                    <p style={{ color: '#374151', lineHeight: 1.6, margin: 0 }}>
+                      {content.icpValueProp.whoOwns}
+                    </p>
+                  </div>
+                )}
               </section>
             )}
 
-            {content.implementation && content.implementation.length > 0 && (
+            {content.implementation && (
               <section className="card" style={{ marginBottom: '1.5rem', padding: '1.5rem' }}>
                 <h2 style={{ 
                   fontSize: '1.1rem', 
@@ -133,25 +270,7 @@ export default function PlaybookDetail() {
                   <span style={{ fontSize: '1.25rem' }}>⚙️</span> Implementation Procedure
                 </h2>
                 <div style={{ color: '#374151' }}>
-                  {content.implementation.map((phase, idx) => (
-                    <div key={idx} style={{ marginBottom: '1.5rem' }}>
-                      <h3 style={{ 
-                        fontSize: '1rem', 
-                        fontWeight: 600, 
-                        marginBottom: '0.75rem',
-                        color: '#7c3aed',
-                      }}>
-                        {phase.title}
-                      </h3>
-                      <ol style={{ paddingLeft: '1.25rem', margin: 0 }}>
-                        {phase.steps.map((step, stepIdx) => (
-                          <li key={stepIdx} style={{ marginBottom: '0.5rem', lineHeight: 1.6 }}>
-                            {step}
-                          </li>
-                        ))}
-                      </ol>
-                    </div>
-                  ))}
+                  {renderMarkdownContent(content.implementation)}
                 </div>
               </section>
             )}
@@ -168,42 +287,13 @@ export default function PlaybookDetail() {
                 }}>
                   <span style={{ fontSize: '1.25rem' }}>🔗</span> Dependencies & Inputs
                 </h2>
-                <div style={{ color: '#374151', lineHeight: 1.7 }}>
-                  {content.dependencies.before && (
-                    <div style={{ marginBottom: '1rem' }}>
-                      <strong>What must exist before starting:</strong>
-                      <ul style={{ marginTop: '0.5rem', paddingLeft: '1.25rem' }}>
-                        {content.dependencies.before.map((item, idx) => (
-                          <li key={idx}>{item}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  {content.dependencies.clientProvides && (
-                    <div style={{ marginBottom: '1rem' }}>
-                      <strong>What client must provide:</strong>
-                      <ul style={{ marginTop: '0.5rem', paddingLeft: '1.25rem' }}>
-                        {content.dependencies.clientProvides.map((item, idx) => (
-                          <li key={idx}>{item}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  {content.dependencies.leanscaleBrings && (
-                    <div>
-                      <strong>What LeanScale brings:</strong>
-                      <ul style={{ marginTop: '0.5rem', paddingLeft: '1.25rem' }}>
-                        {content.dependencies.leanscaleBrings.map((item, idx) => (
-                          <li key={idx}>{item}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
+                <div style={{ color: '#374151' }}>
+                  {renderMarkdownContent(content.dependencies)}
                 </div>
               </section>
             )}
 
-            {content.pitfalls && content.pitfalls.length > 0 && (
+            {content.pitfalls && (
               <section className="card" style={{ marginBottom: '1.5rem', padding: '1.5rem' }}>
                 <h2 style={{ 
                   fontSize: '1.1rem', 
@@ -216,72 +306,32 @@ export default function PlaybookDetail() {
                   <span style={{ fontSize: '1.25rem' }}>⚠️</span> Common Pitfalls
                 </h2>
                 <div style={{ color: '#374151' }}>
-                  {content.pitfalls.map((pitfall, idx) => (
-                    <div key={idx} style={{ 
-                      marginBottom: '1rem',
-                      padding: '1rem',
-                      background: '#fef3c7',
-                      borderRadius: '8px',
-                      borderLeft: '4px solid #f59e0b',
-                    }}>
-                      <strong style={{ color: '#92400e' }}>{pitfall.issue}</strong>
-                      <p style={{ margin: '0.5rem 0 0 0', color: '#78350f' }}>
-                        <strong>Mitigation:</strong> {pitfall.mitigation}
-                      </p>
-                    </div>
-                  ))}
+                  {renderMarkdownContent(content.pitfalls)}
                 </div>
               </section>
             )}
-          </div>
-        ) : (
-          <div className="card" style={{ padding: '2rem', textAlign: 'center' }}>
-            <p style={{ color: '#666', marginBottom: '1rem' }}>
-              Detailed playbook content is being prepared for this service.
-            </p>
-            <p style={{ color: '#666' }}>
-              Contact us to learn more about how we implement {playbook.name}.
-            </p>
-          </div>
+          </>
         )}
 
-        <div style={{
-          marginTop: '3rem',
-          padding: '2rem',
-          background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)',
-          borderRadius: '12px',
-          textAlign: 'center',
-          color: 'white',
-        }}>
-          <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.25rem' }}>
-            Ready to implement {playbook.name}?
-          </h3>
-          <p style={{ margin: '0 0 1rem 0', opacity: 0.9 }}>
-            Start with our diagnostic to see how this fits into your GTM operations strategy.
-          </p>
-          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link 
-              href="/try-leanscale/start"
-              className="btn btn-primary"
-              style={{
-                background: 'white',
-                color: '#7c3aed',
-              }}
-            >
-              Get Started
-            </Link>
-            <Link 
-              href="/try-leanscale/diagnostic"
-              className="btn btn-secondary"
-              style={{
-                background: 'transparent',
-                color: 'white',
-                border: '2px solid white',
-              }}
-            >
-              Take Diagnostic
-            </Link>
-          </div>
+        <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+          <Link 
+            href="/try-leanscale/start" 
+            className="btn btn-primary"
+            style={{ marginRight: '1rem' }}
+          >
+            Start GTM Diagnostic
+          </Link>
+          <Link 
+            href="/why-leanscale/services" 
+            className="btn"
+            style={{ 
+              background: 'white', 
+              border: '1px solid #e5e7eb',
+              color: '#374151',
+            }}
+          >
+            Browse More Services
+          </Link>
         </div>
       </div>
     </Layout>

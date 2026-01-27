@@ -20,7 +20,7 @@ A Next.js-based sales portal for LeanScale, a company providing fractional GTM O
 - `/` - Home page
 - `/why-leanscale` - About the company and resources
 - `/why-leanscale/services` - Complete services catalog (159 services)
-- `/playbooks/[id]` - Dynamic playbook detail pages (13 detailed playbooks)
+- `/playbooks/[id]` - Dynamic playbook detail pages (68 detailed playbooks)
 - `/try-leanscale` - GTM Diagnostic tool
 - `/try-leanscale/start` - Diagnostic start page
 - `/try-leanscale/diagnostic` - Diagnostic questionnaire
@@ -31,12 +31,23 @@ A Next.js-based sales portal for LeanScale, a company providing fractional GTM O
 - **11 Managed Services**
 - **69 Tool Implementations**
 - Organized by function: Cross Functional, Marketing, Sales, Customer Success, Partnerships
-- 13 services link to detailed playbooks with full implementation procedures
+- 68 services link to detailed playbooks with full implementation procedures
 
 ## Key Data Files
-- `data/services-catalog.js` - All 159 services, playbook list, function categories
-- `data/playbook-content.js` - Detailed content for 13 playbooks (15k+ words each)
+- `data/services-catalog.js` - All 159 services, 68 playbook links, function categories
+- `data/playbook-content.js` - Detailed content for 68 playbooks (1MB+, imported from GitHub)
 - `data/diagnostic-data.js` - GTM diagnostic questions and scoring
+- `data/all-playbooks.json` - Raw playbook data fetched from GitHub
+- `scripts/fetch-playbooks.js` - Script to fetch playbooks from GitHub API
+- `scripts/generate-playbook-content.js` - Script to generate playbook-content.js from raw data
+
+## Playbook Content Structure
+Each playbook includes:
+- **Definition**: whatItIs, whatItIsNot
+- **ICP Value Proposition**: painSolves, outcome, whoOwns
+- **Implementation**: Full markdown procedure with phases and steps
+- **Dependencies**: Required inputs and prerequisites
+- **Pitfalls**: Common mistakes and how to avoid them
 
 ## Configuration
 - Port 5000 is used for both development and production
