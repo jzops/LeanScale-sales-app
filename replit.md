@@ -24,7 +24,7 @@ A Next.js-based sales portal for LeanScale, a company providing fractional GTM O
 - `/try-leanscale` - GTM Diagnostic tool
 - `/try-leanscale/start` - Diagnostic start page
 - `/try-leanscale/diagnostic` - Diagnostic questionnaire
-- `/buy-leanscale` - Investor perks and engagement calculator
+- `/buy-leanscale` - Consolidated engagement wizard (plan selection, calculator, start date, contact form)
 
 ## Services Catalog
 - **68 Strategic Projects** (One-Time Projects)

@@ -51,15 +51,11 @@ export default function Navigation() {
             Buy LeanScale <span>▾</span>
           </button>
           <div className="nav-dropdown">
-            <Link href="/buy-leanscale">Overview</Link>
+            <Link href="/buy-leanscale">Get Started</Link>
             <Link href="/buy-leanscale/investor-perks">Investor Perks</Link>
-            <Link href="/buy-leanscale/one-time-projects">One-Time Projects</Link>
-            <Link href="/buy-leanscale/clay">Clay x LeanScale</Link>
             <Link href="/buy-leanscale/security">Security</Link>
             <Link href="/buy-leanscale/team">Your Team</Link>
-            <Link href="/buy-leanscale/availability">Available Start Dates</Link>
-            <Link href="/buy-leanscale/calculator">Engagement Calculator</Link>
-            <Link href="/buy-leanscale/start">Getting Started</Link>
+            <Link href="/buy-leanscale/clay">Clay x LeanScale</Link>
           </div>
         </div>
       </div>
