@@ -52,6 +52,7 @@ export default function Navigation() {
           </button>
           <div className="nav-dropdown">
             <Link href="/buy-leanscale">Get Started</Link>
+            <Link href="/buy-leanscale/one-time-projects">One-Time Projects</Link>
             <Link href="/buy-leanscale/investor-perks">Investor Perks</Link>
             <Link href="/buy-leanscale/security">Security</Link>
             <Link href="/buy-leanscale/team">Your Team</Link>
