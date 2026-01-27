@@ -49,8 +49,8 @@ export default function Home() {
             <div>
               <h3 style={{ marginBottom: '1rem', color: 'var(--ls-purple)' }}>Try LeanScale</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <Link href="/try-leanscale/start" className="button-pill">Start Diagnostic</Link>
                 <Link href="/why-leanscale/services" className="button-pill">Services Catalog</Link>
+                <Link href="/try-leanscale/start" className="button-pill">Start Diagnostic</Link>
                 <Link href="/try-leanscale/diagnostic" className="button-pill">GTM Diagnostic Demo</Link>
               </div>
             </div>
