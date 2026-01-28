@@ -533,6 +533,236 @@ export const processes = [
     "metric": "Opportunity/Deal -> CW conversion rate",
     "serviceId": "win-loss-analysis",
     "serviceType": "strategic"
+  },
+  {
+    "name": "HubSpot to Salesforce CRM Migration",
+    "status": "unable",
+    "addToEngagement": false,
+    "function": "Cross Functional",
+    "outcome": "Scale Operations",
+    "metric": "Pipeline production",
+    "serviceId": "hubspot-to-salesforce-crm-migration",
+    "serviceType": "strategic"
+  },
+  {
+    "name": "Salesforce to HubSpot CRM Migration",
+    "status": "unable",
+    "addToEngagement": false,
+    "function": "Cross Functional",
+    "outcome": "Scale Operations",
+    "metric": "Pipeline production",
+    "serviceId": "salesforce-to-hubspot-crm-migration",
+    "serviceType": "strategic"
+  },
+  {
+    "name": "Fed/PubSec CRM Partitioning",
+    "status": "unable",
+    "addToEngagement": false,
+    "function": "Cross Functional",
+    "outcome": "Scale Operations",
+    "metric": "Pipeline production",
+    "serviceId": "fed-pubsec-crm-partitioning",
+    "serviceType": "strategic"
+  },
+  {
+    "name": "GTM Org Chart & Hiring Plan",
+    "status": "unable",
+    "addToEngagement": false,
+    "function": "Cross Functional",
+    "outcome": "Scale Operations",
+    "metric": "ARR",
+    "serviceId": "gtm-org-chart-roles-and-hiring-plan",
+    "serviceType": "strategic"
+  },
+  {
+    "name": "Revenue Recognition",
+    "status": "unable",
+    "addToEngagement": false,
+    "function": "Cross Functional",
+    "outcome": "Optimize Reporting",
+    "metric": "ARR",
+    "serviceId": "revenue-recognition",
+    "serviceType": "strategic"
+  },
+  {
+    "name": "Monthly/Quarterly GTM Reporting Pack",
+    "status": "careful",
+    "addToEngagement": false,
+    "function": "Cross Functional",
+    "outcome": "Optimize Reporting",
+    "metric": "ARR",
+    "serviceId": "monthly-quarterly-gtm-reporting-pack",
+    "serviceType": "strategic"
+  },
+  {
+    "name": "GTM Diagnostic",
+    "status": "healthy",
+    "addToEngagement": false,
+    "function": "Cross Functional",
+    "outcome": "Optimize Reporting",
+    "metric": "Pipeline production",
+    "serviceId": "gtm-diagnostic",
+    "serviceType": "strategic"
+  },
+  {
+    "name": "CRM-ERP Integration",
+    "status": "unable",
+    "addToEngagement": false,
+    "function": "Cross Functional",
+    "outcome": "Scale Operations",
+    "metric": "ARR",
+    "serviceId": "crm-erp-integration",
+    "serviceType": "strategic"
+  },
+  {
+    "name": "Inbound Lead Journey Mapping",
+    "status": "careful",
+    "addToEngagement": false,
+    "function": "Marketing",
+    "outcome": "Increase Pipeline",
+    "metric": "MQL production",
+    "serviceId": "inbound-lead-journey-mapping",
+    "serviceType": "strategic"
+  },
+  {
+    "name": "Website Lead Capture & Form Configuration",
+    "status": "careful",
+    "addToEngagement": false,
+    "function": "Marketing",
+    "outcome": "Increase Pipeline",
+    "metric": "MQL production",
+    "serviceId": "website-lead-capture-and-form-configuration",
+    "serviceType": "strategic"
+  },
+  {
+    "name": "Marketing Reporting Pack",
+    "status": "careful",
+    "addToEngagement": false,
+    "function": "Marketing",
+    "outcome": "Optimize Reporting",
+    "metric": "MQL production",
+    "serviceId": "marketing-reporting-pack",
+    "serviceType": "strategic"
+  },
+  {
+    "name": "Speed-to-Lead",
+    "status": "warning",
+    "addToEngagement": false,
+    "function": "Marketing",
+    "outcome": "Improve Sales Efficiency",
+    "metric": "MQL -> Opportunity conversion rate",
+    "serviceId": "speed-to-lead",
+    "serviceType": "strategic"
+  },
+  {
+    "name": "Sales Qualification Methodology",
+    "status": "careful",
+    "addToEngagement": false,
+    "function": "Sales",
+    "outcome": "Improve Sales Efficiency",
+    "metric": "Opportunity/Deal -> CW conversion rate",
+    "serviceId": "sales-qualification-methodology",
+    "serviceType": "strategic"
+  },
+  {
+    "name": "Rules of Engagement Design",
+    "status": "careful",
+    "addToEngagement": false,
+    "function": "Sales",
+    "outcome": "Improve Sales Efficiency",
+    "metric": "Pipeline production",
+    "serviceId": "rules-of-engagement-design",
+    "serviceType": "strategic"
+  },
+  {
+    "name": "Sales Engagement Platform",
+    "status": "careful",
+    "addToEngagement": false,
+    "function": "Sales",
+    "outcome": "Improve Sales Efficiency",
+    "metric": "Pipeline production",
+    "serviceId": "sales-engagement-platform",
+    "serviceType": "strategic"
+  },
+  {
+    "name": "Sales Enablement Platform Implementation",
+    "status": "unable",
+    "addToEngagement": false,
+    "function": "Sales",
+    "outcome": "Improve Sales Efficiency",
+    "metric": "Bookings",
+    "serviceId": "sales-enablement-platform-implementation",
+    "serviceType": "strategic"
+  },
+  {
+    "name": "Commission Plan Design & Implementation",
+    "status": "careful",
+    "addToEngagement": false,
+    "function": "Sales",
+    "outcome": "Scale Operations",
+    "metric": "Bookings",
+    "serviceId": "commission-plan-design-and-implementation",
+    "serviceType": "strategic"
+  },
+  {
+    "name": "Revenue Intelligence Process",
+    "status": "careful",
+    "addToEngagement": false,
+    "function": "Sales",
+    "outcome": "Optimize Reporting",
+    "metric": "Pipeline production",
+    "serviceId": "revenue-intelligence-process",
+    "serviceType": "strategic"
+  },
+  {
+    "name": "Opportunity Management UX Improvements",
+    "status": "careful",
+    "addToEngagement": false,
+    "function": "Sales",
+    "outcome": "Improve Sales Efficiency",
+    "metric": "Opportunity/Deal - CW cycle time",
+    "serviceId": "opportunity-management-ux-improvements",
+    "serviceType": "strategic"
+  },
+  {
+    "name": "Onboarding and Process Improvement",
+    "status": "warning",
+    "addToEngagement": false,
+    "function": "Customer Success",
+    "outcome": "Reduce Churn",
+    "metric": "Gross retention",
+    "serviceId": "onboarding-and-process-improvement",
+    "serviceType": "strategic"
+  },
+  {
+    "name": "Sales to CS Handoff Process",
+    "status": "careful",
+    "addToEngagement": false,
+    "function": "Customer Success",
+    "outcome": "Reduce Churn",
+    "metric": "Gross retention",
+    "serviceId": "sales-to-cs-handoff-process-implementation",
+    "serviceType": "strategic"
+  },
+  {
+    "name": "Support System Implementation",
+    "status": "unable",
+    "addToEngagement": false,
+    "function": "Customer Success",
+    "outcome": "Reduce Churn",
+    "metric": "Net retention",
+    "serviceId": "support-system-implementation",
+    "serviceType": "strategic"
+  },
+  {
+    "name": "Partnership Success Platform Implementation",
+    "status": "unable",
+    "addToEngagement": false,
+    "function": "Partnerships",
+    "outcome": "Increase Pipeline",
+    "metric": "Pipeline production",
+    "serviceId": "partnership-success-platform-implementation",
+    "serviceType": "strategic"
   }
 ];
 

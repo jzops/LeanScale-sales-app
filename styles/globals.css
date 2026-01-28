@@ -746,14 +746,74 @@ a:hover {
   .steps-grid {
     grid-template-columns: 1fr !important;
   }
-  
+
   .founder-grid {
     grid-template-columns: 1fr !important;
     text-align: center;
   }
-  
+
   .stats-grid {
     grid-template-columns: 1fr !important;
     gap: 1.5rem !important;
+  }
+}
+
+/* Diagnostic Dashboard Styles */
+.diagnostic-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.diagnostic-tabs {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 2px solid #e5e7eb;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.diagnostic-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.diagnostic-charts-row {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 2rem;
+}
+
+.diagnostic-table {
+  overflow-x: auto;
+}
+
+.diagnostic-table table {
+  min-width: 600px;
+}
+
+@media (max-width: 900px) {
+  .diagnostic-summary-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .diagnostic-charts-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  .power10-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .diagnostic-table table {
+    min-width: 100%;
+  }
+
+  .diagnostic-table th,
+  .diagnostic-table td {
+    padding: 0.5rem;
+    font-size: 0.8rem;
   }
 }

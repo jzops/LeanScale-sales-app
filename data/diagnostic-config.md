@@ -58,6 +58,29 @@ Set `Include` to `✓` to add the process to the recommended engagement.
 | Webinar Operations: Platform Implementation | careful | | Marketing | Increase Pipeline | MQL production | webinar-operations-platform-implementation |
 | Webinar Operations: Process Design | warning | | Marketing | Increase Pipeline | MQL production | webinar-operations-process-design |
 | Win/Loss Analysis | warning | | Sales | Optimize Reporting | Opportunity/Deal -> CW conversion rate | win-loss-analysis |
+| HubSpot to Salesforce CRM Migration | unable | | Cross Functional | Scale Operations | Pipeline production | hubspot-to-salesforce-crm-migration |
+| Salesforce to HubSpot CRM Migration | unable | | Cross Functional | Scale Operations | Pipeline production | salesforce-to-hubspot-crm-migration |
+| Fed/PubSec CRM Partitioning | unable | | Cross Functional | Scale Operations | Pipeline production | fed-pubsec-crm-partitioning |
+| GTM Org Chart & Hiring Plan | unable | | Cross Functional | Scale Operations | ARR | gtm-org-chart-roles-and-hiring-plan |
+| Revenue Recognition | unable | | Cross Functional | Optimize Reporting | ARR | revenue-recognition |
+| Monthly/Quarterly GTM Reporting Pack | careful | | Cross Functional | Optimize Reporting | ARR | monthly-quarterly-gtm-reporting-pack |
+| GTM Diagnostic | healthy | | Cross Functional | Optimize Reporting | Pipeline production | gtm-diagnostic |
+| CRM-ERP Integration | unable | | Cross Functional | Scale Operations | ARR | crm-erp-integration |
+| Inbound Lead Journey Mapping | careful | | Marketing | Increase Pipeline | MQL production | inbound-lead-journey-mapping |
+| Website Lead Capture & Form Configuration | careful | | Marketing | Increase Pipeline | MQL production | website-lead-capture-and-form-configuration |
+| Marketing Reporting Pack | careful | | Marketing | Optimize Reporting | MQL production | marketing-reporting-pack |
+| Speed-to-Lead | warning | | Marketing | Improve Sales Efficiency | MQL -> Opportunity conversion rate | speed-to-lead |
+| Sales Qualification Methodology | careful | | Sales | Improve Sales Efficiency | Opportunity/Deal -> CW conversion rate | sales-qualification-methodology |
+| Rules of Engagement Design | careful | | Sales | Improve Sales Efficiency | Pipeline production | rules-of-engagement-design |
+| Sales Engagement Platform | careful | | Sales | Improve Sales Efficiency | Pipeline production | sales-engagement-platform |
+| Sales Enablement Platform Implementation | unable | | Sales | Improve Sales Efficiency | Bookings | sales-enablement-platform-implementation |
+| Commission Plan Design & Implementation | careful | | Sales | Scale Operations | Bookings | commission-plan-design-and-implementation |
+| Revenue Intelligence Process | careful | | Sales | Optimize Reporting | Pipeline production | revenue-intelligence-process |
+| Opportunity Management UX Improvements | careful | | Sales | Improve Sales Efficiency | Opportunity/Deal - CW cycle time | opportunity-management-ux-improvements |
+| Onboarding and Process Improvement | warning | | Customer Success | Reduce Churn | Gross retention | onboarding-and-process-improvement |
+| Sales to CS Handoff Process | careful | | Customer Success | Reduce Churn | Gross retention | sales-to-cs-handoff-process-implementation |
+| Support System Implementation | unable | | Customer Success | Reduce Churn | Net retention | support-system-implementation |
+| Partnership Success Platform Implementation | unable | | Partnerships | Increase Pipeline | Pipeline production | partnership-success-platform-implementation |
 
 ## Tools
 
