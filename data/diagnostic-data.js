@@ -31,6 +31,8 @@ export const power10MetricNames = [
   'Pipeline production',
 ];
 
+export const power10Metrics = power10MetricNames.map(name => ({ name }));
+
 export const processes = [
   {
     "name": "Activity Capture",

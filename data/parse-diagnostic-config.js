@@ -163,6 +163,8 @@ export const power10MetricNames = [
   'Pipeline production',
 ];
 
+export const power10Metrics = power10MetricNames.map(name => ({ name }));
+
 export const processes = ${JSON.stringify(processes, null, 2)};
 
 export const tools = ${JSON.stringify(tools, null, 2)};
