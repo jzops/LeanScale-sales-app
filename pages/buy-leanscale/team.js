@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react';
 import Layout from '../../components/Layout';
 import team from '../../data/team';
-import customerConfig from '../../data/customer-config';
 
 export default function YourTeam() {
-  const configAssignedIds = customerConfig.assignedTeam || [];
   const [selectedIds, setSelectedIds] = useState([]);
   const [isClient, setIsClient] = useState(false);
 
@@ -40,10 +38,9 @@ export default function YourTeam() {
     setSelectedIds([]);
   };
 
-  // Combine config-assigned and user-selected
-  const allHighlightedIds = [...new Set([...configAssignedIds, ...selectedIds])];
-  const highlightedMembers = team.filter((member) => allHighlightedIds.includes(member.id));
-  const otherMembers = team.filter((member) => !allHighlightedIds.includes(member.id));
+  // Selected vs available members
+  const selectedMembers = team.filter((member) => selectedIds.includes(member.id));
+  const availableMembers = team.filter((member) => !selectedIds.includes(member.id));
 
   const groupByRole = (members) => {
     return members.reduce((acc, member) => {
@@ -53,27 +50,26 @@ export default function YourTeam() {
     }, {});
   };
 
-  const highlightedGrouped = groupByRole(highlightedMembers);
-  const otherGrouped = groupByRole(otherMembers);
+  const selectedGrouped = groupByRole(selectedMembers);
+  const availableGrouped = groupByRole(availableMembers);
 
-  const TeamCard = ({ member, highlighted = false, isConfigAssigned = false }) => {
+  const TeamCard = ({ member, highlighted = false }) => {
     const isSelected = selectedIds.includes(member.id);
 
     return (
       <div
         className="card"
-        onClick={() => !isConfigAssigned && toggleMember(member.id)}
+        onClick={() => toggleMember(member.id)}
         style={{
           border: highlighted ? '2px solid #7c3aed' : '1px solid #e5e7eb',
           position: 'relative',
-          cursor: isConfigAssigned ? 'default' : 'pointer',
+          cursor: 'pointer',
           transition: 'all 0.25s ease',
+          textAlign: 'center',
         }}
         onMouseOver={(e) => {
-          if (!isConfigAssigned) {
-            e.currentTarget.style.transform = 'translateY(-4px)';
-            e.currentTarget.style.boxShadow = '0 12px 24px rgba(0, 0, 0, 0.1)';
-          }
+          e.currentTarget.style.transform = 'translateY(-4px)';
+          e.currentTarget.style.boxShadow = '0 12px 24px rgba(0, 0, 0, 0.1)';
         }}
         onMouseOut={(e) => {
           e.currentTarget.style.transform = 'translateY(0)';
@@ -81,30 +77,28 @@ export default function YourTeam() {
         }}
       >
         {/* Selection indicator */}
-        {!isConfigAssigned && (
-          <div style={{
-            position: 'absolute',
-            top: '0.75rem',
-            left: '0.75rem',
-            width: 24,
-            height: 24,
-            borderRadius: '50%',
-            border: isSelected ? 'none' : '2px solid #d1d5db',
-            background: isSelected ? 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)' : 'white',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            transition: 'all 0.2s ease',
-            zIndex: 2,
-            boxShadow: isSelected ? '0 2px 8px rgba(124, 58, 237, 0.3)' : '0 1px 3px rgba(0,0,0,0.1)',
-          }}>
-            {isSelected && (
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-            )}
-          </div>
-        )}
+        <div style={{
+          position: 'absolute',
+          top: '0.75rem',
+          left: '0.75rem',
+          width: 24,
+          height: 24,
+          borderRadius: '50%',
+          border: isSelected ? 'none' : '2px solid #d1d5db',
+          background: isSelected ? 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)' : 'white',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          transition: 'all 0.2s ease',
+          zIndex: 2,
+          boxShadow: isSelected ? '0 2px 8px rgba(124, 58, 237, 0.3)' : '0 1px 3px rgba(0,0,0,0.1)',
+        }}>
+          {isSelected && (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          )}
+        </div>
 
         {/* Badge */}
         {highlighted && (
@@ -112,7 +106,7 @@ export default function YourTeam() {
             position: 'absolute',
             top: '-0.5rem',
             right: '1rem',
-            background: isConfigAssigned ? '#7c3aed' : 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)',
+            background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)',
             color: 'white',
             padding: '0.25rem 0.75rem',
             borderRadius: '9999px',
@@ -120,25 +114,29 @@ export default function YourTeam() {
             fontWeight: 600,
             boxShadow: '0 2px 8px rgba(124, 58, 237, 0.25)',
           }}>
-            {isConfigAssigned ? 'Assigned' : 'Selected'}
+            Selected
           </div>
         )}
 
+        {/* Circular Photo */}
         <div style={{
-          width: '100%',
-          height: 180,
+          width: 120,
+          height: 120,
+          borderRadius: '50%',
           background: 'linear-gradient(135deg, #e5e7eb 0%, #f3f4f6 100%)',
-          borderRadius: '8px',
-          marginBottom: '1rem',
-          backgroundImage: `url(${member.photo})`,
+          margin: '0.5rem auto 1rem',
+          backgroundImage: member.photo ? `url(${member.photo})` : 'none',
           backgroundSize: 'cover',
-          backgroundPosition: 'center top',
+          backgroundPosition: 'center',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          border: '3px solid #e5e7eb',
+          transition: 'border-color 0.2s ease',
+          ...(isSelected && { borderColor: '#7c3aed' }),
         }}>
           {!member.photo && (
-            <span style={{ fontSize: '3rem', color: '#9ca3af' }}>👤</span>
+            <span style={{ fontSize: '2.5rem', color: '#9ca3af' }}>👤</span>
           )}
         </div>
         <h3 style={{ color: '#7c3aed', marginBottom: '0.5rem', fontSize: '1.1rem' }}>
@@ -156,19 +154,19 @@ export default function YourTeam() {
         }}>
           {member.role}
         </div>
-        <ul style={{ paddingLeft: '1.25rem', marginBottom: '1rem', fontSize: '0.85rem', lineHeight: 1.6, color: '#374151' }}>
+        <ul style={{ paddingLeft: '1.25rem', marginBottom: '1rem', fontSize: '0.85rem', lineHeight: 1.6, color: '#374151', textAlign: 'left' }}>
           {member.experience.map((exp, i) => (
             <li key={i}>{exp}</li>
           ))}
         </ul>
-        <p style={{ fontSize: '0.85rem', color: '#6b7280', fontStyle: 'italic' }}>
+        <p style={{ fontSize: '0.85rem', color: '#6b7280', fontStyle: 'italic', textAlign: 'left' }}>
           {member.personal}
         </p>
       </div>
     );
   };
 
-  const RoleSection = ({ role, members, highlighted = false, showConfigBadge = false }) => (
+  const RoleSection = ({ role, members, highlighted = false }) => (
     <div style={{ marginBottom: '2rem' }}>
       <div style={{
         display: 'flex',
@@ -205,7 +203,6 @@ export default function YourTeam() {
             key={member.id}
             member={member}
             highlighted={highlighted}
-            isConfigAssigned={showConfigBadge && configAssignedIds.includes(member.id)}
           />
         ))}
       </div>
@@ -225,7 +222,7 @@ export default function YourTeam() {
         </div>
 
         {/* Selected Team Section */}
-        {highlightedMembers.length > 0 && (
+        {selectedMembers.length > 0 && (
           <section style={{ marginBottom: '3rem' }}>
             <div style={{
               background: 'linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%)',
@@ -255,35 +252,33 @@ export default function YourTeam() {
                       fontSize: '0.85rem',
                       fontWeight: 500,
                     }}>
-                      {highlightedMembers.length} selected
+                      {selectedMembers.length} selected
                     </span>
                   </h2>
                 </div>
 
-                {selectedIds.length > 0 && (
-                  <button
-                    onClick={clearSelection}
-                    style={{
-                      background: 'white',
-                      border: '1px solid #e5e7eb',
-                      padding: '0.5rem 1rem',
-                      borderRadius: '8px',
-                      fontSize: '0.85rem',
-                      color: '#6b7280',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.5rem',
-                    }}
-                  >
-                    Clear Selection
-                  </button>
-                )}
+                <button
+                  onClick={clearSelection}
+                  style={{
+                    background: 'white',
+                    border: '1px solid #e5e7eb',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '8px',
+                    fontSize: '0.85rem',
+                    color: '#6b7280',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                  }}
+                >
+                  Clear Selection
+                </button>
               </div>
 
-              {Object.entries(highlightedGrouped).map(([role, members]) => (
-                <RoleSection key={role} role={role} members={members} highlighted={true} showConfigBadge={true} />
+              {Object.entries(selectedGrouped).map(([role, members]) => (
+                <RoleSection key={role} role={role} members={members} highlighted={true} />
               ))}
             </div>
           </section>
@@ -302,7 +297,7 @@ export default function YourTeam() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <span style={{ fontSize: '1.5rem' }}>🏢</span>
               <h2 style={{ fontSize: '1.25rem', margin: 0 }}>
-                {highlightedMembers.length > 0 ? 'Available Team Members' : 'LeanScale Team'}
+                {selectedMembers.length > 0 ? 'Available Team Members' : 'LeanScale Team'}
               </h2>
               <span style={{
                 background: '#f3f4f6',
@@ -311,11 +306,11 @@ export default function YourTeam() {
                 fontSize: '0.85rem',
                 color: '#6b7280',
               }}>
-                {highlightedMembers.length > 0 ? otherMembers.length : team.length} members
+                {selectedMembers.length > 0 ? availableMembers.length : team.length} members
               </span>
             </div>
 
-            {highlightedMembers.length === 0 && (
+            {selectedMembers.length === 0 && (
               <div style={{
                 fontSize: '0.85rem',
                 color: '#6b7280',
@@ -340,8 +335,8 @@ export default function YourTeam() {
             )}
           </div>
 
-          {highlightedMembers.length > 0 ? (
-            Object.entries(otherGrouped).map(([role, members]) => (
+          {selectedMembers.length > 0 ? (
+            Object.entries(availableGrouped).map(([role, members]) => (
               <RoleSection key={role} role={role} members={members} />
             ))
           ) : (
