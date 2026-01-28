@@ -8,14 +8,20 @@ export default function Home() {
       {/* Hero Section */}
       <div className="hero">
         <div className="hero-content">
-          <img
-            src="/leanscale-logo.svg"
-            alt="LeanScale"
-            className="hero-logo"
-          />
-          <h1 className="hero-tagline">
-            Accelerate Your Go-To-Market with Top-Tier GTM Operations
+          <h1 style={{ 
+            fontSize: '3rem', 
+            fontWeight: 800,
+            background: 'linear-gradient(135deg, #1f2937 0%, #374151 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            marginBottom: '0.5rem',
+          }}>
+            LeanScale
           </h1>
+          <p className="hero-tagline">
+            Accelerate Your Go-To-Market with Top-Tier GTM Operations
+          </p>
         </div>
       </div>
 
