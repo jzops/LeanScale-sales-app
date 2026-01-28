@@ -35,18 +35,6 @@ const team = [
     personal: "Loves playing in Friday Night Adult Men's Soccer League & rooting for the Toronto Maple Leafs."
   },
   {
-    id: "dmb",
-    name: "David Beitler (DMB)",
-    role: "Architect",
-    photo: "https://leanscale.team/wp-content/uploads/2025/08/image-41.png",
-    experience: [
-      "6 years of Ops Experience",
-      "6+ Salesforce Certifications",
-      "Sat on Partner Advisory Board for Salesforce Sales Cloud"
-    ],
-    personal: "Loves pushing the boundaries of workflow automation tools like n8n."
-  },
-  {
     id: "derek",
     name: "Derek Mogar",
     role: "Architect",

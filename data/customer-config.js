@@ -36,7 +36,7 @@ const customerConfig = {
   ],
 
   // Team members assigned to this customer (by ID)
-  // Options: izzy, brian, john, dmb, derek (Architects)
+  // Options: izzy, brian, john, derek (Architects)
   //          dave, kavean, eduardo, raph, rodolfo, solange, christopher, diego (Engineers)
   assignedTeam: ["izzy", "brian", "dave", "kavean"],
 };
