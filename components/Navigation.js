@@ -73,7 +73,7 @@ export default function Navigation() {
           </button>
           <div className={`nav-dropdown ${openDropdown === 'buy' ? 'nav-dropdown-open' : ''}`}>
             <Link href="/buy-leanscale/availability" onClick={closeMenu}>Cohort Availability</Link>
-            <Link href="/buy-leanscale/one-time-projects" onClick={closeMenu}>One-Time Projects <span className="nav-badge-new">New</span></Link>
+            <Link href="/buy-leanscale/one-time-projects" onClick={closeMenu}>One-Time Projects</Link>
             <Link href="/buy-leanscale/investor-perks" onClick={closeMenu}>Investor Perks</Link>
             <Link href="/buy-leanscale/security" onClick={closeMenu}>Security</Link>
             <Link href="/buy-leanscale/team" onClick={closeMenu}>Your Team</Link>
