@@ -183,6 +183,27 @@ function renderMarkdownContent(text) {
           {line.replace(/^###\s*/, '')}
         </h4>
       );
+    } else if (line.startsWith('#### ')) {
+      flushList();
+      elements.push(
+        <h5 key={elements.length} style={{ fontSize: '0.9rem', fontWeight: 600, marginTop: '0.75rem', marginBottom: '0.25rem', color: '#374151' }}>
+          {line.replace(/^####\s*/, '')}
+        </h5>
+      );
+    } else if (line.startsWith('##### ')) {
+      flushList();
+      elements.push(
+        <h6 key={elements.length} style={{ fontSize: '0.85rem', fontWeight: 600, marginTop: '0.5rem', marginBottom: '0.25rem', color: '#4b5563' }}>
+          {line.replace(/^#####\s*/, '')}
+        </h6>
+      );
+    } else if (line.match(/^\*\*[^*]+:\*\*/) || line.startsWith('**Step Overview:**') || line.startsWith('**End State:**')) {
+      flushList();
+      elements.push(
+        <p key={elements.length} style={{ margin: '0.5rem 0', lineHeight: 1.6, fontStyle: 'italic', color: '#4b5563' }}>
+          {formatInlineText(line)}
+        </p>
+      );
     } else if (line.match(/^[-*]\s/)) {
       if (listType !== 'ul') { flushList(); listType = 'ul'; }
       currentList.push(line.replace(/^[-*]\s/, ''));
