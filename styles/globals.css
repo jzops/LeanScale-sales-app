@@ -545,11 +545,14 @@ a:hover {
   align-items: center;
   justify-content: center;
   padding: 0.75rem 1.5rem;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s;
+  white-space: nowrap;
+  min-height: 44px;
+  box-sizing: border-box;
 }
 
 .btn-primary {
@@ -560,6 +563,33 @@ a:hover {
 
 .btn-primary:hover {
   background: #501a6b;
+}
+
+.btn-secondary {
+  background: white;
+  color: var(--ls-black);
+  border: 1px solid var(--ls-light-gray);
+}
+
+.btn-secondary:hover {
+  border-color: var(--ls-purple);
+  color: var(--ls-purple);
+}
+
+.btn-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+  min-height: 36px;
+}
+
+.btn-lg {
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  min-height: 52px;
+}
+
+.btn-block {
+  width: 100%;
 }
 
 /* Customer Header */
@@ -575,16 +605,8 @@ a:hover {
   height: 20px;
 }
 
-/* Responsive */
+/* Additional Responsive Styles */
 @media (max-width: 768px) {
-  .nav {
-    padding: 0.75rem 1rem;
-  }
-
-  .nav-links {
-    display: none;
-  }
-
   .hero {
     padding: 2rem 1rem;
     text-align: center;
@@ -592,10 +614,11 @@ a:hover {
 
   .hero-tagline {
     margin: 0 auto;
+    font-size: 1.25rem;
   }
 
-  .container {
-    padding: 1rem;
+  .hero-logo {
+    height: 60px;
   }
 
   .form-grid {
@@ -604,5 +627,47 @@ a:hover {
 
   .calculator-options {
     flex-direction: column;
+  }
+
+  .btn {
+    padding: 0.625rem 1rem;
+    font-size: 0.85rem;
+    min-height: 40px;
+  }
+
+  .btn-lg {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+    min-height: 44px;
+  }
+
+  .button-pill {
+    padding: 0.5rem 0.875rem;
+    font-size: 0.8rem;
+  }
+
+  .button-grid {
+    gap: 0.5rem;
+  }
+
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .status-badge {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .button-pill {
+    width: 100%;
+    justify-content: center;
   }
 }
