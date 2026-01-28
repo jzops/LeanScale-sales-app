@@ -684,3 +684,21 @@ a:hover {
     grid-template-columns: 1fr !important;
   }
 }
+
+/* Investor perks responsive */
+@media (max-width: 768px) {
+  .perks-grid,
+  .steps-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .founder-grid {
+    grid-template-columns: 1fr !important;
+    text-align: center;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem !important;
+  }
+}
