@@ -20,7 +20,7 @@ export default function Navigation() {
   return (
     <nav className="nav">
       <Link href="/" className="nav-logo" onClick={closeMenu} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-        <img src="/leanscale-logo.svg" alt="LeanScale" style={{ height: 32 }} />
+        <img src="/leanscale-logo.png" alt="LeanScale" style={{ height: 28 }} />
         {showCustomerBranding && (
           <>
             <span style={{ color: '#d1d5db', fontSize: '1.25rem', fontWeight: 300 }}>×</span>

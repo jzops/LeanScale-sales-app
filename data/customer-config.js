@@ -7,13 +7,13 @@ const customerConfig = {
   // ============================================
   // Set customerName to show "LeanScale × CustomerName" in the navigation
   // Set to "Demo" or empty string to show only the LeanScale logo
-  customerName: "Demo",
+  customerName: "Clay",
   
   // Optional: URL to customer logo image (PNG, SVG, or JPG)
   // If provided, displays logo instead of text name
   // Example: "/customer-logo.png" (place file in /public folder)
   // Example: "https://example.com/logo.png" (external URL)
-  customerLogo: null,
+  customerLogo: "/customer-logo-example.svg",
 
   // Portal password (simple shared password)
   password: "demo2026",
