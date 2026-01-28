@@ -58,6 +58,8 @@ export default function Navigation() {
             <Link href="/try-leanscale/start" onClick={closeMenu}>Start Diagnostic</Link>
             <Link href="/try-leanscale/diagnostic" onClick={closeMenu}>GTM Diagnostic</Link>
             <Link href="/try-leanscale/power10" onClick={closeMenu}>Power10 GTM Metrics</Link>
+            <Link href="/try-leanscale/gtm-tool-health" onClick={closeMenu}>GTM Tool Health</Link>
+            <Link href="/try-leanscale/process-health" onClick={closeMenu}>Process Health</Link>
             <Link href="/try-leanscale/engagement" onClick={closeMenu}>Engagement Overview</Link>
           </div>
         </div>

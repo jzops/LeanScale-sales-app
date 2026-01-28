@@ -716,6 +716,30 @@ a:hover {
   }
 }
 
+/* Tools and process grids responsive */
+@media (max-width: 1024px) {
+  .tools-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .tools-grid,
+  .process-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .summary-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .summary-stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
 /* Investor perks responsive */
 @media (max-width: 768px) {
   .perks-grid,
