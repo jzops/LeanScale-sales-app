@@ -169,6 +169,13 @@ function renderMarkdownContent(text) {
     if (line.match(/^---+$/)) {
       flushList();
       elements.push(<hr key={elements.length} style={{ border: 'none', borderTop: '1px solid #e5e7eb', margin: '1rem 0' }} />);
+    } else if (line.startsWith('## ')) {
+      flushList();
+      elements.push(
+        <h3 key={elements.length} style={{ fontSize: '1.1rem', fontWeight: 700, marginTop: '1.5rem', marginBottom: '0.5rem', color: '#1f2937', borderBottom: '1px solid #e5e7eb', paddingBottom: '0.25rem' }}>
+          {line.replace(/^##\s*/, '')}
+        </h3>
+      );
     } else if (line.startsWith('### ')) {
       flushList();
       elements.push(

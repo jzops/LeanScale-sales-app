@@ -69,6 +69,21 @@ function renderMarkdownContent(text) {
           margin: '1.5rem 0',
         }} />
       );
+    } else if (line.startsWith('## ')) {
+      flushList();
+      elements.push(
+        <h2 key={elements.length} style={{ 
+          fontSize: '1.25rem', 
+          fontWeight: 700, 
+          marginTop: '2rem',
+          marginBottom: '0.75rem',
+          color: '#1f2937',
+          borderBottom: '1px solid #e5e7eb',
+          paddingBottom: '0.5rem',
+        }}>
+          {line.replace(/^##\s*/, '')}
+        </h2>
+      );
     } else if (line.startsWith('### ')) {
       flushList();
       elements.push(
