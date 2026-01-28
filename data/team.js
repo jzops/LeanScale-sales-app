@@ -146,7 +146,7 @@ const team = [
     id: "diego",
     name: "Diego Carvalho",
     role: "Engineer",
-    photo: "https://leanscale.team/wp-content/uploads/2025/12/1757423930303-1.jpeg",
+    photo: "/images/team/diego.png",
     experience: [
       "Experienced Salesforce consultant with over 8 years of experience",
       "Extensive expertise in project management",
