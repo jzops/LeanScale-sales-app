@@ -62,14 +62,15 @@ export default function EngagementOverview() {
       .filter(m => m.addToEngagement)
       .map((m, idx) => {
         const service = managedServices.find(s => s.id === m.serviceId);
+        const hoursPerMonth = m.hoursPerMonth || 8;
         return {
           ...m,
           type: 'managed',
           icon: service?.icon || '🔧',
           description: service?.description || '',
           hasPlaybook: false,
-          lowHours: 8,
-          highHours: 16,
+          lowHours: hoursPerMonth,
+          highHours: hoursPerMonth * 1.5,
           startWeek: 1,
           durationWeeks: 52,
           priority: 'Ongoing',
