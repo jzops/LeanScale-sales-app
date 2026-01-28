@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Layout from '../../components/Layout';
 import { processes, managedServicesHealth, statusToLabel } from '../../data/diagnostic-data';
-import { strategicProjects, managedServices, toolImplementations } from '../../data/services-catalog';
+import { strategicProjects, managedServices } from '../../data/services-catalog';
 
 const allStrategicProjects = [
   ...strategicProjects.crossFunctional,
