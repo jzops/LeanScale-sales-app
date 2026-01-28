@@ -1,12 +1,5 @@
 import { useState } from 'react';
-import { getStatusColor, STATUS_CONFIG } from '../diagnostic/StatusLegend';
-
-const STATUS_LABELS = {
-  healthy: 'Healthy',
-  careful: 'Careful',
-  warning: 'Warning',
-  unable: 'Unable to Report',
-};
+import { getStatusColor, getStatusLabel } from '../diagnostic/StatusLegend';
 
 const STATUS_ORDER = ['warning', 'careful', 'healthy', 'unable'];
 
@@ -53,7 +46,7 @@ export default function BarChart({ data, title }) {
         {STATUS_ORDER.map(status => {
           const items = grouped[status];
           const color = getStatusColor(status);
-          const label = STATUS_LABELS[status];
+          const label = getStatusLabel(status);
           if (items.length === 0) return null;
 
           const isExpanded = expandedGroups[status];
@@ -144,7 +137,7 @@ export default function BarChart({ data, title }) {
                       </span>
                       {item.addToEngagement && (
                         <span style={{
-                          fontSize: '0.65rem',
+                          fontSize: 'var(--text-2xs)',
                           background: 'var(--ls-lime-green)',
                           color: 'var(--ls-purple)',
                           padding: '0.1rem var(--space-1)',

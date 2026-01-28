@@ -1,12 +1,5 @@
 import { PieChart, Pie, Cell, Tooltip } from 'recharts';
-import { getStatusColor, STATUS_CONFIG } from '../diagnostic/StatusLegend';
-
-const STATUS_LABELS = {
-  healthy: 'Healthy',
-  careful: 'Careful',
-  warning: 'Warning',
-  unable: 'Unable',
-};
+import { getStatusColor, getStatusLabel } from '../diagnostic/StatusLegend';
 
 export default function DonutChart({
   data,
@@ -19,7 +12,7 @@ export default function DonutChart({
   const chartData = Object.entries(data)
     .filter(([_, value]) => value > 0)
     .map(([status, value]) => ({
-      name: STATUS_LABELS[status],
+      name: getStatusLabel(status),
       value,
       status,
       color: getStatusColor(status),

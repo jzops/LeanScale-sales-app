@@ -82,3 +82,8 @@ export default function StatusLegend({ compact = false }) {
 }
 
 export { STATUS_CONFIG };
+
+// Helper to get status label
+export function getStatusLabel(status) {
+  return STATUS_CONFIG[status]?.label || 'Unknown';
+}

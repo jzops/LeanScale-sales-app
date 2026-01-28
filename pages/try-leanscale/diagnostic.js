@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Layout from '../../components/Layout';
 import DonutChart from '../../components/charts/DonutChart';
 import BarChart from '../../components/charts/BarChart';
-import { StatusDot, StatusBadge } from '../../components/diagnostic/StatusLegend';
+import { StatusDot, StatusBadge, getStatusColor } from '../../components/diagnostic/StatusLegend';
 import {
   processes,
   tools,
@@ -23,12 +23,6 @@ const TABS = [
   { id: 'by-outcome', label: 'By Outcome', icon: '🎯' },
 ];
 
-const statusColors = {
-  healthy: '#22c55e',
-  careful: '#eab308',
-  warning: '#ef4444',
-  unable: '#6b7280',
-};
 
 function ItemTable({ items, showFunction = false, showPriority = true }) {
   return (
@@ -45,7 +39,7 @@ function ItemTable({ items, showFunction = false, showPriority = true }) {
         <tbody>
           {items.map((item) => (
             <tr key={item.name}>
-              <td style={{ fontWeight: 500 }}>{item.name}</td>
+              <td style={{ fontWeight: 'var(--font-medium)' }}>{item.name}</td>
               {showFunction && (
                 <td style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>
                   {item.function || item.category || '-'}
@@ -150,7 +144,7 @@ function GroupedView({ items, groupByField, groupNames }) {
                     <span style={{ fontSize: 'var(--text-sm)' }}>{item.name}</span>
                     {item.addToEngagement && (
                       <span style={{
-                        fontSize: '0.65rem',
+                        fontSize: 'var(--text-2xs)',
                         background: 'var(--ls-lime-green)',
                         color: 'var(--ls-purple)',
                         padding: '0.1rem var(--space-1)',
@@ -248,25 +242,25 @@ export default function GTMDiagnostic() {
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                   {item.stats.healthy > 0 && (
                     <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.75rem', color: '#4ade80' }}>
-                      <span style={{ width: 8, height: 8, borderRadius: '50%', background: statusColors.healthy }}></span>
+                      <span style={{ width: 8, height: 8, borderRadius: '50%', background: getStatusColor('healthy') }}></span>
                       {item.stats.healthy}
                     </span>
                   )}
                   {item.stats.careful > 0 && (
                     <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.75rem', color: '#facc15' }}>
-                      <span style={{ width: 8, height: 8, borderRadius: '50%', background: statusColors.careful }}></span>
+                      <span style={{ width: 8, height: 8, borderRadius: '50%', background: getStatusColor('careful') }}></span>
                       {item.stats.careful}
                     </span>
                   )}
                   {item.stats.warning > 0 && (
                     <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.75rem', color: '#f87171' }}>
-                      <span style={{ width: 8, height: 8, borderRadius: '50%', background: statusColors.warning }}></span>
+                      <span style={{ width: 8, height: 8, borderRadius: '50%', background: getStatusColor('warning') }}></span>
                       {item.stats.warning}
                     </span>
                   )}
                   {item.stats.unable > 0 && (
                     <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.75rem', color: '#9ca3af' }}>
-                      <span style={{ width: 8, height: 8, borderRadius: '50%', background: statusColors.unable }}></span>
+                      <span style={{ width: 8, height: 8, borderRadius: '50%', background: getStatusColor('unable') }}></span>
                       {item.stats.unable}
                     </span>
                   )}
@@ -277,19 +271,19 @@ export default function GTMDiagnostic() {
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '1rem', padding: '1rem', background: 'rgba(0,0,0,0.2)', borderRadius: '8px' }}>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '0.65rem', color: '#a5b4fc', marginBottom: '0.25rem' }}>Healthy</div>
+              <div style={{ fontSize: 'var(--text-2xs)', color: '#a5b4fc', marginBottom: '0.25rem' }}>Healthy</div>
               <div style={{ fontSize: '1.25rem', fontWeight: 700, color: '#4ade80' }}>{processStats.healthy + toolStats.healthy + power10Stats.healthy}</div>
             </div>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '0.65rem', color: '#a5b4fc', marginBottom: '0.25rem' }}>Careful</div>
+              <div style={{ fontSize: 'var(--text-2xs)', color: '#a5b4fc', marginBottom: '0.25rem' }}>Careful</div>
               <div style={{ fontSize: '1.25rem', fontWeight: 700, color: '#facc15' }}>{processStats.careful + toolStats.careful + power10Stats.careful}</div>
             </div>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '0.65rem', color: '#a5b4fc', marginBottom: '0.25rem' }}>Warning</div>
+              <div style={{ fontSize: 'var(--text-2xs)', color: '#a5b4fc', marginBottom: '0.25rem' }}>Warning</div>
               <div style={{ fontSize: '1.25rem', fontWeight: 700, color: '#f87171' }}>{processStats.warning + toolStats.warning + power10Stats.warning}</div>
             </div>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '0.65rem', color: '#a5b4fc', marginBottom: '0.25rem' }}>Unable to Report</div>
+              <div style={{ fontSize: 'var(--text-2xs)', color: '#a5b4fc', marginBottom: '0.25rem' }}>Unable to Report</div>
               <div style={{ fontSize: '1.25rem', fontWeight: 700, color: '#9ca3af' }}>{processStats.unable + toolStats.unable + power10Stats.unable}</div>
             </div>
           </div>
@@ -342,7 +336,7 @@ export default function GTMDiagnostic() {
                         borderRadius: 'var(--radius-lg)',
                       }}
                     >
-                      <span style={{ fontSize: 'var(--text-sm)', fontWeight: 500 }}>{metric.name}</span>
+                      <span style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)' }}>{metric.name}</span>
                       <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
                         <div style={{ textAlign: 'center' }}>
                           <div style={{ fontSize: '0.6rem', color: 'var(--text-muted)', marginBottom: '2px' }}>Report</div>
