@@ -32,9 +32,23 @@ export default function Navigation() {
           </>
         ) : showCustomerBranding ? (
           <>
-            <span style={{ fontWeight: 700, fontSize: '1.1rem', color: '#1f2937' }}>LeanScale</span>
-            <span style={{ color: '#9ca3af', fontSize: '1.1rem', fontWeight: 300 }}>×</span>
-            <span style={{ fontWeight: 700, fontSize: '1.1rem', color: '#1f2937' }}>{customerConfig.customerName}</span>
+            <span style={{ 
+              fontWeight: 800, 
+              fontSize: '1.25rem', 
+              background: 'linear-gradient(135deg, #642585 0%, #8b5cf6 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}>LeanScale</span>
+            <span style={{ color: '#c4b5fd', fontSize: '1rem', fontWeight: 400, margin: '0 0.25rem' }}>×</span>
+            <span style={{ 
+              fontWeight: 800, 
+              fontSize: '1.25rem', 
+              background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}>{customerConfig.customerName}</span>
           </>
         ) : (
           <img src="/leanscale-logo.png" alt="LeanScale" style={{ height: 28 }} />
