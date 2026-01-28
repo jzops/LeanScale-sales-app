@@ -59,9 +59,9 @@ export default function Home() {
             <div>
               <h3 style={{ marginBottom: '1rem', color: 'var(--ls-purple)' }}>Buy LeanScale</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <Link href="/buy-leanscale" className="button-pill">Getting Started</Link>
                 <Link href="/buy-leanscale/investor-perks" className="button-pill">Investor Perks</Link>
-                <Link href="/buy-leanscale/calculator" className="button-pill">Engagement Calculator</Link>
-                <Link href="/buy-leanscale/start" className="button-pill">Getting Started</Link>
+                <Link href="/buy-leanscale/clay" className="button-pill">Clay x LeanScale</Link>
               </div>
             </div>
           </div>
