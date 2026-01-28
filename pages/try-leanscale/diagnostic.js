@@ -2,7 +2,124 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Layout from '../../components/Layout';
 import HealthBar from '../../components/HealthBar';
-import { processes, tools, power10Metrics, countStatuses, statusToLabel } from '../../data/diagnostic-data';
+import { 
+  processes, 
+  tools, 
+  power10Metrics, 
+  countStatuses, 
+  statusToLabel, 
+  groupBy,
+  gtmFunctions,
+  gtmOutcomes,
+  power10MetricNames,
+} from '../../data/diagnostic-data';
+
+const statusColors = {
+  healthy: '#22c55e',
+  careful: '#eab308',
+  warning: '#ef4444',
+  unable: '#1f2937',
+};
+
+function StatusDot({ status }) {
+  return (
+    <span
+      style={{
+        display: 'inline-block',
+        width: 14,
+        height: 14,
+        borderRadius: '50%',
+        backgroundColor: statusColors[status] || '#ccc',
+        flexShrink: 0,
+      }}
+      title={statusToLabel(status)}
+    />
+  );
+}
+
+function GroupedSection({ title, items, showFunction = false }) {
+  const counts = countStatuses(items);
+  
+  return (
+    <div style={{
+      background: 'white',
+      border: '1px solid #e5e7eb',
+      borderRadius: '8px',
+      marginBottom: '1rem',
+      overflow: 'hidden',
+    }}>
+      <div style={{
+        background: '#f9fafb',
+        padding: '0.75rem 1rem',
+        borderBottom: '1px solid #e5e7eb',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: '0.5rem',
+      }}>
+        <h3 style={{ fontSize: '1rem', fontWeight: 600, margin: 0 }}>{title}</h3>
+        <div style={{ display: 'flex', gap: '1rem', fontSize: '0.8rem' }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+            <StatusDot status="healthy" /> {counts.healthy}
+          </span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+            <StatusDot status="careful" /> {counts.careful}
+          </span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+            <StatusDot status="warning" /> {counts.warning}
+          </span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+            <StatusDot status="unable" /> {counts.unable}
+          </span>
+        </div>
+      </div>
+      <div style={{ padding: '0.5rem' }}>
+        {items.map((item, index) => (
+          <div
+            key={index}
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '0.5rem 0.75rem',
+              borderRadius: '4px',
+              background: index % 2 === 0 ? '#fafafa' : 'white',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1 }}>
+              <span style={{ fontSize: '0.85rem' }}>{item.name}</span>
+              {showFunction && item.function && (
+                <span style={{
+                  fontSize: '0.65rem',
+                  background: '#e5e7eb',
+                  padding: '0.1rem 0.4rem',
+                  borderRadius: '4px',
+                  color: '#6b7280',
+                }}>
+                  {item.function}
+                </span>
+              )}
+              {item.addToEngagement && (
+                <span style={{
+                  fontSize: '0.65rem',
+                  background: 'var(--ls-lime-green)',
+                  color: 'var(--ls-purple)',
+                  padding: '0.1rem 0.4rem',
+                  borderRadius: '4px',
+                  fontWeight: 600,
+                }}>
+                  Priority
+                </span>
+              )}
+            </div>
+            <StatusDot status={item.status} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 const views = [
   { id: 'power10', label: 'Power10 GTM Metric Health', icon: '📈' },
@@ -18,6 +135,10 @@ export default function GTMDiagnostic() {
 
   const processStats = countStatuses(processes);
   const toolStats = countStatuses(tools);
+  
+  const processesByFunction = groupBy(processes, 'function');
+  const processesByOutcome = groupBy(processes, 'outcome');
+  const processesByMetric = groupBy(processes, 'metric');
 
   return (
     <Layout title="GTM Diagnostic">
@@ -28,7 +149,6 @@ export default function GTMDiagnostic() {
           </h1>
         </div>
 
-        {/* View Selector */}
         <div className="card-grid" style={{ marginBottom: '2rem' }}>
           {views.map((view) => (
             <div
@@ -47,7 +167,6 @@ export default function GTMDiagnostic() {
           ))}
         </div>
 
-        {/* Power10 Metrics View */}
         {activeView === 'power10' && (
           <section>
             <h2 style={{ marginBottom: '1.5rem' }}>Power10 GTM Metric Health</h2>
@@ -62,10 +181,14 @@ export default function GTMDiagnostic() {
             <p style={{ marginTop: '1rem', color: '#666', fontStyle: 'italic' }}>
               Note: Metric health statuses are populated during the diagnostic session.
             </p>
+            <div style={{ marginTop: '1rem' }}>
+              <Link href="/try-leanscale/power10" className="btn btn-primary">
+                View Full Power10 Report →
+              </Link>
+            </div>
           </section>
         )}
 
-        {/* Tools View */}
         {activeView === 'tools' && (
           <section>
             <h2 style={{ marginBottom: '1rem' }}>GTM Tool Health</h2>
@@ -94,16 +217,20 @@ export default function GTMDiagnostic() {
                 </tbody>
               </table>
             </div>
+            <div style={{ marginTop: '1rem' }}>
+              <Link href="/try-leanscale/gtm-tool-health" className="btn btn-primary">
+                View Full Tool Health Report →
+              </Link>
+            </div>
           </section>
         )}
 
-        {/* Processes View */}
         {activeView === 'processes' && (
           <section>
             <h2 style={{ marginBottom: '1rem' }}>Processes Overall Health</h2>
             <p style={{ marginBottom: '1rem' }}>{processes.length} Process Inspection Points</p>
 
-            <div style={{ display: 'flex', gap: '2rem', marginBottom: '1rem' }}>
+            <div style={{ display: 'flex', gap: '2rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
               <span>{processStats.healthy} ({((processStats.healthy / processes.length) * 100).toFixed(0)}%) Healthy</span>
               <span>{processStats.careful} ({((processStats.careful / processes.length) * 100).toFixed(0)}%) Careful</span>
               <span>{processStats.warning} ({((processStats.warning / processes.length) * 100).toFixed(0)}%) Warning</span>
@@ -136,53 +263,80 @@ export default function GTMDiagnostic() {
                 </tbody>
               </table>
             </div>
+            <div style={{ marginTop: '1rem' }}>
+              <Link href="/try-leanscale/process-health" className="btn btn-primary">
+                View Full Process Health Report →
+              </Link>
+            </div>
           </section>
         )}
 
-        {/* By Outcome View */}
         {activeView === 'by-outcome' && (
           <section>
-            <h2 style={{ marginBottom: '1.5rem' }}>by GTM Outcome</h2>
-            <p style={{ color: '#666' }}>
-              Process health grouped by desired GTM outcome (Increase Pipeline, Improve Sales Data, etc.)
+            <h2 style={{ marginBottom: '0.5rem' }}>by GTM Outcome</h2>
+            <p style={{ color: '#666', marginBottom: '1.5rem' }}>
+              {processes.length} processes grouped by desired GTM outcome
             </p>
-            <div className="card" style={{ marginTop: '1rem', padding: '2rem', textAlign: 'center' }}>
-              <p>Outcome-based grouping coming soon.</p>
-              <p style={{ color: '#666', marginTop: '0.5rem' }}>
-                This view will show the same {processes.length} processes grouped by their associated GTM outcomes.
-              </p>
-            </div>
+            
+            {gtmOutcomes.map((outcome) => {
+              const items = processesByOutcome[outcome] || [];
+              if (items.length === 0) return null;
+              return (
+                <GroupedSection 
+                  key={outcome} 
+                  title={outcome} 
+                  items={items}
+                  showFunction={true}
+                />
+              );
+            })}
           </section>
         )}
 
-        {/* By Metric View */}
         {activeView === 'by-metric' && (
           <section>
-            <h2 style={{ marginBottom: '1.5rem' }}>by GTM Metric (Power10)</h2>
-            <p style={{ color: '#666' }}>
-              Process health grouped by which Power10 metric they impact.
+            <h2 style={{ marginBottom: '0.5rem' }}>by GTM Metric (Power10)</h2>
+            <p style={{ color: '#666', marginBottom: '1.5rem' }}>
+              {processes.length} processes grouped by which Power10 metric they impact
             </p>
-            <div className="card" style={{ marginTop: '1rem', padding: '2rem', textAlign: 'center' }}>
-              <p>Metric-based grouping coming soon.</p>
-            </div>
+            
+            {power10MetricNames.map((metric) => {
+              const items = processesByMetric[metric] || [];
+              if (items.length === 0) return null;
+              return (
+                <GroupedSection 
+                  key={metric} 
+                  title={metric} 
+                  items={items}
+                  showFunction={true}
+                />
+              );
+            })}
           </section>
         )}
 
-        {/* By Function View */}
         {activeView === 'by-function' && (
           <section>
-            <h2 style={{ marginBottom: '1.5rem' }}>by Function</h2>
-            {['Cross Functional', 'Marketing', 'Sales', 'Customer Success', 'Partnerships'].map((func) => (
-              <div key={func} className="card" style={{ marginBottom: '1rem' }}>
-                <h3 style={{ marginBottom: '0.5rem' }}>{func}</h3>
-                <p style={{ color: '#666' }}>Process items for {func} function</p>
-              </div>
-            ))}
+            <h2 style={{ marginBottom: '0.5rem' }}>by Function</h2>
+            <p style={{ color: '#666', marginBottom: '1.5rem' }}>
+              {processes.length} processes grouped by GTM function
+            </p>
+            
+            {gtmFunctions.map((func) => {
+              const items = processesByFunction[func] || [];
+              if (items.length === 0) return null;
+              return (
+                <GroupedSection 
+                  key={func} 
+                  title={func} 
+                  items={items}
+                />
+              );
+            })}
           </section>
         )}
 
-        {/* Navigation */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2rem', flexWrap: 'wrap', gap: '0.5rem' }}>
           <Link href="/try-leanscale" className="btn" style={{ background: 'var(--ls-light-gray)' }}>
             ← Go Back
           </Link>
