@@ -1,0 +1,11 @@
+Diagnostic Name,Able to Report (P10),Status Against Plan (P10),Current Performance (P10)
+ARR,🔴,🔴,
+Bookings,🟡,🟡,
+Gross churn,🔴,🔴,
+Gross retention,⚫,⚫,
+MQL -> Opportunity conversion rate,🟢,🟡,
+MQL production,🟡,🟡,
+Net retention,🔴,🔴,
+Opportunity/Deal - CW cycle time,⚫,⚫,
+Opportunity/Deal -> CW conversion rate,🟢,🟡,
+Pipeline production,🟡,🟡,
