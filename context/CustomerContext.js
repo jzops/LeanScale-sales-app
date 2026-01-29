@@ -10,22 +10,30 @@ import { createContext, useContext, useState, useEffect } from 'react';
 const CustomerContext = createContext(null);
 
 // Default customer config (used as fallback)
+// Field names match what /api/customer returns
 const defaultCustomer = {
   slug: 'demo',
-  name: 'Demo',
-  logoUrl: null,
-  password: null,
-  ndaLink: null,
-  intakeFormLink: null,
+  customerName: 'Demo',
+  customerLogo: null,
+  ndaLink: 'https://powerforms.docusign.net/0758efed-0a42-4275-b5d9-f26875d64ae6?env=na4&acct=9287b4d2-50a6-4309-b7e8-7f0b785470c0&accountId=9287b4d2-50a6-4309-b7e8-7f0b785470c0',
+  intakeFormLink: 'https://forms.fillout.com/t/nqEbrHoL5Eus',
   youtubeVideoId: 'M7oECb8xsy0',
-  googleSlidesEmbedUrl: null,
-  assignedTeam: [],
-  startDates: [],
+  googleSlidesEmbedUrl: 'https://docs.google.com/presentation/d/e/2PACX-1vSGSLvHvPn9Cus6N3BpGnK6AkZsUiEdh8cARVVBiZ4w54uUCjHHJ-lHfymW8wfPPraAXMfgXtePxIwf/pubembed?start=true&loop=true&delayms=3000',
+  assignedTeam: ['izzy', 'brian', 'dave', 'kavean'],
+  isDemo: true,
 };
+
+// Static availability dates (fallback when API fails)
+const defaultAvailability = [
+  { date: '2026-02-02', status: 'waitlist', spotsLeft: 0 },
+  { date: '2026-02-16', status: 'waitlist', spotsLeft: 0 },
+  { date: '2026-03-02', status: 'available', spotsLeft: 2 },
+  { date: '2026-03-16', status: 'available', spotsLeft: 3 },
+];
 
 export function CustomerProvider({ children, initialCustomer = null }) {
   const [customer, setCustomer] = useState(initialCustomer || defaultCustomer);
-  const [availability, setAvailability] = useState([]);
+  const [availability, setAvailability] = useState(defaultAvailability);
   const [loading, setLoading] = useState(!initialCustomer);
   const [error, setError] = useState(null);
 
@@ -40,22 +48,26 @@ export function CustomerProvider({ children, initialCustomer = null }) {
       try {
         // Fetch customer config from API
         const customerRes = await fetch('/api/customer');
-        if (!customerRes.ok) {
-          throw new Error('Failed to fetch customer');
+        if (customerRes.ok) {
+          const customerData = await customerRes.json();
+          // Only update if we got valid data
+          if (customerData && customerData.slug) {
+            setCustomer(customerData);
+          }
         }
-        const customerData = await customerRes.json();
-        setCustomer(customerData);
 
         // Fetch availability dates
         const availRes = await fetch('/api/availability');
         if (availRes.ok) {
           const availData = await availRes.json();
-          setAvailability(availData.dates || []);
+          if (availData.dates && availData.dates.length > 0) {
+            setAvailability(availData.dates);
+          }
         }
       } catch (err) {
         console.error('Error loading customer:', err);
         setError(err.message);
-        // Keep using default customer on error
+        // Keep using default customer on error - already set in initial state
       } finally {
         setLoading(false);
       }
@@ -70,9 +82,9 @@ export function CustomerProvider({ children, initialCustomer = null }) {
     loading,
     error,
     // Helper to check if we have real customer data vs demo
-    isDemo: customer.slug === 'demo' || customer.name === 'Demo',
-    // Helper to get customer name for display
-    displayName: customer.name && customer.name !== 'Demo' ? customer.name : null,
+    isDemo: customer.slug === 'demo' || customer.customerName === 'Demo' || customer.isDemo,
+    // Helper to get customer name for display (returns null for demo)
+    displayName: customer.customerName && customer.customerName !== 'Demo' ? customer.customerName : null,
   };
 
   return (

@@ -21,12 +21,12 @@ export default function Navigation() {
   return (
     <nav className="nav">
       <Link href="/" className="nav-logo" onClick={closeMenu}>
-        {showCustomerBranding && customer.logoUrl ? (
+        {showCustomerBranding && customer.customerLogo ? (
           <>
             <img src="/leanscale-logo.png" alt="LeanScale" />
             <span className="nav-logo-divider">×</span>
             <img
-              src={customer.logoUrl}
+              src={customer.customerLogo}
               alt={displayName}
               className="nav-customer-logo"
             />
