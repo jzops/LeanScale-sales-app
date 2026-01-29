@@ -1,8 +1,13 @@
 import { useState } from 'react';
 import Layout from '../../components/Layout';
-import customerConfig from '../../data/customer-config';
+import { useCustomer } from '../../context/CustomerContext';
 
 export default function GettingStarted() {
+  const { customer, availability, loading } = useCustomer();
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState(null);
+
   const [formData, setFormData] = useState({
     yourName: '',
     companyName: '',
@@ -20,12 +25,49 @@ export default function GettingStarted() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // In production, this would send to your backend/webhook
-    console.log('Form submitted:', formData);
-    alert('Form submitted! Our team will be in touch shortly.');
+    setSubmitting(true);
+    setError(null);
+
+    try {
+      const response = await fetch('/api/submit-form', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          formType: 'getting_started',
+          data: formData,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to submit form');
+      }
+
+      setSubmitted(true);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
   };
+
+  if (submitted) {
+    return (
+      <Layout title="Getting Started">
+        <div className="container" style={{ maxWidth: 600, margin: '0 auto', textAlign: 'center', padding: '3rem 1rem' }}>
+          <div className="card">
+            <h2 style={{ color: 'var(--ls-green)', marginBottom: '1rem' }}>Thank You!</h2>
+            <p>Your submission has been received. Our team will be in touch shortly to discuss next steps.</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout title="Getting Started">
@@ -35,6 +77,20 @@ export default function GettingStarted() {
             <span>⚡</span> Getting Started
           </h1>
         </div>
+
+        {error && (
+          <div style={{
+            background: '#fee',
+            border: '1px solid #c00',
+            padding: '1rem',
+            borderRadius: '8px',
+            marginBottom: '1rem',
+            maxWidth: 800,
+            margin: '0 auto 1rem'
+          }}>
+            <strong>Error:</strong> {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
           <div className="card" style={{ maxWidth: 800, margin: '0 auto' }}>
@@ -212,30 +268,43 @@ export default function GettingStarted() {
                 <div style={{ fontSize: '0.75rem', color: '#666', marginBottom: '0.5rem' }}>
                   Updated real-time
                 </div>
-                {customerConfig.startDates.map((dateOption) => (
-                  <div key={dateOption.date} style={{ marginBottom: '0.25rem' }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
-                      <input
-                        type="radio"
-                        name="startDate"
-                        value={dateOption.date}
-                        checked={formData.startDate === dateOption.date}
-                        onChange={handleChange}
-                      />
-                      {new Date(dateOption.date).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })}
-                      {' - '}
-                      {dateOption.status === 'waitlist'
-                        ? 'Waitlist Only'
-                        : `${dateOption.spotsLeft} Spots Left`}
-                    </label>
-                  </div>
-                ))}
+                {loading ? (
+                  <div style={{ color: '#666', fontSize: '0.875rem' }}>Loading dates...</div>
+                ) : availability.length === 0 ? (
+                  <div style={{ color: '#666', fontSize: '0.875rem' }}>Contact us for availability</div>
+                ) : (
+                  availability.map((dateOption) => (
+                    <div key={dateOption.date} style={{ marginBottom: '0.25rem' }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                        <input
+                          type="radio"
+                          name="startDate"
+                          value={dateOption.date}
+                          checked={formData.startDate === dateOption.date}
+                          onChange={handleChange}
+                          disabled={dateOption.status === 'full'}
+                        />
+                        {new Date(dateOption.date).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })}
+                        {' - '}
+                        {dateOption.status === 'waitlist'
+                          ? 'Waitlist Only'
+                          : dateOption.status === 'full'
+                          ? 'Full'
+                          : `${dateOption.spotsLeft} Spots Left`}
+                      </label>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
 
             <div style={{ textAlign: 'right', marginTop: '1.5rem' }}>
-              <button type="submit" className="btn btn-primary">
-                Submit
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={submitting}
+              >
+                {submitting ? 'Submitting...' : 'Submit'}
               </button>
             </div>
           </div>

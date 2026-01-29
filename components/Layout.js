@@ -1,9 +1,10 @@
 import Head from 'next/head';
 import Navigation from './Navigation';
-import customerConfig from '../data/customer-config';
+import { useCustomer } from '../context/CustomerContext';
 
 export default function Layout({ children, title = "LeanScale" }) {
-  const pageTitle = `${customerConfig.customerName} | ${title}`;
+  const { displayName } = useCustomer();
+  const pageTitle = displayName ? `${displayName} | ${title}` : title;
 
   return (
     <>

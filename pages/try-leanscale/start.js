@@ -1,8 +1,13 @@
-import { useState } from 'react';
 import Layout from '../../components/Layout';
-import customerConfig from '../../data/customer-config';
+import { useCustomer } from '../../context/CustomerContext';
 
 export default function StartDiagnostic() {
+  const { customer } = useCustomer();
+
+  // Default NDA link if not configured for customer
+  const ndaLink = customer.ndaLink || 'https://powerforms.docusign.net/0758efed-0a42-4275-b5d9-f26875d64ae6?env=na4&acct=9287b4d2-50a6-4309-b7e8-7f0b785470c0&accountId=9287b4d2-50a6-4309-b7e8-7f0b785470c0';
+  const intakeFormLink = customer.intakeFormLink || 'https://forms.fillout.com/t/nqEbrHoL5Eus';
+
   return (
     <Layout title="Start Diagnostic">
       <div className="container" style={{ maxWidth: 900, margin: '0 auto' }}>
@@ -20,15 +25,15 @@ export default function StartDiagnostic() {
           </p>
 
           {/* Embedded DocuSign PowerForm */}
-          <div style={{ 
-            width: '100%', 
+          <div style={{
+            width: '100%',
             minHeight: '600px',
             border: '1px solid #eee',
             borderRadius: '8px',
             overflow: 'hidden'
           }}>
             <iframe
-              src={customerConfig.ndaLink}
+              src={ndaLink}
               style={{
                 width: '100%',
                 height: '600px',
@@ -39,7 +44,7 @@ export default function StartDiagnostic() {
           </div>
 
           <p style={{ marginTop: '1rem', fontSize: '0.875rem', color: '#666' }}>
-            Having trouble? <a href={customerConfig.ndaLink} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--ls-purple)' }}>Open in new tab</a>
+            Having trouble? <a href={ndaLink} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--ls-purple)' }}>Open in new tab</a>
           </p>
         </section>
 
@@ -60,7 +65,7 @@ export default function StartDiagnostic() {
             overflow: 'hidden'
           }}>
             <iframe
-              src="https://forms.fillout.com/t/nqEbrHoL5Eus"
+              src={intakeFormLink}
               style={{
                 width: '100%',
                 height: '800px',

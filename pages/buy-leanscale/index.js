@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Layout from '../../components/Layout';
-import customerConfig from '../../data/customer-config';
 import AvailabilityCalendar from '../../components/AvailabilityCalendar';
 
 const hourTiers = [

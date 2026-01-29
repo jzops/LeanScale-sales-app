@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import Link from 'next/link';
-import customerConfig from '../data/customer-config';
+import { useCustomer } from '../context/CustomerContext';
 
 export default function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null);
+  const { customer, isDemo, displayName } = useCustomer();
 
   const toggleDropdown = (name) => {
     setOpenDropdown(openDropdown === name ? null : name);
@@ -15,18 +16,18 @@ export default function Navigation() {
     setOpenDropdown(null);
   };
 
-  const showCustomerBranding = customerConfig.customerName && customerConfig.customerName !== "Demo";
+  const showCustomerBranding = !isDemo && displayName;
 
   return (
     <nav className="nav">
       <Link href="/" className="nav-logo" onClick={closeMenu}>
-        {showCustomerBranding && customerConfig.customerLogo ? (
+        {showCustomerBranding && customer.logoUrl ? (
           <>
             <img src="/leanscale-logo.png" alt="LeanScale" />
             <span className="nav-logo-divider">×</span>
             <img
-              src={customerConfig.customerLogo}
-              alt={customerConfig.customerName}
+              src={customer.logoUrl}
+              alt={displayName}
               className="nav-customer-logo"
             />
           </>
@@ -34,7 +35,7 @@ export default function Navigation() {
           <>
             <span className="nav-brand-text nav-brand-leanscale">LeanScale</span>
             <span className="nav-logo-divider-small">×</span>
-            <span className="nav-brand-text nav-brand-customer">{customerConfig.customerName}</span>
+            <span className="nav-brand-text nav-brand-customer">{displayName}</span>
           </>
         ) : (
           <img src="/leanscale-logo.png" alt="LeanScale" />

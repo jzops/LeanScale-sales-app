@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Layout from '../components/Layout';
-import customerConfig from '../data/customer-config';
+import { useCustomer } from '../context/CustomerContext';
 
 const stats = [
   { value: '2021', label: 'Founded' },
@@ -50,6 +50,8 @@ const quickLinks = [
 ];
 
 export default function Home() {
+  const { customer } = useCustomer();
+
   return (
     <Layout title="LeanScale">
       <div className="container">
@@ -131,7 +133,7 @@ export default function Home() {
         </div>
 
         {/* Video Section */}
-        {customerConfig.youtubeVideoId && !customerConfig.youtubeVideoId.includes('YOUR_') && (
+        {customer.youtubeVideoId && !customer.youtubeVideoId.includes('YOUR_') && (
           <div style={{ marginBottom: '2.5rem' }}>
             <h3 style={{
               fontSize: '1rem',
@@ -145,7 +147,7 @@ export default function Home() {
             </h3>
             <div className="video-container">
               <iframe
-                src={`https://www.youtube.com/embed/${customerConfig.youtubeVideoId}`}
+                src={`https://www.youtube.com/embed/${customer.youtubeVideoId}`}
                 title="LeanScale Overview"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -156,7 +158,7 @@ export default function Home() {
         )}
 
         {/* Google Slides Embed */}
-        {customerConfig.googleSlidesEmbedUrl && !customerConfig.googleSlidesEmbedUrl.includes('YOUR_') && (
+        {customer.googleSlidesEmbedUrl && !customer.googleSlidesEmbedUrl.includes('YOUR_') && (
           <div style={{ marginBottom: '2.5rem' }}>
             <h3 style={{
               fontSize: '1rem',
@@ -170,7 +172,7 @@ export default function Home() {
             </h3>
             <div className="video-container">
               <iframe
-                src={customerConfig.googleSlidesEmbedUrl}
+                src={customer.googleSlidesEmbedUrl}
                 title="LeanScale Deck"
                 frameBorder="0"
                 allowFullScreen

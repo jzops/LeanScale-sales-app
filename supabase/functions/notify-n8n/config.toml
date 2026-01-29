@@ -1,0 +1,9 @@
+# Edge Function Configuration
+# Deploy with: supabase functions deploy notify-n8n
+
+[function]
+# Verify JWT tokens (set to false if called from database trigger)
+verify_jwt = false
+
+# Import map for Deno dependencies
+import_map = "./import_map.json"
