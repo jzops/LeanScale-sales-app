@@ -1,5 +1,6 @@
 # Netlify Configuration for LeanScale Sales App
 # Supports wildcard subdomains: *.clients.leanscale.team
+# Build: 2026-01-29 - Force new chunk hashes
 
 [build]
   command = "npm run build"
