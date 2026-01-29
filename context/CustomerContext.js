@@ -46,8 +46,22 @@ export function CustomerProvider({ children, initialCustomer = null }) {
 
     async function loadCustomer() {
       try {
-        // Fetch customer config from API
-        const customerRes = await fetch('/api/customer');
+        // Determine customer slug from the cookie set by middleware
+        // Read from document.cookie as this reflects what middleware set
+        let slugFromCookie = null;
+        if (typeof document !== 'undefined') {
+          const cookieMatch = document.cookie.match(/customer-slug=([^;]+)/);
+          if (cookieMatch) {
+            slugFromCookie = cookieMatch[1];
+          }
+        }
+
+        // Fetch customer config from API with explicit slug
+        // This ensures we get the right customer even if cookie timing is off
+        const apiUrl = slugFromCookie
+          ? `/api/customer?slug=${slugFromCookie}`
+          : '/api/customer';
+        const customerRes = await fetch(apiUrl);
         if (customerRes.ok) {
           const customerData = await customerRes.json();
           // Only update if we got valid data

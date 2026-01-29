@@ -44,6 +44,8 @@ export async function middleware(request) {
   let customerSlug = extractCustomerSlug(hostname, searchParams);
 
   // Default to 'demo' for direct access without customer context
+  // IMPORTANT: Always reset to demo when not on a /c/ path to prevent
+  // cookie persistence from showing customer branding on main site
   if (!customerSlug) {
     customerSlug = 'demo';
   }
@@ -54,13 +56,16 @@ export async function middleware(request) {
   // Set customer slug in header for server-side access
   response.headers.set('x-customer-slug', customerSlug);
 
-  // Set cookie for client-side access (persists across navigation)
+  // Set cookie for client-side access
+  // Using session cookie (no maxAge) for non-path-based routing
+  // so visiting the main site always shows demo branding
   response.cookies.set('customer-slug', customerSlug, {
     httpOnly: false, // Allow JS access
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
-    maxAge: 60 * 60 * 24, // 24 hours
     path: '/',
+    // No maxAge = session cookie (cleared when browser closes)
+    // This prevents /c/formance from persisting to main site
   });
 
   return response;
@@ -127,7 +132,7 @@ export const config = {
   matcher: [
     /*
      * Match all paths except:
-     * - /api/* (API routes handle their own logic)
+     * - /api/* (API routes - CustomerContext passes slug via query param)
      * - /_next/* (Next.js internals)
      * - Static files (images, favicon, etc.)
      */

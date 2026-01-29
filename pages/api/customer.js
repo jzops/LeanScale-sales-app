@@ -14,11 +14,18 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // Get slug from various sources
-  let slug = req.cookies['customer-slug'];
+  // Get slug from various sources (in priority order)
+  // 1. Header set by middleware (most authoritative - reflects current URL)
+  // 2. Query param (explicit override)
+  // 3. Cookie (persisted from previous visit - least authoritative)
+  let slug = req.headers['x-customer-slug'];
 
   if (!slug) {
     slug = req.query.slug || req.query.customer;
+  }
+
+  if (!slug) {
+    slug = req.cookies['customer-slug'];
   }
 
   // Default to demo
