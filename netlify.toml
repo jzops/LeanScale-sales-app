@@ -1,9 +1,9 @@
 # Netlify Configuration for LeanScale Sales App
-# Supports wildcard subdomains: *.leanscale.team
+# Supports wildcard subdomains: *.clients.leanscale.team
 
 [build]
   command = "npm run build"
-  publish = ".next"
+  # publish directory is handled by @netlify/plugin-nextjs
 
 # Use Next.js plugin for optimal deployment
 [[plugins]]
@@ -26,28 +26,11 @@
 
 # Cache static assets
 [[headers]]
-  for = "/static/*"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
   for = "/_next/static/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
-# Wildcard subdomain handling
-# Netlify automatically routes *.leanscale.team to the same app
-# The middleware.js extracts the subdomain for customer routing
-
-# Redirects for common patterns
-[[redirects]]
-  from = "/www/*"
-  to = "/:splat"
-  status = 301
-
-# SPA fallback (handled by Next.js, but good to have)
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-  conditions = {Role = ["admin"]}
+[[headers]]
+  for = "/images/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
