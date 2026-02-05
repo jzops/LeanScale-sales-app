@@ -463,6 +463,11 @@ export default function ClayPartnership() {
                 Custom Enrichment Project
               </button>
             </Link>
+            <Link href="/buy-leanscale/clay-intake" style={{ textDecoration: 'none' }}>
+              <button className="btn btn-primary">
+                Start Clay Project Intake
+              </button>
+            </Link>
           </div>
         </div>
       </div>

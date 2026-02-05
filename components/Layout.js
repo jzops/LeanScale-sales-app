@@ -3,7 +3,7 @@ import Navigation from './Navigation';
 import { useCustomer } from '../context/CustomerContext';
 
 export default function Layout({ children, title = "LeanScale" }) {
-  const { displayName } = useCustomer();
+  const { displayName, customerType } = useCustomer();
   const pageTitle = displayName ? `${displayName} | ${title}` : title;
 
   return (
@@ -18,6 +18,18 @@ export default function Layout({ children, title = "LeanScale" }) {
           rel="stylesheet"
         />
       </Head>
+      {customerType === 'active' && (
+        <div style={{
+          background: 'var(--ls-purple)',
+          color: 'white',
+          textAlign: 'center',
+          padding: '0.35rem 1rem',
+          fontSize: '0.75rem',
+          fontWeight: 500,
+        }}>
+          Customer Portal — {displayName}
+        </div>
+      )}
       <Navigation />
       <main>{children}</main>
     </>
