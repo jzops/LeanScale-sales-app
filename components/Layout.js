@@ -12,7 +12,7 @@ export default function Layout({ children, title = "LeanScale" }) {
         <title>{pageTitle}</title>
         <meta name="description" content="LeanScale - GTM Operations for Hypergrowth Startups" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link
           href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
           rel="stylesheet"
