@@ -129,7 +129,7 @@ export default function WhyLeanScale() {
                 </div>
               </div>
             </div>
-            <div style={{ marginTop: '2rem', background: '#1a1a2e', borderRadius: '12px', padding: '0.5rem', overflow: 'hidden' }}>
+            <div style={{ marginTop: '2rem', borderRadius: '12px', overflow: 'hidden' }}>
               <ImageZoom
                 src="/images/gtm-ops-projects-screenshot.png"
                 alt="LeanScale GTM Ops Projects by Function"
