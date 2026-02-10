@@ -1,7 +1,7 @@
 // Diagnostic Registry
 // Maps diagnostic types to their configurations for dynamic rendering
 
-import { processes as gtmProcesses, tools, gtmFunctions, gtmOutcomes, countStatuses, groupBy } from './diagnostic-data';
+import { processes as gtmProcesses, tools, gtmFunctions, gtmOutcomes, power10Metrics, countStatuses, groupBy } from './diagnostic-data';
 import { clayProcesses, clayCategories, clayOutcomes } from './clay-diagnostic-data';
 import { cpqProcesses, cpqCategories, cpqOutcomes } from './cpq-diagnostic-data';
 
@@ -13,6 +13,7 @@ export const diagnosticRegistry = {
     icon: '\uD83D\uDCCA',
     processes: gtmProcesses,
     tools: tools,
+    power10Metrics: power10Metrics,
     categories: gtmFunctions,
     outcomes: gtmOutcomes,
   },

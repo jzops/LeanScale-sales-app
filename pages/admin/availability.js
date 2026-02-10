@@ -226,6 +226,17 @@ export default function AdminAvailability() {
             }}>
               Customers
             </Link>
+            <Link href="/admin/diagnostics" style={{
+              padding: '0.5rem 1rem',
+              background: 'white',
+              border: '1px solid #ddd',
+              borderRadius: '6px',
+              textDecoration: 'none',
+              fontSize: '0.875rem',
+              color: '#333',
+            }}>
+              Diagnostics
+            </Link>
             <Link href="/admin/availability" style={{
               padding: '0.5rem 1rem',
               background: '#7c3aed',
