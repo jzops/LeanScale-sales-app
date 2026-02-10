@@ -2,10 +2,82 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useCustomer } from '../context/CustomerContext';
 
+// Prospect/default navigation sections (Why / Try / Buy)
+const prospectSections = [
+  {
+    name: 'why',
+    label: 'Why LeanScale?',
+    links: [
+      { href: '/why-leanscale', label: 'Overview' },
+      { href: '/why-leanscale/about', label: 'About Us' },
+      { href: '/why-leanscale/resources', label: 'Key Resources' },
+      { href: '/why-leanscale/references', label: 'Customer References' },
+      { href: '/why-leanscale/services', label: 'Services Catalog' },
+      { href: '/why-leanscale/glossary', label: 'GTM Ops Glossary' },
+    ],
+  },
+  {
+    name: 'try',
+    label: 'Try LeanScale',
+    links: [
+      { href: '/try-leanscale', label: 'Overview' },
+      { href: '/try-leanscale/start', label: 'Start Diagnostic' },
+      { href: '/try-leanscale/diagnostic', label: 'GTM Diagnostic' },
+      { href: '/try-leanscale/power10', label: 'Power10 GTM Metrics' },
+      { href: '/try-leanscale/gtm-tool-health', label: 'GTM Tool Health' },
+      { href: '/try-leanscale/process-health', label: 'Process Health' },
+      { href: '/try-leanscale/clay-diagnostic', label: 'Clay Diagnostic' },
+      { href: '/try-leanscale/cpq-diagnostic', label: 'Q2C Diagnostic' },
+      { href: '/try-leanscale/engagement', label: 'Engagement Overview' },
+    ],
+  },
+  {
+    name: 'buy',
+    label: 'Buy LeanScale',
+    links: [
+      { href: '/buy-leanscale/availability', label: 'Cohort Availability' },
+      { href: '/buy-leanscale/one-time-projects', label: 'One-Time Projects' },
+      { href: '/buy-leanscale/investor-perks', label: 'Investor Perks' },
+      { href: '/buy-leanscale/security', label: 'Security' },
+      { href: '/buy-leanscale/team', label: 'Your Team' },
+      { href: '/buy-leanscale/clay', label: 'Clay x LeanScale' },
+      { href: '/buy-leanscale/q2c-intake', label: 'Q2C Assessment' },
+    ],
+  },
+];
+
+// Active customer navigation sections (Diagnostics / Projects / Documents)
+const customerSections = [
+  {
+    name: 'diagnostics',
+    label: 'Diagnostics',
+    links: [
+      { href: '/try-leanscale/diagnostic', label: 'GTM Diagnostic' },
+      { href: '/try-leanscale/clay-diagnostic', label: 'Clay Diagnostic' },
+      { href: '/try-leanscale/cpq-diagnostic', label: 'Q2C Diagnostic' },
+    ],
+  },
+  {
+    name: 'projects',
+    label: 'Projects',
+    links: [
+      { href: '/buy-leanscale/clay-intake', label: 'Clay Project Intake' },
+      { href: '/buy-leanscale/q2c-intake', label: 'Q2C Assessment' },
+    ],
+  },
+  {
+    name: 'documents',
+    label: 'Documents',
+    links: [
+      { href: '/sow', label: 'Statements of Work' },
+    ],
+  },
+];
+
 export default function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null);
-  const { customer, isDemo, displayName } = useCustomer();
+  const { customer, isDemo, displayName, customerType } = useCustomer();
 
   const toggleDropdown = (name) => {
     setOpenDropdown(openDropdown === name ? null : name);
@@ -17,6 +89,8 @@ export default function Navigation() {
   };
 
   const showCustomerBranding = !isDemo && displayName;
+  const isActive = customerType === 'active';
+  const sections = isActive ? customerSections : prospectSections;
 
   return (
     <nav className="nav">
@@ -24,7 +98,7 @@ export default function Navigation() {
         {showCustomerBranding && customer.customerLogo ? (
           <>
             <img src="/leanscale-logo.png" alt="LeanScale" />
-            <span className="nav-logo-divider">×</span>
+            <span className="nav-logo-divider">&times;</span>
             <img
               src={customer.customerLogo}
               alt={displayName}
@@ -34,7 +108,7 @@ export default function Navigation() {
         ) : showCustomerBranding ? (
           <>
             <span className="nav-brand-text nav-brand-leanscale">LeanScale</span>
-            <span className="nav-logo-divider-small">×</span>
+            <span className="nav-logo-divider-small">&times;</span>
             <span className="nav-brand-text nav-brand-customer">{displayName}</span>
           </>
         ) : (
@@ -42,70 +116,42 @@ export default function Navigation() {
         )}
       </Link>
 
-      <button 
+      <button
         className="mobile-menu-btn"
         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         aria-label="Toggle menu"
       >
-        {mobileMenuOpen ? '✕' : '☰'}
+        {mobileMenuOpen ? '\u2715' : '\u2630'}
       </button>
 
       <div className={`nav-links ${mobileMenuOpen ? 'nav-links-open' : ''}`}>
-        <div className="nav-item">
-          <button 
-            className="nav-button"
-            onClick={() => toggleDropdown('why')}
-          >
-            Why LeanScale? <span>▾</span>
-          </button>
-          <div className={`nav-dropdown ${openDropdown === 'why' ? 'nav-dropdown-open' : ''}`}>
-            <Link href="/why-leanscale" onClick={closeMenu}>Overview</Link>
-            <Link href="/why-leanscale/about" onClick={closeMenu}>About Us</Link>
-            <Link href="/why-leanscale/resources" onClick={closeMenu}>Key Resources</Link>
-            <Link href="/why-leanscale/references" onClick={closeMenu}>Customer References</Link>
-            <Link href="/why-leanscale/services" onClick={closeMenu}>Services Catalog</Link>
-            <Link href="/why-leanscale/glossary" onClick={closeMenu}>GTM Ops Glossary</Link>
+        {sections.map((section) => (
+          <div className="nav-item" key={section.name}>
+            <button
+              className="nav-button"
+              onClick={() => toggleDropdown(section.name)}
+            >
+              {section.label} <span>&#9662;</span>
+            </button>
+            <div className={`nav-dropdown ${openDropdown === section.name ? 'nav-dropdown-open' : ''}`}>
+              {section.links.map((link) => (
+                <Link href={link.href} onClick={closeMenu} key={link.href}>
+                  {link.label}
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
+        ))}
 
-        <div className="nav-item">
-          <button 
-            className="nav-button"
-            onClick={() => toggleDropdown('try')}
-          >
-            Try LeanScale <span>▾</span>
-          </button>
-          <div className={`nav-dropdown ${openDropdown === 'try' ? 'nav-dropdown-open' : ''}`}>
-            <Link href="/try-leanscale" onClick={closeMenu}>Overview</Link>
-            <Link href="/try-leanscale/start" onClick={closeMenu}>Start Diagnostic</Link>
-            <Link href="/try-leanscale/diagnostic" onClick={closeMenu}>GTM Diagnostic</Link>
-            <Link href="/try-leanscale/power10" onClick={closeMenu}>Power10 GTM Metrics</Link>
-            <Link href="/try-leanscale/gtm-tool-health" onClick={closeMenu}>GTM Tool Health</Link>
-            <Link href="/try-leanscale/process-health" onClick={closeMenu}>Process Health</Link>
-            <Link href="/try-leanscale/engagement" onClick={closeMenu}>Engagement Overview</Link>
-          </div>
-        </div>
-
-        <div className="nav-item">
-          <button 
-            className="nav-button"
-            onClick={() => toggleDropdown('buy')}
-          >
-            Buy LeanScale <span>▾</span>
-          </button>
-          <div className={`nav-dropdown ${openDropdown === 'buy' ? 'nav-dropdown-open' : ''}`}>
-            <Link href="/buy-leanscale/availability" onClick={closeMenu}>Cohort Availability</Link>
-            <Link href="/buy-leanscale/one-time-projects" onClick={closeMenu}>One-Time Projects</Link>
-            <Link href="/buy-leanscale/investor-perks" onClick={closeMenu}>Investor Perks</Link>
-            <Link href="/buy-leanscale/security" onClick={closeMenu}>Security</Link>
-            <Link href="/buy-leanscale/team" onClick={closeMenu}>Your Team</Link>
-            <Link href="/buy-leanscale/clay" onClick={closeMenu}>Clay x LeanScale</Link>
-          </div>
-        </div>
-
-        <Link href="/buy-leanscale" className="nav-cta" onClick={closeMenu}>
-          Get Started
-        </Link>
+        {isActive ? (
+          <Link href="/dashboard" className="nav-cta" onClick={closeMenu}>
+            Dashboard
+          </Link>
+        ) : (
+          <Link href="/buy-leanscale" className="nav-cta" onClick={closeMenu}>
+            Get Started
+          </Link>
+        )}
       </div>
     </nav>
   );

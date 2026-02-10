@@ -53,6 +53,7 @@ export default async function handler(req, res) {
       googleSlidesEmbedUrl: customer.google_slides_embed_url,
       assignedTeam: customer.assigned_team || [],
       isDemo: customer.is_demo,
+      customerType: customer.customer_type || 'prospect',
     };
 
     // Cache for 5 minutes

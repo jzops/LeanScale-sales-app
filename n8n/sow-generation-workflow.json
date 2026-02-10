@@ -1,0 +1,173 @@
+{
+  "name": "SOW Generation Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "generate-sow",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook - SOW Request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [220, 300],
+      "webhookId": "sow-generation"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract and validate incoming data\n// Field names match the API payload from pages/api/sow/generate.js:\n//   { customer, sowType, transcript, intakeData, diagnosticData }\nconst input = $input.first().json;\n\nconst sowType = input.sowType || 'embedded';\nconst customerName = input.customer?.name || 'Unnamed Client';\nconst transcriptText = input.transcript || '';\nconst intakeData = input.intakeData || null;\nconst diagnosticData = input.diagnosticData || null;\n\n// Build the prompt context\nlet contextParts = [];\n\nif (transcriptText) {\n  contextParts.push(`## Call Transcript\\n\\n${transcriptText}`);\n}\n\nif (intakeData) {\n  contextParts.push(`## Intake Form Responses\\n\\n${JSON.stringify(intakeData, null, 2)}`);\n}\n\nif (diagnosticData) {\n  contextParts.push(`## Diagnostic Assessment\\n\\n${JSON.stringify(diagnosticData, null, 2)}`);\n}\n\n// Include customer metadata if available\nif (input.customer) {\n  const c = input.customer;\n  const customerParts = [];\n  if (c.name) customerParts.push(`Company: ${c.name}`);\n  if (c.industry) customerParts.push(`Industry: ${c.industry}`);\n  if (c.slug) customerParts.push(`Slug: ${c.slug}`);\n  if (customerParts.length > 0) {\n    contextParts.unshift(`## Customer Information\\n\\n${customerParts.join('\\n')}`);\n  }\n}\n\nconst context = contextParts.join('\\n\\n---\\n\\n');\n\nreturn {\n  sowType,\n  customerName,\n  context,\n  hasTranscript: !!transcriptText,\n  hasIntake: !!intakeData,\n  hasDiagnostic: !!diagnosticData\n};"
+      },
+      "id": "prepare-context",
+      "name": "Prepare Context",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\n\n// System prompt aligned with SKILL.md from Skills-and-SOPs/statement-of-work-maker\n// and the SowPreview component schema in components/SowPreview.js\nconst systemPrompt = `You are a professional Statement of Work generator for LeanScale, a GTM operations consultancy.\n\n## LeanScale Engagement Types\n\n| Type | Description | Typical Duration | Team Structure |\n|------|-------------|------------------|----------------|\n| **Embedded Engagement** | Ongoing GTM ops support, integrated into client's team | Monthly (3-month minimum) | 1 Architect + specialists as needed |\n| **One-Time Project** | Scoped deliverable with defined outcome | 4-12 weeks | 1 Principal Project Owner + 1 Architect |\n\n**Team Structure Decision:**\n- **Embedded engagements** → Default to \"Architect\" as the primary team member\n- **One-time projects** → Use \"Principal Project Owner\" (strategy & oversight) + \"Architect\" (hands-on build)\n\n## Extract Information from Transcript/Intake\n\nWhen given input data, extract:\n\n| Category | What to Capture |\n|----------|-----------------|\n| **Company Info** | Name, stage (Seed/A/B/C), industry, CRM, current tools |\n| **Primary Contact** | Name, title, reporting structure |\n| **Pain Points** | What problems they're trying to solve |\n| **Desired Outcomes** | What success looks like to them |\n| **Specific Requests** | Exact deliverables or use cases mentioned |\n| **Timeline** | Urgency, deadlines, \"as soon as possible\" signals |\n| **Budget Signals** | Any mentioned constraints, comparisons, or ceilings |\n| **Integration Needs** | Systems that need to connect (CRM, Slack, etc.) |\n\n## Pricing Guidelines\n\n| Engagement Type | Starting Price | Notes |\n|-----------------|----------------|-------|\n| Embedded (50 hrs/mo) | $15,000/month | 3-month default, flexible cancellation |\n| One-Time Project | $25,000-$45,000 | Scope-dependent, custom pricing available |\n| Clay Projects (standard) | $45,000 | 3-month engagement, no hour concept |\n\n**Budget Sensitivity:** If prospect mentions budget constraints, offer custom scoping. Match their stated ceiling when possible while ensuring scope is deliverable.\n\n## Output Format\n\nReturn a JSON object with this EXACT structure. Do not deviate from these field names or types.\n\n{\n  \"executive_summary\": \"1-2 sentences on what LeanScale will deliver and why it matters\",\n  \"client_info\": {\n    \"company\": \"Company Name\",\n    \"primary_contact\": \"Name, Title\",\n    \"stage\": \"Series A/B/etc.\",\n    \"crm\": \"HubSpot/Salesforce/etc.\",\n    \"industry\": \"Their market\"\n  },\n  \"scope\": [\n    {\n      \"title\": \"Deliverable Name\",\n      \"description\": \"What this includes and why it matters\",\n      \"deliverables\": [\"Specific deliverable 1\", \"Specific deliverable 2\"]\n    }\n  ],\n  \"deliverables_table\": [\n    {\n      \"deliverable\": \"Item name\",\n      \"description\": \"What it is\",\n      \"integration\": \"Where it connects\"\n    }\n  ],\n  \"timeline\": [\n    {\n      \"phase\": \"Week 1-2\",\n      \"activities\": \"What happens during this phase\",\n      \"duration\": \"10 days\"\n    }\n  ],\n  \"investment\": {\n    \"total\": 45000,\n    \"payment_terms\": \"Payment terms description\",\n    \"breakdown\": [\n      { \"item\": \"Line item name\", \"amount\": 45000 }\n    ]\n  },\n  \"team\": [\n    {\n      \"role\": \"Principal Project Owner\",\n      \"responsibility\": \"Strategy and oversight\"\n    },\n    {\n      \"role\": \"Architect\",\n      \"responsibility\": \"Hands-on implementation\"\n    }\n  ],\n  \"assumptions\": [\n    \"Client will provide timely access to systems and stakeholders\",\n    \"Scope changes require mutual agreement and may affect timeline/investment\"\n  ],\n  \"acceptance_criteria\": [\n    \"All deliverables completed and reviewed\",\n    \"Client sign-off on implementation\"\n  ]\n}\n\n## CRITICAL Schema Rules\n- scope[].title (string) — NOT \"name\"\n- scope[].deliverables (array of strings) — list of specific items\n- investment.total (number) — NOT a string like \"$45,000\"\n- investment.breakdown (array of {item, amount}) — NOT \"inclusions\"\n- investment.breakdown[].amount (number) — NOT a string\n- team (array of {role, responsibility}) — NOT an object with nested members\n- Do NOT include hour estimates — show only total investment price\n- Do NOT include signature blocks\n- Match pricing to the engagement type and scope\n- Be specific about deliverables — avoid vague language\n- Timeline should be realistic based on scope`;\n\n// User prompt with the actual data\nconst userPrompt = `Generate a Statement of Work for the following engagement:\n\n**SOW Type:** ${input.sowType}\n**Customer:** ${input.customerName}\n\n${input.context || 'No additional context provided. Generate a template SOW for this engagement type.'}\n\nReturn ONLY valid JSON matching the structure specified. Do not include markdown code blocks or any other text.`;\n\nreturn {\n  ...input,\n  systemPrompt,\n  userPrompt\n};"
+      },
+      "id": "build-prompt",
+      "name": "Build Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [660, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "={{ $env.ANTHROPIC_API_KEY }}"
+            },
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"claude-sonnet-4-20250514\",\n  \"max_tokens\": 8192,\n  \"temperature\": 0.3,\n  \"system\": {{ JSON.stringify($json.systemPrompt) }},\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": {{ JSON.stringify($json.userPrompt) }}\n    }\n  ]\n}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "claude-generate",
+      "name": "Claude - Generate SOW",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\n\ntry {\n  // Extract text from the Anthropic Messages API response\n  // Response shape: { content: [{ type: 'text', text: '...' }], ... }\n  let responseText = '';\n\n  if (input.content && Array.isArray(input.content)) {\n    responseText = input.content\n      .filter(block => block.type === 'text')\n      .map(block => block.text)\n      .join('');\n  } else if (input.text) {\n    responseText = input.text;\n  } else if (typeof input === 'string') {\n    responseText = input;\n  }\n\n  // Clean up the response — remove markdown code blocks if present\n  responseText = responseText\n    .replace(/^```json\\s*/i, '')\n    .replace(/^```\\s*/i, '')\n    .replace(/\\s*```$/i, '')\n    .trim();\n\n  // Parse the JSON\n  const sowContent = JSON.parse(responseText);\n\n  // Validate and normalize critical fields to match SowPreview expectations\n  // scope: ensure \"title\" field exists (not \"name\")\n  if (sowContent.scope && Array.isArray(sowContent.scope)) {\n    sowContent.scope = sowContent.scope.map(item => ({\n      title: item.title || item.name || 'Untitled',\n      description: item.description || '',\n      deliverables: item.deliverables || [],\n    }));\n  }\n\n  // investment: ensure total is a number and breakdown exists\n  if (sowContent.investment) {\n    if (typeof sowContent.investment.total === 'string') {\n      sowContent.investment.total = parseInt(sowContent.investment.total.replace(/[^0-9]/g, ''), 10) || 0;\n    }\n    // Normalize \"inclusions\" → \"breakdown\" if the model used the wrong field\n    if (sowContent.investment.inclusions && !sowContent.investment.breakdown) {\n      sowContent.investment.breakdown = [];\n    }\n    delete sowContent.investment.inclusions;\n    // Ensure breakdown items have numeric amounts\n    if (sowContent.investment.breakdown && Array.isArray(sowContent.investment.breakdown)) {\n      sowContent.investment.breakdown = sowContent.investment.breakdown.map(item => ({\n        item: item.item || item.name || '',\n        amount: typeof item.amount === 'string'\n          ? parseInt(item.amount.replace(/[^0-9]/g, ''), 10) || 0\n          : (item.amount || 0),\n      }));\n    }\n  }\n\n  // team: normalize to array of {role, responsibility}\n  if (sowContent.team && !Array.isArray(sowContent.team)) {\n    // Convert object format to array format\n    const teamObj = sowContent.team;\n    const members = teamObj.members || [];\n    sowContent.team = members.map(m => ({\n      role: m.role || '',\n      responsibility: m.responsibility || '',\n    }));\n  } else if (sowContent.team && Array.isArray(sowContent.team)) {\n    sowContent.team = sowContent.team.map(m => ({\n      role: m.role || '',\n      responsibility: m.responsibility || '',\n    }));\n  }\n\n  return {\n    success: true,\n    content: sowContent\n  };\n} catch (error) {\n  // If parsing fails, return error info with a valid fallback structure\n  return {\n    success: false,\n    error: error.message,\n    rawResponse: typeof input === 'object' ? JSON.stringify(input).substring(0, 1000) : String(input).substring(0, 1000),\n    content: {\n      executive_summary: 'SOW generation encountered an error. Please review and edit manually.',\n      client_info: {},\n      scope: [],\n      deliverables_table: [],\n      timeline: [],\n      investment: { total: 0, payment_terms: '', breakdown: [] },\n      team: [],\n      assumptions: [],\n      acceptance_criteria: []\n    }\n  };\n}"
+      },
+      "id": "parse-response",
+      "name": "Parse Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1100, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "respond-success",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1320, 300]
+    }
+  ],
+  "connections": {
+    "Webhook - SOW Request": {
+      "main": [
+        [
+          {
+            "node": "Prepare Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Context": {
+      "main": [
+        [
+          {
+            "node": "Build Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Prompt": {
+      "main": [
+        [
+          {
+            "node": "Claude - Generate SOW",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claude - Generate SOW": {
+      "main": [
+        [
+          {
+            "node": "Parse Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Response": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "SOW",
+      "createdAt": "2026-02-05T00:00:00.000Z",
+      "updatedAt": "2026-02-09T00:00:00.000Z"
+    },
+    {
+      "name": "Sales App",
+      "createdAt": "2026-02-05T00:00:00.000Z",
+      "updatedAt": "2026-02-09T00:00:00.000Z"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-09T00:00:00.000Z",
+  "versionId": "2"
+}

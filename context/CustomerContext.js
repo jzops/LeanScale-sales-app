@@ -21,6 +21,7 @@ const defaultCustomer = {
   googleSlidesEmbedUrl: 'https://docs.google.com/presentation/d/e/2PACX-1vSGSLvHvPn9Cus6N3BpGnK6AkZsUiEdh8cARVVBiZ4w54uUCjHHJ-lHfymW8wfPPraAXMfgXtePxIwf/pubembed?start=true&loop=true&delayms=3000',
   assignedTeam: ['izzy', 'brian', 'dave', 'kavean'],
   isDemo: true,
+  customerType: 'prospect',
 };
 
 // Static availability dates (fallback when API fails)
@@ -99,6 +100,8 @@ export function CustomerProvider({ children, initialCustomer = null }) {
     isDemo: customer.slug === 'demo' || customer.customerName === 'Demo' || customer.isDemo,
     // Helper to get customer name for display (returns null for demo)
     displayName: customer.customerName && customer.customerName !== 'Demo' ? customer.customerName : null,
+    // Customer type: 'prospect' (default), 'active', or 'churned'
+    customerType: customer.customerType || 'prospect',
   };
 
   return (

@@ -8,6 +8,12 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Skip auth if Supabase not configured
+    if (!supabase) {
+      setLoading(false);
+      return;
+    }
+
     // Check active session
     const getSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -28,6 +34,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const signIn = async (email, password) => {
+    if (!supabase) throw new Error('Authentication not configured');
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -37,6 +44,7 @@ export function AuthProvider({ children }) {
   };
 
   const signUp = async (email, password) => {
+    if (!supabase) throw new Error('Authentication not configured');
     // Validate @leanscale.team email domain
     if (!email.toLowerCase().endsWith('@leanscale.team')) {
       throw new Error('Registration is only available for @leanscale.team email addresses');
@@ -54,11 +62,13 @@ export function AuthProvider({ children }) {
   };
 
   const signOut = async () => {
+    if (!supabase) throw new Error('Authentication not configured');
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
   };
 
   const resetPassword = async (email) => {
+    if (!supabase) throw new Error('Authentication not configured');
     if (!email.toLowerCase().endsWith('@leanscale.team')) {
       throw new Error('Password reset is only available for @leanscale.team email addresses');
     }
@@ -70,6 +80,7 @@ export function AuthProvider({ children }) {
   };
 
   const updatePassword = async (newPassword) => {
+    if (!supabase) throw new Error('Authentication not configured');
     const { error } = await supabase.auth.updateUser({
       password: newPassword,
     });
