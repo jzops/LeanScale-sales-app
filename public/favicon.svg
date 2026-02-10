@@ -1,4 +1,17 @@
-<svg width="32" height="32" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="25" cy="25" r="20" stroke="#000" stroke-width="3" fill="none"/>
-  <path d="M25 5 Q45 25 25 45 Q5 25 25 5" stroke="#000" stroke-width="2" fill="none"/>
+<svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Left circle -->
+  <circle cx="35" cy="50" r="30" stroke="#000" stroke-width="4" fill="none"/>
+  <!-- Right circle -->
+  <circle cx="65" cy="50" r="30" stroke="#000" stroke-width="4" fill="none"/>
+  <!-- Diagonal lines in intersection -->
+  <clipPath id="intersection">
+    <path d="M50 23.5 A30 30 0 0 1 50 76.5 A30 30 0 0 1 50 23.5"/>
+  </clipPath>
+  <g clip-path="url(#intersection)">
+    <line x1="35" y1="25" x2="65" y2="75" stroke="#000" stroke-width="3"/>
+    <line x1="40" y1="20" x2="70" y2="70" stroke="#000" stroke-width="3"/>
+    <line x1="45" y1="15" x2="75" y2="65" stroke="#000" stroke-width="3"/>
+    <line x1="30" y1="30" x2="60" y2="80" stroke="#000" stroke-width="3"/>
+    <line x1="25" y1="35" x2="55" y2="85" stroke="#000" stroke-width="3"/>
+  </g>
 </svg>
