@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Layout from '../../components/Layout';
+import ImageZoom from '../../components/ImageZoom';
 
 const navLinks = [
   { href: '#capital-clock', label: 'The "Capital Clock"' },
@@ -68,10 +69,9 @@ export default function WhyLeanScale() {
                 </div>
               </div>
               <div style={{ background: '#1a1a2e', borderRadius: '12px', padding: '0.5rem', overflow: 'hidden' }}>
-                <img 
-                  src="/images/capital-clock-screenshot.png" 
+                <ImageZoom
+                  src="/images/capital-clock-screenshot.png"
                   alt="The Capital Clock - GTM Operations Roadmap from Seed to Series D+"
-                  style={{ width: '100%', height: 'auto', display: 'block', borderRadius: '8px' }}
                 />
               </div>
             </div>
@@ -122,19 +122,17 @@ export default function WhyLeanScale() {
                   </div>
                 </div>
                 <div style={{ background: '#1a1a2e', borderRadius: '12px', padding: '0.5rem', overflow: 'hidden' }}>
-                  <img 
-                    src="/images/gtm-ops-screenshot.png" 
+                  <ImageZoom
+                    src="/images/gtm-ops-screenshot.png"
                     alt="GTM Ops Matrix - The Full Stack View"
-                    style={{ width: '100%', height: 'auto', display: 'block', borderRadius: '8px' }}
                   />
                 </div>
               </div>
             </div>
             <div style={{ marginTop: '2rem', background: '#1a1a2e', borderRadius: '12px', padding: '0.5rem', overflow: 'hidden' }}>
-              <img 
-                src="/images/gtm-ops-projects-screenshot.png" 
+              <ImageZoom
+                src="/images/gtm-ops-projects-screenshot.png"
                 alt="LeanScale GTM Ops Projects by Function"
-                style={{ width: '100%', height: 'auto', display: 'block', borderRadius: '8px' }}
               />
             </div>
             <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
@@ -214,17 +212,15 @@ export default function WhyLeanScale() {
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
               <div style={{ background: '#e9d8f4', borderRadius: '12px', padding: '0.5rem', overflow: 'hidden' }}>
-                <img 
-                  src="/images/in-house-vs-partner-screenshot.png" 
+                <ImageZoom
+                  src="/images/in-house-vs-partner-screenshot.png"
                   alt="In-House vs LeanScale Comparison"
-                  style={{ width: '100%', height: 'auto', display: 'block', borderRadius: '8px' }}
                 />
               </div>
               <div style={{ background: '#1a1a2e', borderRadius: '12px', padding: '0.5rem', overflow: 'hidden' }}>
-                <img 
-                  src="/images/grow-efficiently-screenshot.png" 
+                <ImageZoom
+                  src="/images/grow-efficiently-screenshot.png"
                   alt="Grow quickly and efficiently through each stage"
-                  style={{ width: '100%', height: 'auto', display: 'block', borderRadius: '8px' }}
                 />
               </div>
             </div>
@@ -275,10 +271,9 @@ export default function WhyLeanScale() {
             </div>
 
             <div style={{ background: '#1a1a2e', borderRadius: '12px', padding: '0.5rem', overflow: 'hidden' }}>
-              <img 
-                src="/images/pod-structure-screenshot.png" 
+              <ImageZoom
+                src="/images/pod-structure-screenshot.png"
                 alt="Build The Best 0 FTE GTM Ops Org"
-                style={{ width: '100%', height: 'auto', display: 'block', borderRadius: '8px' }}
               />
             </div>
 
@@ -323,18 +318,16 @@ export default function WhyLeanScale() {
             </div>
 
             <div style={{ background: '#1a1a2e', borderRadius: '12px', padding: '0.5rem', overflow: 'hidden', marginBottom: '1.5rem' }}>
-              <img 
-                src="/images/working-with-leanscale-screenshot.png" 
+              <ImageZoom
+                src="/images/working-with-leanscale-screenshot.png"
                 alt="A Week in the Life with your LeanScale Team"
-                style={{ width: '100%', height: 'auto', display: 'block', borderRadius: '8px' }}
               />
             </div>
 
             <div style={{ background: '#f3f4f6', borderRadius: '12px', padding: '0.5rem', overflow: 'hidden', marginBottom: '1.5rem' }}>
-              <img 
-                src="/images/highest-value-projects-screenshot.png" 
+              <ImageZoom
+                src="/images/highest-value-projects-screenshot.png"
                 alt="Quickly Address Poor Performance With The Highest Value Projects"
-                style={{ width: '100%', height: 'auto', display: 'block', borderRadius: '8px' }}
               />
             </div>
 

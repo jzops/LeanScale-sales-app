@@ -90,19 +90,19 @@ const projects = [
     duration: '3 months',
     playbookId: 'quote-to-cash',
   },
-  { 
-    id: 'lead-attribution-rebuild', 
-    name: 'Lead Attribution Rebuild', 
-    status: 'Coming Q1 2026', 
+  {
+    id: 'lead-attribution-rebuild',
+    name: 'Lead Attribution Rebuild',
+    status: 'Available',
     icon: '🔍',
     price: '$45,000',
     duration: '3 months',
     playbookId: 'lead-and-opportunity-attribution',
   },
-  { 
-    id: 'lead-routing-rebuild', 
-    name: 'Lead Routing Rebuild', 
-    status: 'Coming Q1 2026', 
+  {
+    id: 'lead-routing-rebuild',
+    name: 'Lead Routing Rebuild',
+    status: 'Available',
     icon: '🛤️',
     price: '$45,000',
     duration: '3 months',
