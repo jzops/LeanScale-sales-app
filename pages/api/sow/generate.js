@@ -113,7 +113,12 @@ export default async function handler(req, res) {
         });
 
         if (response.ok) {
-          content = await response.json();
+          const n8nResult = await response.json();
+          // n8n returns { success, content, error? }
+          // Extract just the SOW content for storage
+          if (n8nResult.content) {
+            content = n8nResult.content;
+          }
         } else {
           const errorText = await response.text();
           console.error('n8n webhook returned error:', response.status, errorText);

@@ -424,9 +424,10 @@ describe('n8n webhook integration', () => {
       scope: [{ title: 'AI Scope', description: 'Generated' }],
     };
 
+    // n8n returns { success: true, content: <sowContent> }
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
-      json: async () => generatedContent,
+      json: async () => ({ success: true, content: generatedContent }),
     });
 
     createSow.mockImplementation(async (args) => ({
@@ -459,9 +460,10 @@ describe('n8n webhook integration', () => {
     const customerData = { id: 'cust-1', name: 'Webhook Co' };
     mockSupabaseSingle.mockReturnValue({ data: customerData, error: null });
 
+    // n8n returns { success: true, content: <sowContent> }
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
-      json: async () => ({ executive_summary: 'Generated' }),
+      json: async () => ({ success: true, content: { executive_summary: 'Generated' } }),
     });
 
     createSow.mockImplementation(async (args) => ({
@@ -499,9 +501,10 @@ describe('n8n webhook integration', () => {
       scope: [{ title: 'Custom Scope', description: 'AI generated' }],
     };
 
+    // n8n returns { success: true, content: <sowContent> }
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
-      json: async () => generatedContent,
+      json: async () => ({ success: true, content: generatedContent }),
     });
 
     createSow.mockImplementation(async (args) => ({
