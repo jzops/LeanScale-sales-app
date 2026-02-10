@@ -1,7 +1,27 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import Layout from '../../components/Layout';
 import AvailabilityCalendar from '../../components/AvailabilityCalendar';
+
+const engagementTypes = [
+  {
+    id: 'embedded',
+    label: 'Embedded Team',
+    description: 'Ongoing GTM operations support with dedicated hours each month',
+    icon: '👥',
+    features: ['Dedicated team members', 'Monthly hour blocks', 'Continuous improvement', 'Flexible scope'],
+    recommended: true,
+  },
+  {
+    id: 'one-time',
+    label: 'One-Time Project',
+    description: 'Fixed-scope projects like Clay implementations, migrations, or audits',
+    icon: '🎯',
+    features: ['Fixed deliverables', 'Clear timeline', 'Project-based pricing', 'Defined scope'],
+    recommended: false,
+  },
+];
 
 const hourTiers = [
   { hours: 50, price: 15000, label: 'Starter', description: 'Best for early-stage startups' },
@@ -22,7 +42,9 @@ const paymentOptions = [
 ];
 
 export default function BuyLeanScale() {
-  const [step, setStep] = useState(1);
+  const router = useRouter();
+  const [step, setStep] = useState(0);
+  const [engagementType, setEngagementType] = useState('embedded');
   const [selectedHours, setSelectedHours] = useState(hourTiers[1]);
   const [cancellation, setCancellation] = useState(cancellationOptions[1]);
   const [payment, setPayment] = useState(paymentOptions[1]);
@@ -135,38 +157,134 @@ export default function BuyLeanScale() {
           </div>
         )}
 
-        <div style={{ 
-          display: 'flex', 
-          gap: '0.5rem', 
+        <div style={{
+          display: 'flex',
+          gap: '0.5rem',
           marginBottom: '2rem',
           justifyContent: 'center',
+          alignItems: 'center',
         }}>
-          {[1, 2, 3].map((s) => (
-            <div
-              key={s}
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: 600,
-                background: step >= s ? '#7c3aed' : '#e5e7eb',
-                color: step >= s ? 'white' : '#9ca3af',
-                cursor: step > s ? 'pointer' : 'default',
-              }}
-              onClick={() => step > s && setStep(s)}
-            >
-              {s}
+          {['Type', 'Plan', 'Date', 'Details'].map((label, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <div
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 600,
+                  fontSize: '0.875rem',
+                  background: step >= i ? '#7c3aed' : '#e5e7eb',
+                  color: step >= i ? 'white' : '#9ca3af',
+                  cursor: step > i ? 'pointer' : 'default',
+                  transition: 'all 0.2s ease',
+                }}
+                onClick={() => step > i && setStep(i)}
+              >
+                {i + 1}
+              </div>
+              {i < 3 && (
+                <div style={{
+                  width: 24,
+                  height: 2,
+                  background: step > i ? '#7c3aed' : '#e5e7eb',
+                  transition: 'all 0.2s ease',
+                }} />
+              )}
             </div>
           ))}
         </div>
 
+        {step === 0 && (
+          <div className="card" style={{ padding: '2rem' }}>
+            <h2 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', textAlign: 'center' }}>
+              How would you like to work with us?
+            </h2>
+            <p style={{ textAlign: 'center', color: '#6b7280', marginBottom: '2rem', fontSize: '0.9rem' }}>
+              Choose the engagement model that fits your needs
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
+              {engagementTypes.map((type) => (
+                <div
+                  key={type.id}
+                  onClick={() => setEngagementType(type.id)}
+                  style={{
+                    padding: '1.5rem',
+                    border: engagementType === type.id ? '2px solid #7c3aed' : '1px solid #e5e7eb',
+                    borderRadius: '16px',
+                    cursor: 'pointer',
+                    background: engagementType === type.id ? 'linear-gradient(135deg, #f5f3ff 0%, #faf5ff 100%)' : 'white',
+                    transition: 'all 0.2s ease',
+                    position: 'relative',
+                  }}
+                >
+                  {type.recommended && (
+                    <div style={{
+                      position: 'absolute',
+                      top: '-10px',
+                      right: '16px',
+                      background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)',
+                      color: 'white',
+                      padding: '0.25rem 0.75rem',
+                      borderRadius: '100px',
+                      fontSize: '0.7rem',
+                      fontWeight: 600,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px',
+                    }}>
+                      Most Popular
+                    </div>
+                  )}
+                  <div style={{ fontSize: '2rem', marginBottom: '0.75rem' }}>{type.icon}</div>
+                  <div style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+                    {type.label}
+                  </div>
+                  <p style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '1rem', lineHeight: 1.5 }}>
+                    {type.description}
+                  </p>
+                  <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                    {type.features.map((feature, i) => (
+                      <li key={i} style={{
+                        fontSize: '0.8rem',
+                        color: '#374151',
+                        marginBottom: '0.35rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                      }}>
+                        <span style={{ color: '#7c3aed' }}>✓</span> {feature}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ textAlign: 'center' }}>
+              <button
+                className="btn btn-primary"
+                style={{ padding: '0.875rem 2rem', fontSize: '1rem' }}
+                onClick={() => {
+                  if (engagementType === 'one-time') {
+                    router.push('/buy-leanscale/one-time-projects');
+                  } else {
+                    setStep(1);
+                  }
+                }}
+              >
+                Continue →
+              </button>
+            </div>
+          </div>
+        )}
+
         {step === 1 && (
           <div className="card" style={{ padding: '2rem' }}>
             <h2 style={{ fontSize: '1.25rem', marginBottom: '1.5rem', textAlign: 'center' }}>
-              Step 1: Choose Your Plan
+              Step 2: Choose Your Plan
             </h2>
             
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
@@ -294,9 +412,16 @@ export default function BuyLeanScale() {
               </div>
             </div>
 
-            <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
-              <button 
-                className="btn btn-primary" 
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1.5rem' }}>
+              <button
+                className="btn"
+                style={{ background: 'white', border: '1px solid #e5e7eb', color: '#374151' }}
+                onClick={() => setStep(0)}
+              >
+                ← Back
+              </button>
+              <button
+                className="btn btn-primary"
                 style={{ padding: '0.875rem 2rem', fontSize: '1rem' }}
                 onClick={() => setStep(2)}
               >
@@ -309,7 +434,7 @@ export default function BuyLeanScale() {
         {step === 2 && (
           <div className="card" style={{ padding: '2rem' }}>
             <h2 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', textAlign: 'center' }}>
-              Step 2: Select Your Start Date
+              Step 3: Select Your Start Date
             </h2>
             <p style={{ textAlign: 'center', color: '#6b7280', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
               Cohorts start every 2 weeks. Reserve your spot before it fills up.
@@ -345,7 +470,7 @@ export default function BuyLeanScale() {
           <form onSubmit={handleSubmit}>
             <div className="card" style={{ padding: '2rem' }}>
               <h2 style={{ fontSize: '1.25rem', marginBottom: '1.5rem', textAlign: 'center' }}>
-                Step 3: Your Details
+                Step 4: Your Details
               </h2>
 
               <div style={{
