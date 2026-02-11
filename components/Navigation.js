@@ -58,24 +58,28 @@ const diagnosticConfig = {
 
 /**
  * Build customer-specific nav items.
- * Core flow is flat links: Diagnostic → Engagement → SOW
+ * Primary flat links: Dashboard → Diagnostic → SOW
  * Secondary items go in a single "More" dropdown.
  */
 function buildCustomerNav(diagnosticType) {
   const diagLink = diagnosticConfig[diagnosticType] || diagnosticConfig.gtm;
 
   return [
+    { name: 'dashboard', label: 'Dashboard', type: 'link', href: '/dashboard' },
     { name: 'diagnostic', label: diagLink.label, type: 'link', href: diagLink.href },
-    { name: 'engagement', label: 'Engagement', type: 'link', href: '/try-leanscale/engagement' },
     { name: 'sow', label: 'SOW', type: 'link', href: '/sow' },
     {
       name: 'more',
       label: 'More',
       type: 'dropdown',
       links: [
+        { href: '/try-leanscale/engagement', label: 'Engagement' },
         { href: '/why-leanscale/services', label: 'Services Catalog' },
         { href: '/buy-leanscale/team', label: 'Your Team' },
+        { href: '/why-leanscale/resources', label: 'Key Resources' },
+        { href: '/why-leanscale/references', label: 'Customer References' },
         { href: '/buy-leanscale/security', label: 'Security' },
+        { href: '/why-leanscale/glossary', label: 'GTM Ops Glossary' },
       ],
     },
   ];
@@ -165,11 +169,7 @@ export default function Navigation() {
           )
         )}
 
-        {isActive ? (
-          <Link href={customerPath('/dashboard')} className="nav-cta" onClick={closeMenu}>
-            Dashboard
-          </Link>
-        ) : (
+        {!isActive && (
           <Link href={customerPath('/buy-leanscale')} className="nav-cta" onClick={closeMenu}>
             Get Started
           </Link>

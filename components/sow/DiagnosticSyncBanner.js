@@ -10,6 +10,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const STATUS_COLORS = {
   healthy: '#38A169',
@@ -24,6 +25,7 @@ export default function DiagnosticSyncBanner({ sowId }) {
   const [dismissed, setDismissed] = useState(false);
   const [resyncing, setResyncing] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [dismissedItems, setDismissedItems] = useState(new Set());
 
   useEffect(() => {
     if (!sowId) return;
@@ -143,82 +145,174 @@ export default function DiagnosticSyncBanner({ sowId }) {
         </div>
       </div>
 
-      {/* Expanded details */}
-      {expanded && (
-        <div style={{ padding: '1rem 1.25rem' }}>
-          {snapshotAt && (
-            <p style={{ fontSize: '0.75rem', color: '#B45309', marginBottom: '0.75rem' }}>
-              Snapshot taken: {new Date(snapshotAt).toLocaleString()}
-            </p>
-          )}
-
-          {/* Status changes */}
-          {statusChanged.length > 0 && (
-            <div style={{ marginBottom: '0.75rem' }}>
-              <h4 style={{ fontSize: '0.8rem', fontWeight: 600, color: '#92400E', marginBottom: '0.4rem' }}>
-                Status Changed ({statusChanged.length})
-              </h4>
-              {statusChanged.map(item => (
-                <div key={item.name} style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  padding: '0.25rem 0',
-                  fontSize: '0.8rem',
-                }}>
-                  <span style={{ color: '#4A5568' }}>{item.name}</span>
-                  <StatusDot status={item.previousStatus} />
-                  <span style={{ color: '#A0AEC0' }}>{'→'}</span>
-                  <StatusDot status={item.currentStatus} />
+      {/* Expanded details with per-item actions */}
+      <AnimatePresence>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            style={{ overflow: 'hidden' }}
+          >
+            <div style={{ padding: '1rem 1.25rem' }}>
+              {snapshotAt && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                  <p style={{ fontSize: '0.75rem', color: '#B45309', margin: 0 }}>
+                    Snapshot taken: {new Date(snapshotAt).toLocaleString()}
+                  </p>
+                  {dismissedItems.size > 0 && (
+                    <button
+                      onClick={() => setDismissedItems(new Set())}
+                      style={{
+                        fontSize: '0.7rem',
+                        color: '#B45309',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        textDecoration: 'underline',
+                      }}
+                    >
+                      Reset dismissed
+                    </button>
+                  )}
                 </div>
-              ))}
-            </div>
-          )}
+              )}
 
-          {/* Added items */}
-          {added.length > 0 && (
-            <div style={{ marginBottom: '0.75rem' }}>
-              <h4 style={{ fontSize: '0.8rem', fontWeight: 600, color: '#059669', marginBottom: '0.4rem' }}>
-                New Items ({added.length})
-              </h4>
-              {added.map(item => (
-                <div key={item.name} style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  padding: '0.25rem 0',
-                  fontSize: '0.8rem',
-                }}>
-                  <span style={{ color: '#059669' }}>+</span>
-                  <span style={{ color: '#4A5568' }}>{item.name}</span>
-                  <StatusDot status={item.status} />
+              {/* Status changes */}
+              {statusChanged.length > 0 && (
+                <div style={{ marginBottom: '0.75rem' }}>
+                  <h4 style={{ fontSize: '0.8rem', fontWeight: 600, color: '#92400E', marginBottom: '0.4rem' }}>
+                    Status Changed ({statusChanged.filter(i => !dismissedItems.has(i.name)).length}/{statusChanged.length})
+                  </h4>
+                  {statusChanged.map(item => dismissedItems.has(item.name) ? null : (
+                    <div key={item.name} style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: '0.5rem',
+                      padding: '0.35rem 0.5rem',
+                      fontSize: '0.8rem',
+                      borderRadius: '0.25rem',
+                      background: '#FFF',
+                      marginBottom: '0.25rem',
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <span style={{ color: '#4A5568' }}>{item.name}</span>
+                        <StatusDot status={item.previousStatus} />
+                        <span style={{ color: '#A0AEC0' }}>{'→'}</span>
+                        <StatusDot status={item.currentStatus} />
+                      </div>
+                      <button
+                        onClick={() => setDismissedItems(prev => new Set(prev).add(item.name))}
+                        style={{
+                          fontSize: '0.7rem',
+                          color: '#A0AEC0',
+                          background: 'none',
+                          border: '1px solid #E2E8F0',
+                          borderRadius: '0.25rem',
+                          padding: '0.15rem 0.5rem',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Dismiss
+                      </button>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          )}
+              )}
 
-          {/* Removed items */}
-          {removed.length > 0 && (
-            <div>
-              <h4 style={{ fontSize: '0.8rem', fontWeight: 600, color: '#E53E3E', marginBottom: '0.4rem' }}>
-                Removed Items ({removed.length})
-              </h4>
-              {removed.map(item => (
-                <div key={item.name} style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  padding: '0.25rem 0',
-                  fontSize: '0.8rem',
-                }}>
-                  <span style={{ color: '#E53E3E' }}>-</span>
-                  <span style={{ color: '#A0AEC0', textDecoration: 'line-through' }}>{item.name}</span>
+              {/* Added items */}
+              {added.length > 0 && (
+                <div style={{ marginBottom: '0.75rem' }}>
+                  <h4 style={{ fontSize: '0.8rem', fontWeight: 600, color: '#059669', marginBottom: '0.4rem' }}>
+                    New Priority Items ({added.filter(i => !dismissedItems.has(i.name)).length}/{added.length})
+                  </h4>
+                  {added.map(item => dismissedItems.has(item.name) ? null : (
+                    <div key={item.name} style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: '0.5rem',
+                      padding: '0.35rem 0.5rem',
+                      fontSize: '0.8rem',
+                      borderRadius: '0.25rem',
+                      background: '#FFF',
+                      marginBottom: '0.25rem',
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <span style={{ color: '#059669' }}>+</span>
+                        <span style={{ color: '#4A5568' }}>{item.name}</span>
+                        <StatusDot status={item.status} />
+                      </div>
+                      <button
+                        onClick={() => setDismissedItems(prev => new Set(prev).add(item.name))}
+                        style={{
+                          fontSize: '0.7rem',
+                          color: '#A0AEC0',
+                          background: 'none',
+                          border: '1px solid #E2E8F0',
+                          borderRadius: '0.25rem',
+                          padding: '0.15rem 0.5rem',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Skip
+                      </button>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
+
+              {/* Removed items */}
+              {removed.length > 0 && (
+                <div>
+                  <h4 style={{ fontSize: '0.8rem', fontWeight: 600, color: '#E53E3E', marginBottom: '0.4rem' }}>
+                    Removed Items ({removed.length})
+                  </h4>
+                  {removed.map(item => (
+                    <div key={item.name} style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      padding: '0.25rem 0.5rem',
+                      fontSize: '0.8rem',
+                    }}>
+                      <span style={{ color: '#E53E3E' }}>-</span>
+                      <span style={{ color: '#A0AEC0', textDecoration: 'line-through' }}>{item.name}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Dismiss All button */}
+              {(statusChanged.length > 0 || added.length > 0) && (
+                <div style={{ marginTop: '0.75rem', display: 'flex', gap: '0.5rem' }}>
+                  <button
+                    onClick={() => {
+                      const all = new Set(dismissedItems);
+                      statusChanged.forEach(i => all.add(i.name));
+                      added.forEach(i => all.add(i.name));
+                      setDismissedItems(all);
+                    }}
+                    style={{
+                      fontSize: '0.75rem',
+                      color: '#92400E',
+                      background: 'transparent',
+                      border: '1px solid #D97706',
+                      borderRadius: '0.25rem',
+                      padding: '0.25rem 0.75rem',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Dismiss All
+                  </button>
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

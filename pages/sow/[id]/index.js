@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Layout from '../../../components/Layout';
 import SowPage from '../../../components/sow/SowPage';
+import SowSkeleton from '../../../components/sow/SowSkeleton';
 import { useCustomer } from '../../../context/CustomerContext';
 
 export default function SowDetail() {
@@ -140,12 +141,8 @@ export default function SowDetail() {
           </Link>
         </div>
 
-        {/* Loading */}
-        {loading && (
-          <div style={{ textAlign: 'center', padding: '3rem 1rem', color: '#718096' }}>
-            <p>Loading SOW...</p>
-          </div>
-        )}
+        {/* Loading skeleton */}
+        {loading && <SowSkeleton />}
 
         {/* Error */}
         {error && !loading && (
@@ -170,6 +167,7 @@ export default function SowDetail() {
             readOnly={isReadOnly}
             onStatusUpdate={handleStatusUpdate}
             onExport={handleExport}
+            onSowUpdate={(updatedSow) => setSow(updatedSow)}
             customerSlug={customer?.slug}
             customerName={customer?.customerName}
           />
