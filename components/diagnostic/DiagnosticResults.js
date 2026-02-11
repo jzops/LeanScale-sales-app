@@ -11,6 +11,7 @@ import NoteDrawer from './NoteDrawer';
 import MarkdownImport from './MarkdownImport';
 import FilterBar from './FilterBar';
 import StatusPicker from './StatusPicker';
+import SowPreviewPanel from './SowPreviewPanel';
 
 /**
  * ItemTable — tabular view of diagnostic items with optional function/category column
@@ -332,6 +333,7 @@ export default function DiagnosticResults({ diagnosticType, readOnly = false }) 
   const [loadingData, setLoadingData] = useState(false);
   const [quickMode, setQuickMode] = useState(false);
   const [exportingPdf, setExportingPdf] = useState(false);
+  const [showSowPreview, setShowSowPreview] = useState(false);
   const [filters, setFilters] = useState({
     search: '', status: 'all', function: 'all', outcome: 'all', priorityOnly: false,
   });
@@ -685,6 +687,21 @@ export default function DiagnosticResults({ diagnosticType, readOnly = false }) 
                   {exportingPdf ? '⏳ Generating...' : '📄 Export PDF'}
                 </button>
               )}
+              <button
+                onClick={() => setShowSowPreview(!showSowPreview)}
+                style={{
+                  padding: 'var(--space-2) var(--space-4)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-semibold)',
+                  background: showSowPreview ? '#312e81' : 'var(--bg-subtle)',
+                  color: showSowPreview ? 'white' : 'var(--text-secondary)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: 'var(--radius-sm)',
+                  cursor: 'pointer',
+                }}
+              >
+                {showSowPreview ? '📋 Hide SOW Preview' : '📋 Preview SOW Impact'}
+              </button>
               {diagnosticResultId && (
                 <button
                   onClick={async () => {
@@ -835,8 +852,15 @@ export default function DiagnosticResults({ diagnosticType, readOnly = false }) 
           ))}
         </div>
 
-        {/* Tab Content */}
-        <div style={{ marginTop: 'var(--space-8)' }}>
+        {/* Tab Content — split view when SOW preview is active */}
+        <div style={{ marginTop: 'var(--space-8)', display: showSowPreview ? 'flex' : 'block', gap: 'var(--space-6)', alignItems: 'flex-start' }}>
+        {showSowPreview && (
+          <SowPreviewPanel
+            processes={allProcesses}
+            onClose={() => setShowSowPreview(false)}
+          />
+        )}
+        <div style={{ flex: 1, minWidth: 0 }}>
           {activeTab === 'power10' && power10Data && (
             <div>
               <div className="diagnostic-charts-row" style={{ marginBottom: 'var(--space-6)' }}>
@@ -984,6 +1008,7 @@ export default function DiagnosticResults({ diagnosticType, readOnly = false }) 
               <GroupedView items={processes} groupByField="outcome" groupNames={outcomes} />
             </div>
           )}
+        </div>
         </div>
 
         {/* CTA Banner */}
