@@ -5,10 +5,11 @@
  * to generate a branded, print-ready PDF.
  *
  * Props:
- *   sow       - The SOW object
- *   sections  - Array of sow_sections
+ *   sow              - The SOW object
+ *   sections         - Array of sow_sections
  *   diagnosticResult - Linked diagnostic result (optional)
  *   customerName     - Customer name for header
+ *   versionNumber    - Version number (for watermark)
  */
 
 import {
@@ -17,7 +18,6 @@ import {
   View,
   Text,
   StyleSheet,
-  Font,
 } from '@react-pdf/renderer';
 
 // Color palette matching LeanScale brand
@@ -34,6 +34,7 @@ const COLORS = {
   greenBg: '#F0FDF4',
   red: '#9B2C2C',
   yellow: '#975A16',
+  watermark: 'rgba(108, 92, 231, 0.06)',
 };
 
 const STATUS_COLORS = {
@@ -46,10 +47,24 @@ const STATUS_COLORS = {
 const styles = StyleSheet.create({
   page: {
     padding: 50,
+    paddingBottom: 70,
     fontSize: 10,
     fontFamily: 'Helvetica',
     color: COLORS.text,
   },
+
+  // Watermark
+  watermark: {
+    position: 'absolute',
+    top: '35%',
+    left: '15%',
+    fontSize: 80,
+    fontFamily: 'Helvetica-Bold',
+    color: COLORS.watermark,
+    transform: 'rotate(-35deg)',
+    opacity: 1,
+  },
+
   // Header
   header: {
     marginBottom: 30,
@@ -81,6 +96,47 @@ const styles = StyleSheet.create({
     color: COLORS.text,
   },
 
+  // Generation date / validity bar
+  validityBar: {
+    marginTop: 6,
+    paddingTop: 6,
+    borderTop: `1px solid ${COLORS.border}`,
+  },
+  validityText: {
+    fontSize: 8,
+    color: COLORS.textMuted,
+  },
+
+  // Table of Contents
+  tocContainer: {
+    marginBottom: 20,
+    padding: 14,
+    backgroundColor: COLORS.bgLight,
+    borderRadius: 4,
+    border: `1px solid ${COLORS.border}`,
+  },
+  tocTitle: {
+    fontSize: 14,
+    fontFamily: 'Helvetica-Bold',
+    color: COLORS.dark,
+    marginBottom: 10,
+  },
+  tocItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 3,
+    borderBottom: `1px dotted ${COLORS.border}`,
+  },
+  tocItemText: {
+    fontSize: 9,
+    color: COLORS.text,
+  },
+  tocItemPage: {
+    fontSize: 9,
+    color: COLORS.primary,
+    fontFamily: 'Helvetica-Bold',
+  },
+
   // Section headings
   sectionHeading: {
     fontSize: 14,
@@ -92,12 +148,23 @@ const styles = StyleSheet.create({
   },
 
   // Executive summary
+  execSummaryContainer: {
+    marginBottom: 20,
+    minPresenceAhead: 100,
+  },
   summaryBox: {
     backgroundColor: COLORS.bgLight,
     padding: 14,
     borderRadius: 4,
     borderLeft: `3px solid ${COLORS.primary}`,
-    marginBottom: 20,
+  },
+  summaryLabel: {
+    fontSize: 8,
+    fontFamily: 'Helvetica-Bold',
+    color: COLORS.primary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 6,
   },
   summaryText: {
     fontSize: 10,
@@ -224,11 +291,22 @@ const styles = StyleSheet.create({
     fontFamily: 'Helvetica-Bold',
     color: COLORS.dark,
   },
+  // Subtotal row per function group
+  subtotalRow: {
+    flexDirection: 'row',
+    padding: '6 10',
+    backgroundColor: COLORS.primaryLight,
+    borderBottom: `1px solid ${COLORS.border}`,
+  },
   tableFooter: {
     flexDirection: 'row',
-    padding: '8 10',
-    backgroundColor: COLORS.bgLight,
-    borderTop: `2px solid ${COLORS.primary}`,
+    padding: '10 10',
+    backgroundColor: COLORS.dark,
+  },
+  tableFooterCell: {
+    fontSize: 10,
+    fontFamily: 'Helvetica-Bold',
+    color: 'white',
   },
 
   // Column widths for table
@@ -260,7 +338,7 @@ const styles = StyleSheet.create({
     minWidth: 20,
   },
 
-  // Footer
+  // Footer (fixed on every page)
   footer: {
     position: 'absolute',
     bottom: 30,
@@ -268,6 +346,7 @@ const styles = StyleSheet.create({
     right: 50,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     borderTop: `1px solid ${COLORS.border}`,
     paddingTop: 8,
   },
@@ -280,18 +359,41 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     fontFamily: 'Helvetica-Bold',
   },
+  footerPageNumber: {
+    fontSize: 8,
+    color: COLORS.textMuted,
+  },
 });
 
 const BAR_COLORS = ['#6C5CE7', '#00B894', '#FDCB6E', '#E17055', '#0984E3', '#A29BFE'];
+
+/**
+ * Group sections by their `function_area` (or 'General') and compute subtotals.
+ */
+function groupSectionsByFunction(sections) {
+  const groups = {};
+  for (const section of sections) {
+    const key = section.function_area || 'General';
+    if (!groups[key]) groups[key] = { label: key, sections: [], totalHours: 0, totalCost: 0 };
+    const h = parseFloat(section.hours) || 0;
+    const r = parseFloat(section.rate) || 0;
+    groups[key].sections.push(section);
+    groups[key].totalHours += h;
+    groups[key].totalCost += h * r;
+  }
+  return Object.values(groups);
+}
 
 export default function SowPdfDocument({
   sow,
   sections = [],
   diagnosticResult,
   customerName = '',
+  versionNumber,
 }) {
   const content = sow.content || {};
   const diagnosticProcesses = diagnosticResult?.processes || [];
+  const isDraft = sow.status === 'draft';
 
   // Calculate totals
   const totalHours = sow.total_hours
@@ -303,16 +405,44 @@ export default function SowPdfDocument({
         return sum + (parseFloat(s.hours) || 0) * (parseFloat(s.rate) || 0);
       }, 0);
 
-  // Date range
-  const formattedDate = new Date().toLocaleDateString('en-US', {
+  // Dates
+  const now = new Date();
+  const formattedDate = now.toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
+  const validUntil = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+  const formattedValidUntil = validUntil.toLocaleDateString('en-US', {
     month: 'long',
     day: 'numeric',
     year: 'numeric',
   });
 
+  // Watermark text
+  const watermarkText = isDraft ? 'DRAFT' : versionNumber ? `v${versionNumber}` : null;
+
+  // Build TOC entries
+  const tocEntries = [];
+  if (content.executive_summary) tocEntries.push('Executive Summary');
+  if (sections.length > 0) tocEntries.push('Scope of Work');
+  if (sections.some(s => s.start_date && s.end_date)) tocEntries.push('Timeline');
+  if (sections.length > 0) tocEntries.push('Investment Summary');
+
+  // Group sections for investment table
+  const functionGroups = groupSectionsByFunction(sections);
+  const hasMultipleGroups = functionGroups.length > 1;
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>
+        {/* ===== WATERMARK ===== */}
+        {watermarkText && (
+          <Text style={styles.watermark} fixed>
+            {watermarkText}
+          </Text>
+        )}
+
         {/* ===== HEADER ===== */}
         <View style={styles.header}>
           <Text style={styles.headerTitle}>{sow.title}</Text>
@@ -326,6 +456,11 @@ export default function SowPdfDocument({
             <Text style={styles.metaItem}>
               Type: <Text style={styles.metaValue}>{sow.sow_type}</Text>
             </Text>
+            {versionNumber && (
+              <Text style={styles.metaItem}>
+                Version: <Text style={styles.metaValue}>v{versionNumber}</Text>
+              </Text>
+            )}
             {totalHours > 0 && (
               <Text style={styles.metaItem}>
                 Total Hours: <Text style={styles.metaValue}>{totalHours}</Text>
@@ -337,13 +472,43 @@ export default function SowPdfDocument({
               </Text>
             )}
           </View>
+          {/* Generation date and validity */}
+          <View style={styles.validityBar}>
+            <Text style={styles.validityText}>
+              Generated: {formattedDate} | Valid for 30 days (until {formattedValidUntil})
+              {isDraft ? ' | STATUS: DRAFT' : ''}
+            </Text>
+          </View>
         </View>
+
+        {/* ===== TABLE OF CONTENTS ===== */}
+        {tocEntries.length > 0 && (
+          <View style={styles.tocContainer} wrap={false}>
+            <Text style={styles.tocTitle}>Table of Contents</Text>
+            {tocEntries.map((entry, idx) => (
+              <View key={idx} style={styles.tocItem}>
+                <Text style={styles.tocItemText}>
+                  {idx + 1}. {entry}
+                </Text>
+              </View>
+            ))}
+            {/* Scope subsections */}
+            {sections.map((section, idx) => (
+              <View key={`sub-${idx}`} style={[styles.tocItem, { paddingLeft: 16 }]}>
+                <Text style={[styles.tocItemText, { color: COLORS.textLight, fontSize: 8 }]}>
+                  {idx + 1}. {section.title}
+                </Text>
+              </View>
+            ))}
+          </View>
+        )}
 
         {/* ===== EXECUTIVE SUMMARY ===== */}
         {content.executive_summary && (
-          <View>
+          <View style={styles.execSummaryContainer} minPresenceAhead={100}>
             <Text style={styles.sectionHeading}>Executive Summary</Text>
             <View style={styles.summaryBox}>
+              <Text style={styles.summaryLabel}>Overview</Text>
               <Text style={styles.summaryText}>{content.executive_summary}</Text>
             </View>
           </View>
@@ -361,7 +526,12 @@ export default function SowPdfDocument({
               const linkedItems = section.diagnostic_items || [];
 
               return (
-                <View key={section.id || idx} style={styles.scopeCard} wrap={false}>
+                <View
+                  key={section.id || idx}
+                  style={styles.scopeCard}
+                  wrap={false}
+                  minPresenceAhead={80}
+                >
                   <View style={styles.scopeHeader}>
                     <Text style={styles.scopeTitle}>
                       {idx + 1}. {section.title}
@@ -436,7 +606,7 @@ export default function SowPdfDocument({
 
         {/* ===== TIMELINE ===== */}
         {sections.some(s => s.start_date && s.end_date) && (
-          <View wrap={false} style={{ marginTop: 10 }}>
+          <View wrap={false} style={{ marginTop: 10 }} minPresenceAhead={60}>
             <Text style={styles.sectionHeading}>Timeline</Text>
             {sections
               .filter(s => s.start_date && s.end_date)
@@ -460,7 +630,7 @@ export default function SowPdfDocument({
 
         {/* ===== INVESTMENT TABLE ===== */}
         {sections.length > 0 && (
-          <View wrap={false} style={{ marginTop: 10 }}>
+          <View wrap={false} style={{ marginTop: 10 }} minPresenceAhead={80}>
             <Text style={styles.sectionHeading}>Investment Summary</Text>
             <View style={styles.table}>
               {/* Header */}
@@ -471,33 +641,69 @@ export default function SowPdfDocument({
                 <Text style={[styles.tableHeaderCell, styles.colSubtotal]}>Subtotal</Text>
               </View>
 
-              {/* Rows */}
-              {sections.map((section, idx) => {
-                const h = parseFloat(section.hours) || 0;
-                const r = parseFloat(section.rate) || 0;
-                const subtotal = h * r;
-
+              {/* Rows grouped by function */}
+              {functionGroups.map((group, gIdx) => {
+                let rowIndex = 0;
                 return (
-                  <View
-                    key={section.id || idx}
-                    style={[styles.tableRow, idx % 2 === 1 ? styles.tableRowAlt : {}]}
-                  >
-                    <Text style={[styles.tableCellBold, styles.colSection]}>{section.title}</Text>
-                    <Text style={[styles.tableCell, styles.colHours]}>{h > 0 ? String(h) : '—'}</Text>
-                    <Text style={[styles.tableCell, styles.colRate]}>{r > 0 ? `$${r.toLocaleString()}` : '—'}</Text>
-                    <Text style={[styles.tableCellBold, styles.colSubtotal, { color: COLORS.green }]}>
-                      {subtotal > 0 ? `$${subtotal.toLocaleString()}` : '—'}
-                    </Text>
+                  <View key={gIdx}>
+                    {/* Group label if multiple groups */}
+                    {hasMultipleGroups && (
+                      <View style={[styles.tableRow, { backgroundColor: COLORS.primaryLight }]}>
+                        <Text style={[styles.tableCellBold, { color: COLORS.primary, fontSize: 8, textTransform: 'uppercase', letterSpacing: 0.5 }]}>
+                          {group.label}
+                        </Text>
+                      </View>
+                    )}
+
+                    {group.sections.map((section, idx) => {
+                      const h = parseFloat(section.hours) || 0;
+                      const r = parseFloat(section.rate) || 0;
+                      const subtotal = h * r;
+                      const isAlt = rowIndex % 2 === 1;
+                      rowIndex++;
+
+                      return (
+                        <View
+                          key={section.id || idx}
+                          style={[styles.tableRow, isAlt ? styles.tableRowAlt : {}]}
+                        >
+                          <Text style={[styles.tableCellBold, styles.colSection]}>
+                            {hasMultipleGroups ? '  ' : ''}{section.title}
+                          </Text>
+                          <Text style={[styles.tableCell, styles.colHours]}>{h > 0 ? String(h) : '—'}</Text>
+                          <Text style={[styles.tableCell, styles.colRate]}>{r > 0 ? `$${r.toLocaleString()}` : '—'}</Text>
+                          <Text style={[styles.tableCellBold, styles.colSubtotal, { color: COLORS.green }]}>
+                            {subtotal > 0 ? `$${subtotal.toLocaleString()}` : '—'}
+                          </Text>
+                        </View>
+                      );
+                    })}
+
+                    {/* Subtotal row per group (only if multiple groups) */}
+                    {hasMultipleGroups && (
+                      <View style={styles.subtotalRow}>
+                        <Text style={[styles.tableCellBold, styles.colSection, { fontSize: 8, color: COLORS.primary }]}>
+                          {group.label} Subtotal
+                        </Text>
+                        <Text style={[styles.tableCellBold, styles.colHours, { fontSize: 8, color: COLORS.primary }]}>
+                          {group.totalHours > 0 ? String(group.totalHours) : ''}
+                        </Text>
+                        <Text style={[styles.tableCell, styles.colRate]}></Text>
+                        <Text style={[styles.tableCellBold, styles.colSubtotal, { fontSize: 9, color: COLORS.primary }]}>
+                          ${group.totalCost.toLocaleString()}
+                        </Text>
+                      </View>
+                    )}
                   </View>
                 );
               })}
 
-              {/* Footer */}
+              {/* Grand Total Footer */}
               <View style={styles.tableFooter}>
-                <Text style={[styles.tableCellBold, styles.colSection]}>Total</Text>
-                <Text style={[styles.tableCellBold, styles.colHours]}>{totalHours > 0 ? String(totalHours) : ''}</Text>
-                <Text style={[styles.tableCell, styles.colRate]}></Text>
-                <Text style={[styles.tableCellBold, styles.colSubtotal, { color: COLORS.green, fontSize: 11 }]}>
+                <Text style={[styles.tableFooterCell, styles.colSection]}>Grand Total</Text>
+                <Text style={[styles.tableFooterCell, styles.colHours]}>{totalHours > 0 ? String(totalHours) : ''}</Text>
+                <Text style={[styles.tableFooterCell, styles.colRate]}></Text>
+                <Text style={[styles.tableFooterCell, styles.colSubtotal, { fontSize: 12 }]}>
                   ${totalInvestment.toLocaleString()}
                 </Text>
               </View>
@@ -505,11 +711,15 @@ export default function SowPdfDocument({
           </View>
         )}
 
-        {/* ===== FOOTER ===== */}
+        {/* ===== FOOTER (fixed on every page) ===== */}
         <View style={styles.footer} fixed>
           <Text style={styles.footerText}>
             {customerName ? `${customerName} — ` : ''}{sow.title}
           </Text>
+          <Text
+            style={styles.footerPageNumber}
+            render={({ pageNumber, totalPages }) => `Page ${pageNumber} of ${totalPages}`}
+          />
           <Text style={styles.footerBrand}>LeanScale</Text>
         </View>
       </Page>

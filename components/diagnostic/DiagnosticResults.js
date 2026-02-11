@@ -22,6 +22,7 @@ function ItemTable({
   showPriority = true,
   functionLabel = 'Function',
   editMode = false,
+  readOnly = false,
   onStatusChange,
   onPriorityToggle,
   notes = [],
@@ -39,7 +40,7 @@ function ItemTable({
             {showFunction && <th>{functionLabel}</th>}
             <th style={{ textAlign: 'center' }}>Status</th>
             {showPriority && <th style={{ textAlign: 'center' }}>Priority</th>}
-            {editMode && <th style={{ textAlign: 'center', width: '60px' }}>Notes</th>}
+            {(editMode || readOnly) && <th style={{ textAlign: 'center', width: '60px' }}>Notes</th>}
           </tr>
         </thead>
         <tbody>
@@ -100,22 +101,41 @@ function ItemTable({
                     )}
                   </td>
                 )}
-                {editMode && (
+                {(editMode || readOnly) && (
                   <td style={{ textAlign: 'center' }}>
-                    <button
-                      onClick={() => onRowExpand?.(isExpanded ? null : item.name)}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        cursor: 'pointer',
-                        fontSize: '0.8rem',
-                        color: noteCount > 0 ? 'var(--ls-purple)' : 'var(--text-muted)',
-                        padding: '0.2rem',
-                      }}
-                      title={isExpanded ? 'Close notes' : 'Open notes'}
-                    >
-                      {noteCount > 0 ? `💬 ${noteCount}` : '💬'}
-                    </button>
+                    {noteCount > 0 ? (
+                      <button
+                        onClick={() => onRowExpand?.(isExpanded ? null : item.name)}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          fontSize: '0.8rem',
+                          color: noteCount > 0 ? 'var(--ls-purple)' : 'var(--text-muted)',
+                          padding: '0.2rem',
+                        }}
+                        title={isExpanded ? 'Close notes' : 'Open notes'}
+                      >
+                        {`💬 ${noteCount}`}
+                      </button>
+                    ) : readOnly ? (
+                      <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>—</span>
+                    ) : (
+                      <button
+                        onClick={() => onRowExpand?.(isExpanded ? null : item.name)}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          fontSize: '0.8rem',
+                          color: 'var(--text-muted)',
+                          padding: '0.2rem',
+                        }}
+                        title="Open notes"
+                      >
+                        💬
+                      </button>
+                    )}
                   </td>
                 )}
               </tr>
@@ -125,12 +145,13 @@ function ItemTable({
       </table>
 
       {/* Render NoteDrawer below the table for the expanded row */}
-      {editMode && expandedRow && (
+      {(editMode || readOnly) && expandedRow && (
         <NoteDrawer
           processName={expandedRow}
           notes={notes}
-          onAddNote={onAddNote}
-          onDeleteNote={onDeleteNote}
+          onAddNote={readOnly ? undefined : onAddNote}
+          onDeleteNote={readOnly ? undefined : onDeleteNote}
+          readOnly={readOnly}
         />
       )}
     </div>
@@ -294,7 +315,7 @@ function HealthOverviewCard({ label, stats }) {
  *
  * @param {string} diagnosticType - 'gtm' | 'clay' | 'cpq'
  */
-export default function DiagnosticResults({ diagnosticType }) {
+export default function DiagnosticResults({ diagnosticType, readOnly = false }) {
   const router = useRouter();
   const { customer, isDemo, customerPath } = useCustomer();
   const config = diagnosticRegistry[diagnosticType];
@@ -310,6 +331,7 @@ export default function DiagnosticResults({ diagnosticType }) {
   const [saving, setSaving] = useState(false);
   const [loadingData, setLoadingData] = useState(false);
   const [quickMode, setQuickMode] = useState(false);
+  const [exportingPdf, setExportingPdf] = useState(false);
   const [filters, setFilters] = useState({
     search: '', status: 'all', function: 'all', outcome: 'all', priorityOnly: false,
   });
@@ -579,8 +601,8 @@ export default function DiagnosticResults({ diagnosticType }) {
           </h1>
           <p className="page-subtitle">{config.subtitle}</p>
 
-          {/* Edit mode toggle + Import button + Build SOW (only for non-demo customers) */}
-          {!isDemo && (
+          {/* Edit mode toggle + Import button + Build SOW (only for non-demo customers, hidden in readOnly) */}
+          {!isDemo && !readOnly && (
             <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', marginTop: '0.75rem', flexWrap: 'wrap' }}>
               <button
                 onClick={() => setEditMode(!editMode)}
@@ -626,6 +648,43 @@ export default function DiagnosticResults({ diagnosticType }) {
               >
                 Import Markdown
               </button>
+              {diagnosticResultId && (
+                <button
+                  disabled={exportingPdf}
+                  onClick={async () => {
+                    setExportingPdf(true);
+                    try {
+                      const res = await fetch(
+                        `/api/diagnostics/export?diagnosticType=${diagnosticType}&customerId=${customer.id}`
+                      );
+                      if (!res.ok) throw new Error('Export failed');
+                      const blob = await res.blob();
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = `${customer.customerName || 'Diagnostic'}-${diagnosticType}-diagnostic.pdf`;
+                      a.click();
+                      URL.revokeObjectURL(url);
+                    } catch (err) {
+                      console.error('Error exporting diagnostic PDF:', err);
+                    } finally {
+                      setExportingPdf(false);
+                    }
+                  }}
+                  style={{
+                    padding: '0.4rem 1rem',
+                    fontSize: '0.8rem',
+                    background: 'var(--bg-subtle)',
+                    color: 'var(--text-secondary)',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: 'var(--radius-sm)',
+                    cursor: exportingPdf ? 'wait' : 'pointer',
+                    opacity: exportingPdf ? 0.6 : 1,
+                  }}
+                >
+                  {exportingPdf ? '⏳ Generating...' : '📄 Export PDF'}
+                </button>
+              )}
               {diagnosticResultId && (
                 <button
                   onClick={async () => {
@@ -674,7 +733,7 @@ export default function DiagnosticResults({ diagnosticType }) {
         </div>
 
         {/* Markdown Import Modal */}
-        {showImport && (
+        {showImport && !readOnly && (
           <div style={{ marginBottom: '2rem' }}>
             <MarkdownImport
               diagnosticType={diagnosticType}
@@ -888,7 +947,8 @@ export default function DiagnosticResults({ diagnosticType }) {
                   items={processes}
                   showFunction={true}
                   functionLabel={categoryLabel}
-                  editMode={editMode}
+                  editMode={readOnly ? false : editMode}
+                  readOnly={readOnly}
                   onStatusChange={handleStatusChange}
                   onPriorityToggle={handlePriorityToggle}
                   notes={notes}
@@ -927,18 +987,25 @@ export default function DiagnosticResults({ diagnosticType }) {
         </div>
 
         {/* CTA Banner */}
-        <div className="cta-banner" style={{ marginTop: '2rem' }}>
-          <h3 className="cta-title">{cta.title}</h3>
-          <p className="cta-subtitle">{cta.subtitle}</p>
-          <div className="cta-buttons">
-            <Link href={customerPath(cta.primaryLink)} className="btn cta-btn-primary">
-              {cta.primaryLabel}
-            </Link>
-            <Link href={customerPath(cta.secondaryLink)} className="btn cta-btn-secondary">
-              {cta.secondaryLabel}
-            </Link>
+        {readOnly ? (
+          <div className="cta-banner" style={{ marginTop: '2rem', background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)' }}>
+            <h3 className="cta-title">Want to learn more?</h3>
+            <p className="cta-subtitle">Contact your LeanScale advisor to discuss these findings and recommended next steps.</p>
           </div>
-        </div>
+        ) : (
+          <div className="cta-banner" style={{ marginTop: '2rem' }}>
+            <h3 className="cta-title">{cta.title}</h3>
+            <p className="cta-subtitle">{cta.subtitle}</p>
+            <div className="cta-buttons">
+              <Link href={customerPath(cta.primaryLink)} className="btn cta-btn-primary">
+                {cta.primaryLabel}
+              </Link>
+              <Link href={customerPath(cta.secondaryLink)} className="btn cta-btn-secondary">
+                {cta.secondaryLabel}
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
     </Layout>
   );

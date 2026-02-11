@@ -28,16 +28,17 @@ export default async function handler(req, res) {
     const sections = await listSections(id);
     const { exportedBy, customerName } = req.body || {};
 
-    // Generate PDF buffer
+    // Get version number and generate PDF
+    const versionNumber = await getNextVersionNumber(id);
     const pdfBuffer = await generateSowPdf({
       sow,
       sections,
       diagnosticResult: null, // Could fetch if needed
       customerName: customerName || '',
+      versionNumber,
     });
 
     // Create version snapshot
-    const versionNumber = await getNextVersionNumber(id);
     const version = await createVersion({
       sowId: id,
       versionNumber,
