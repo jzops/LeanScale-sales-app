@@ -490,6 +490,11 @@ export default function SowPage({
         </div>
       )}
 
+      {/* ===== CUSTOMER WORKFLOW (readOnly mode) ===== */}
+      {readOnly && (
+        <CustomerWorkflowPanel sowId={sow.id} sowStatus={sow.status} onExport={onExport} />
+      )}
+
       {/* ===== VERSION HISTORY ===== */}
       <div style={{ marginBottom: '2rem' }}>
         <h2 style={sectionHeadingStyle}>Versions</h2>

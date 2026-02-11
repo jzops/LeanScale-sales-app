@@ -63,7 +63,7 @@ async function handleGet(id, req, res) {
 async function handlePut(id, req, res) {
   try {
     const {
-      title, status, content, transcriptText, diagnosticSnapshot,
+      title, status, content, contentPartial, transcriptText, diagnosticSnapshot,
       diagnosticResultIds, overallRating, totalHours, totalInvestment,
       startDate, endDate, teamworkProjectId, teamworkProjectUrl, currentVersion,
     } = req.body;
@@ -72,7 +72,17 @@ async function handlePut(id, req, res) {
     const updates = {};
     if (title !== undefined) updates.title = title;
     if (status !== undefined) updates.status = status;
-    if (content !== undefined) updates.content = content;
+
+    // Support partial content updates (merge with existing JSONB)
+    if (contentPartial !== undefined) {
+      const existingSow = await getSowById(id);
+      if (!existingSow) {
+        return res.status(404).json({ success: false, error: 'SOW not found' });
+      }
+      updates.content = { ...(existingSow.content || {}), ...contentPartial };
+    } else if (content !== undefined) {
+      updates.content = content;
+    }
     if (transcriptText !== undefined) updates.transcript_text = transcriptText;
     if (diagnosticSnapshot !== undefined) updates.diagnostic_snapshot = diagnosticSnapshot;
     if (diagnosticResultIds !== undefined) updates.diagnostic_result_ids = diagnosticResultIds;
