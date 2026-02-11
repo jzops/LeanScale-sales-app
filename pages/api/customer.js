@@ -27,8 +27,10 @@ export default async function handler(req, res) {
       customerType: customer.customerType || 'active',
     };
 
-    // Cache for 5 minutes
-    res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate');
+    // No CDN caching — response varies by slug query param which Netlify
+    // edge cache doesn't key on, causing cross-customer data leaks
+    res.setHeader('Cache-Control', 'private, no-store, no-cache, must-revalidate');
+    res.setHeader('Netlify-Vary', 'query=slug');
 
     return res.status(200).json(config);
   } catch (err) {

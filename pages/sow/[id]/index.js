@@ -5,6 +5,9 @@ import Layout from '../../../components/Layout';
 import SowPage from '../../../components/sow/SowPage';
 import SowSkeleton from '../../../components/sow/SowSkeleton';
 import { useCustomer } from '../../../context/CustomerContext';
+import { getCustomerServerSideProps } from '../../../lib/getCustomer';
+
+export const getServerSideProps = getCustomerServerSideProps;
 
 export default function SowDetail() {
   const router = useRouter();

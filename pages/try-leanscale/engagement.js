@@ -4,6 +4,9 @@ import Layout from '../../components/Layout';
 import { processes as staticProcesses, managedServicesHealth, statusToLabel } from '../../data/diagnostic-data';
 import { strategicProjects, managedServices } from '../../data/services-catalog';
 import { useCustomer } from '../../context/CustomerContext';
+import { getCustomerServerSideProps } from '../../lib/getCustomer';
+
+export const getServerSideProps = getCustomerServerSideProps;
 
 const allStrategicProjects = [
   ...strategicProjects.crossFunctional,
