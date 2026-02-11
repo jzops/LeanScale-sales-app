@@ -25,10 +25,15 @@ export async function middleware(request) {
     const url = request.nextUrl.clone();
     url.pathname = remainingPath;
 
-    const response = NextResponse.rewrite(url);
+    // Set slug on request headers so getServerSideProps can read it
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set('x-customer-slug', customerSlug);
 
-    // Set customer slug in header and cookie
-    response.headers.set('x-customer-slug', customerSlug);
+    const response = NextResponse.rewrite(url, {
+      request: { headers: requestHeaders },
+    });
+
+    // Set cookie for client-side access
     response.cookies.set('customer-slug', customerSlug, {
       httpOnly: false,
       secure: process.env.NODE_ENV === 'production',
@@ -50,11 +55,13 @@ export async function middleware(request) {
     customerSlug = 'demo';
   }
 
-  // Create response with customer info injected
-  const response = NextResponse.next();
+  // Set slug on request headers so getServerSideProps can read it
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-customer-slug', customerSlug);
 
-  // Set customer slug in header for server-side access
-  response.headers.set('x-customer-slug', customerSlug);
+  const response = NextResponse.next({
+    request: { headers: requestHeaders },
+  });
 
   // Set cookie for client-side access
   // Using session cookie (no maxAge) for non-path-based routing
