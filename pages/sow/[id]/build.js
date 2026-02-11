@@ -1,16 +1,17 @@
 /**
  * SOW Builder Page
  *
- * /sow/[id]/build — Diagnostic item selection + section creation
+ * /sow/[id]/build — WYSIWYG SOW builder with live preview
  *
  * Loads the SOW and its linked diagnostic result, then renders
- * the SowBuilder component for the two-panel editing experience.
+ * the SplitBuilder component for side-by-side editing + preview.
  */
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Layout from '../../../components/Layout';
+import SplitBuilder from '../../../components/sow/SplitBuilder';
 import SowBuilder from '../../../components/sow/SowBuilder';
 import { useCustomer } from '../../../context/CustomerContext';
 
@@ -44,8 +45,6 @@ export default function SowBuildPage() {
 
         // Fetch linked diagnostic result if we have diagnostic_result_ids
         if (sowData.diagnostic_result_ids && sowData.diagnostic_result_ids.length > 0 && customer?.id) {
-          // We need to find the diagnostic type from the diagnostic result
-          // Try all types and use whichever returns data
           for (const type of ['gtm', 'clay', 'cpq']) {
             const diagRes = await fetch(`/api/diagnostics/${type}?customerId=${customer.id}`);
             if (diagRes.ok) {
@@ -69,15 +68,16 @@ export default function SowBuildPage() {
   }, [id, customer?.id]);
 
   function handleSave() {
-    // Refresh SOW data after save
     router.replace(router.asPath);
   }
 
+  const customerName = customer?.name || sow?.content?.client_info?.company || '';
+
   return (
-    <Layout title={sow ? `Build: ${sow.title}` : 'SOW Builder'}>
-      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '1.5rem 1rem' }}>
+    <Layout title={sow ? `Build: ${sow.title}` : 'SOW Builder'} fullWidth>
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         {/* Breadcrumb */}
-        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '1.5rem', fontSize: '0.875rem' }}>
+        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', padding: '0.75rem 1rem', fontSize: '0.875rem', borderBottom: '1px solid #E2E8F0', flexShrink: 0 }}>
           <Link href={customerPath('/sow')} style={{ color: '#6C5CE7', textDecoration: 'none' }}>
             Statements of Work
           </Link>
@@ -105,6 +105,7 @@ export default function SowBuildPage() {
           <div style={{
             textAlign: 'center',
             padding: '2rem',
+            margin: '1rem',
             background: '#FFF5F5',
             border: '1px solid #FED7D7',
             borderRadius: '0.75rem',
@@ -114,53 +115,26 @@ export default function SowBuildPage() {
           </div>
         )}
 
-        {/* No diagnostic data */}
+        {/* No diagnostic data - still show SplitBuilder with empty diagnostics */}
         {sow && !loading && !error && !diagnosticResult && (
-          <div style={{
-            textAlign: 'center',
-            padding: '3rem 2rem',
-            background: '#FFFFF0',
-            border: '1px solid #FEFCBF',
-            borderRadius: '0.75rem',
-          }}>
-            <h2 style={{ fontSize: '1.25rem', color: '#975A16', marginBottom: '0.75rem' }}>
-              No Diagnostic Data Linked
-            </h2>
-            <p style={{ color: '#744210', fontSize: '0.875rem', marginBottom: '1rem' }}>
-              This SOW doesn&apos;t have linked diagnostic results. You can still create sections manually,
-              or go back and create this SOW from a diagnostic page.
-            </p>
-            <SowBuilder
-              sow={sow}
-              sections={sections}
-              diagnosticResult={{ processes: [] }}
-              onSave={handleSave}
-            />
-          </div>
+          <SplitBuilder
+            sow={sow}
+            sections={sections}
+            diagnosticResult={{ processes: [] }}
+            onSave={handleSave}
+            customerName={customerName}
+          />
         )}
 
-        {/* Builder */}
+        {/* Builder with diagnostic data */}
         {sow && !loading && !error && diagnosticResult && (
-          <>
-            <div style={{ marginBottom: '1.5rem' }}>
-              <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#1a1a2e', marginBottom: '0.25rem' }}>
-                {sow.title}
-              </h1>
-              <p style={{ fontSize: '0.875rem', color: '#718096' }}>
-                Select diagnostic items and organize them into SOW sections.
-                {diagnosticResult.processes?.length > 0 && (
-                  <span> {diagnosticResult.processes.length} diagnostic items available.</span>
-                )}
-              </p>
-            </div>
-
-            <SowBuilder
-              sow={sow}
-              sections={sections}
-              diagnosticResult={diagnosticResult}
-              onSave={handleSave}
-            />
-          </>
+          <SplitBuilder
+            sow={sow}
+            sections={sections}
+            diagnosticResult={diagnosticResult}
+            onSave={handleSave}
+            customerName={customerName}
+          />
         )}
       </div>
     </Layout>

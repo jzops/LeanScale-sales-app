@@ -369,15 +369,25 @@ export default function SowBuilder({
         if (s.end_date && (!maxDate || s.end_date > maxDate)) maxDate = s.end_date;
       });
 
+      // Apply global discount and tax
+      const globalDiscount = investmentConfig.globalDiscount || 0;
+      const taxRate = investmentConfig.taxRate || 0;
+      const afterDiscount = totalInvestment * (1 - globalDiscount / 100);
+      const withTax = afterDiscount * (1 + taxRate / 100);
+
       // Update the SOW with calculated totals
       await fetch(`/api/sow/${sow.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           totalHours,
-          totalInvestment,
+          totalInvestment: withTax,
           startDate: minDate,
           endDate: maxDate,
+          contentPartial: {
+            investment_config: investmentConfig,
+            velocity,
+          },
         }),
       });
 
@@ -546,6 +556,14 @@ export default function SowBuilder({
         </div>
       </div>
 
+      {/* Investment Configurator */}
+      <InvestmentConfigurator
+        sections={sections}
+        config={investmentConfig}
+        onConfigChange={saveInvestmentConfig}
+        onApplyRateToAll={applyRateToAll}
+      />
+
       {/* Two-panel layout */}
       <div style={{
         display: 'grid',
@@ -679,17 +697,15 @@ export default function SowBuilder({
                     cursor: 'grab',
                   }}
                 >
-                  <SectionEditor
+                  <SectionConfigurator
                     section={section}
                     onUpdate={(updates) => updateSection(section.id, updates)}
                     onDelete={() => deleteSection(section.id)}
                     diagnosticItems={processMap}
+                    defaultRate={investmentConfig.defaultRate}
+                    velocity={velocity}
+                    currency={investmentConfig.currency}
                   />
-                  {section.diagnostic_items?.length > 0 && (
-                    <div style={{ padding: '0 0.75rem 0.5rem', fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
-                      📊 Auto-generated from diagnostic ({section.diagnostic_items.length} items)
-                    </div>
-                  )}
                 </div>
               ))}
             </div>
@@ -704,6 +720,14 @@ export default function SowBuilder({
           onCancel={() => setShowCatalog(false)}
         />
       )}
+
+      {/* Timeline Configurator */}
+      <TimelineConfigurator
+        sections={sections}
+        onUpdateSection={(sectionId, updates) => updateSection(sectionId, updates)}
+        velocity={velocity}
+        onVelocityChange={handleVelocityChange}
+      />
 
       {/* Assumptions & Acceptance Criteria Editor */}
       <AssumptionsEditor

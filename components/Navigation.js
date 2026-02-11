@@ -31,6 +31,7 @@ const prospectSections = [
       { href: '/try-leanscale/clay-diagnostic', label: 'Clay Diagnostic' },
       { href: '/try-leanscale/cpq-diagnostic', label: 'Q2C Diagnostic' },
       { href: '/try-leanscale/engagement', label: 'Engagement Overview' },
+      { href: '/try-leanscale/workflow', label: '🚀 Sales Workflow' },
     ],
   },
   {
@@ -65,6 +66,7 @@ function buildCustomerNav(diagnosticType) {
   const diagLink = diagnosticConfig[diagnosticType] || diagnosticConfig.gtm;
 
   return [
+    { name: 'workflow', label: '🚀 Workflow', type: 'link', href: '/try-leanscale/workflow' },
     { name: 'diagnostic', label: diagLink.label, type: 'link', href: diagLink.href },
     { name: 'engagement', label: 'Engagement', type: 'link', href: '/try-leanscale/engagement' },
     { name: 'sow', label: 'SOW', type: 'link', href: '/sow' },
