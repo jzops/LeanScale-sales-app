@@ -8,7 +8,16 @@ import { listServices, createService } from '../../../lib/service-catalog';
 
 export default async function handler(req, res) {
   if (req.method === 'GET') {
-    const { category, active, search } = req.query;
+    const { category, active, search, slugs } = req.query;
+
+    // Slug-based lookup for engagement page
+    if (slugs) {
+      const { getServicesBySlugs } = await import('../../../lib/service-catalog');
+      const slugArr = slugs.split(',').map(s => s.trim()).filter(Boolean);
+      const map = await getServicesBySlugs(slugArr);
+      return res.status(200).json({ success: true, data: Array.from(map.values()) });
+    }
+
     const services = await listServices({
       category: category || undefined,
       active: active !== undefined ? active === 'true' : undefined,

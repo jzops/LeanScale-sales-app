@@ -11,12 +11,15 @@
  *   createdBy: string
  * }
  *
- * Creates a new SOW linked to the diagnostic result with status 'draft',
- * then returns the SOW so the user can be redirected to /sow/[id]/build.
+ * Creates a new SOW linked to the diagnostic result with auto-populated
+ * sections based on diagnostic data and service catalog.
  */
 
-import { createSow } from '../../../lib/sow';
+import { createSow, updateSow } from '../../../lib/sow';
 import { getDiagnosticResult } from '../../../lib/diagnostics';
+import { bulkCreateSections } from '../../../lib/sow-sections';
+import { getServicesBySlugs } from '../../../lib/service-catalog';
+import { generateSectionsFromDiagnostic, generateExecutiveSummary } from '../../../lib/sow-auto-generate';
 
 const VALID_SOW_TYPES = ['clay', 'q2c', 'embedded', 'custom'];
 
@@ -73,20 +76,32 @@ export default async function handler(req, res) {
     else if (criticalPct > 0.3) overallRating = 'warning';
     else if (criticalPct > 0.1) overallRating = 'moderate';
 
+    // Look up service catalog entries by slug for auto-generation
+    const slugs = [...new Set(processes.filter(p => p.serviceId).map(p => p.serviceId))];
+    const catalogMap = slugs.length > 0 ? await getServicesBySlugs(slugs) : new Map();
+
+    // Generate sections from diagnostic data
+    const generatedSections = generateSectionsFromDiagnostic(processes, catalogMap);
+
+    // Generate executive summary
+    const executiveSummary = generateExecutiveSummary(
+      processes, customerName, diagnosticType, overallRating
+    );
+
     // Auto-generate title
     const title = customerName
       ? `${customerName} Statement of Work`
       : 'Statement of Work';
 
-    // Create the SOW with diagnostic links
+    // Create the SOW
     const sow = await createSow({
       customerId,
       title,
       sowType,
       content: {
-        executive_summary: '',
+        executive_summary: executiveSummary,
         client_info: customerName ? { company: customerName } : {},
-        scope: [],
+        scope: generatedSections.map(s => ({ title: s.title, description: s.description, deliverables: s.deliverables })),
         deliverables_table: [],
         timeline: [],
         investment: { total: 0, payment_terms: '', breakdown: [] },
@@ -101,9 +116,21 @@ export default async function handler(req, res) {
       return res.status(500).json({ success: false, error: 'Failed to create SOW' });
     }
 
-    // Now update the SOW with the new diagnostic-linked fields
-    // (createSow doesn't support these yet, so we update after creation)
-    const { updateSow } = await import('../../../lib/sow');
+    // Create sections in the database
+    let sections = [];
+    if (generatedSections.length > 0) {
+      sections = await bulkCreateSections(sow.id, generatedSections);
+    }
+
+    // Calculate totals from generated sections
+    let totalHours = 0;
+    let totalInvestment = 0;
+    for (const s of generatedSections) {
+      if (s.hours) totalHours += s.hours;
+      if (s.hours && s.rate) totalInvestment += s.hours * s.rate;
+    }
+
+    // Update the SOW with diagnostic links and totals
     await updateSow(sow.id, {
       diagnostic_result_ids: [diagnosticResultId],
       overall_rating: overallRating,
@@ -115,14 +142,19 @@ export default async function handler(req, res) {
         })),
         snapshotAt: new Date().toISOString(),
       },
+      total_hours: totalHours || null,
+      total_investment: totalInvestment || null,
     });
 
     return res.status(201).json({
       success: true,
       data: {
         ...sow,
+        sections,
         diagnostic_result_ids: [diagnosticResultId],
         overall_rating: overallRating,
+        total_hours: totalHours,
+        total_investment: totalInvestment,
       },
       diagnosticProcesses: processes,
     });
