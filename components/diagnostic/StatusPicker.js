@@ -86,7 +86,7 @@ export default function StatusPicker({ currentStatus, onChange }) {
             left: '50%',
             transform: 'translateX(-50%)',
             zIndex: 50,
-            background: 'white',
+            background: 'var(--bg-white)',
             border: '1px solid var(--border-color)',
             borderRadius: 'var(--radius-md)',
             boxShadow: 'var(--shadow-lg)',
@@ -108,7 +108,7 @@ export default function StatusPicker({ currentStatus, onChange }) {
               style={{
                 background: i === focusIndex ? 'var(--bg-subtle)' : s === currentStatus ? 'rgba(124, 58, 237, 0.06)' : 'transparent',
                 border: 'none',
-                padding: '0.35rem 0.5rem',
+                padding: 'var(--space-1) var(--space-2)',
                 cursor: 'pointer',
                 borderRadius: 'var(--radius-sm)',
                 textAlign: 'left',

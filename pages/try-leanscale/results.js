@@ -59,21 +59,21 @@ export default function CustomerResultsPage() {
     : '#9ca3af';
 
   return (
-    <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", minHeight: '100vh', background: '#f8fafc' }}>
+    <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", minHeight: '100vh', background: 'var(--bg-subtle)' }}>
       {/* Clean header */}
       <div style={{
         background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%)',
-        padding: '3rem 1.5rem 2rem',
+        padding: 'var(--space-12) var(--space-6) var(--space-8)',
         color: 'white',
         textAlign: 'center',
       }}>
-        <p style={{ fontSize: '0.85rem', color: '#c4b5fd', marginBottom: '0.5rem', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+        <p style={{ fontSize: 'var(--text-sm)', color: '#c4b5fd', marginBottom: 'var(--space-2)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
           {customer?.customerName || 'Your Company'}
         </p>
-        <h1 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '0.5rem' }}>
+        <h1 style={{ fontSize: 'var(--text-3xl)', fontWeight: 'var(--font-bold)', marginBottom: 'var(--space-2)' }}>
           Your GTM Assessment Results
         </h1>
-        <p style={{ fontSize: '1rem', color: '#c4b5fd', maxWidth: '600px', margin: '0 auto' }}>
+        <p style={{ fontSize: 'var(--text-base)', color: '#c4b5fd', maxWidth: '600px', margin: '0 auto' }}>
           A comprehensive review of your go-to-market operations, processes, and tools.
         </p>
       </div>
@@ -86,68 +86,68 @@ export default function CustomerResultsPage() {
           padding: '0 1.5rem',
         }}>
           <div style={{
-            background: 'white',
-            borderRadius: '0.75rem',
-            border: '1px solid #e2e8f0',
-            padding: '1.5rem 2rem',
+            background: 'var(--bg-white)',
+            borderRadius: 'var(--radius-xl)',
+            border: '1px solid var(--border-color)',
+            padding: 'var(--space-6) var(--space-8)',
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-            gap: '1.5rem',
+            gap: 'var(--space-6)',
             boxShadow: '0 4px 6px -1px rgba(0,0,0,0.07)',
           }}>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '0.75rem', color: '#718096', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Overall Health
               </div>
-              <div style={{ fontSize: '1.5rem', fontWeight: 700, color: overallColor }}>
+              <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-bold)', color: overallColor }}>
                 {overallHealth}
               </div>
-              <div style={{ fontSize: '0.8rem', color: '#a0aec0' }}>{summaryData.healthPct}% healthy</div>
+              <div style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)' }}>{summaryData.healthPct}% healthy</div>
             </div>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '0.75rem', color: '#718096', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Processes Assessed
               </div>
-              <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#1e1b4b' }}>{summaryData.total}</div>
+              <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-bold)', color: '#1e1b4b' }}>{summaryData.total}</div>
             </div>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '0.75rem', color: '#718096', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Areas of Concern
               </div>
-              <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#ef4444' }}>{summaryData.warningCount}</div>
+              <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-bold)', color: '#ef4444' }}>{summaryData.warningCount}</div>
             </div>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '0.75rem', color: '#718096', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Priority Items
               </div>
-              <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#6c5ce7' }}>{summaryData.priorityCount}</div>
+              <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-bold)', color: 'var(--ls-purple-light)' }}>{summaryData.priorityCount}</div>
             </div>
           </div>
 
           {/* Key Findings */}
           {summaryData.topFindings.length > 0 && (
             <div style={{
-              background: 'white',
-              borderRadius: '0.75rem',
-              border: '1px solid #e2e8f0',
+              background: 'var(--bg-white)',
+              borderRadius: 'var(--radius-xl)',
+              border: '1px solid var(--border-color)',
               padding: '1.25rem 2rem',
-              marginTop: '1rem',
+              marginTop: 'var(--space-4)',
             }}>
-              <h3 style={{ fontSize: '0.9rem', fontWeight: 600, color: '#1a1a2e', marginBottom: '0.75rem' }}>
+              <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', color: 'var(--gray-900)', marginBottom: 'var(--space-3)' }}>
                 Key Findings
               </h3>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
                 {summaryData.topFindings.map((name) => (
                   <span key={name} style={{
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '0.375rem',
-                    padding: '0.35rem 0.75rem',
-                    background: '#FFF5F5',
-                    border: '1px solid #FED7D7',
-                    borderRadius: '9999px',
-                    fontSize: '0.8rem',
-                    color: '#9B2C2C',
+                    padding: 'var(--space-1) var(--space-3)',
+                    background: 'var(--status-warning-bg)',
+                    border: '1px solid var(--status-warning-bg)',
+                    borderRadius: 'var(--radius-full)',
+                    fontSize: 'var(--text-sm)',
+                    color: 'var(--status-warning-text)',
                   }}>
                     <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#ef4444', display: 'inline-block' }} />
                     {name}
@@ -159,16 +159,16 @@ export default function CustomerResultsPage() {
 
           {/* Recommended Next Steps */}
           <div style={{
-            background: 'white',
-            borderRadius: '0.75rem',
-            border: '1px solid #e2e8f0',
+            background: 'var(--bg-white)',
+            borderRadius: 'var(--radius-xl)',
+            border: '1px solid var(--border-color)',
             padding: '1.25rem 2rem',
-            marginTop: '1rem',
+            marginTop: 'var(--space-4)',
           }}>
-            <h3 style={{ fontSize: '0.9rem', fontWeight: 600, color: '#1a1a2e', marginBottom: '0.75rem' }}>
+            <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', color: 'var(--gray-900)', marginBottom: 'var(--space-3)' }}>
               Recommended Next Steps
             </h3>
-            <ol style={{ margin: 0, paddingLeft: '1.25rem', color: '#4a5568', fontSize: '0.875rem', lineHeight: 1.7 }}>
+            <ol style={{ margin: 0, paddingLeft: '1.25rem', color: 'var(--text-primary)', fontSize: 'var(--text-sm)', lineHeight: 1.7 }}>
               <li>Review the detailed findings below to understand each area of your GTM operations.</li>
               <li>Schedule a follow-up with your LeanScale advisor to discuss prioritization.</li>
               <li>View our engagement recommendations for a tailored improvement plan.</li>
@@ -178,8 +178,8 @@ export default function CustomerResultsPage() {
           {/* CTA buttons */}
           <div style={{
             display: 'flex',
-            gap: '1rem',
-            marginTop: '1.5rem',
+            gap: 'var(--space-4)',
+            marginTop: 'var(--space-6)',
             justifyContent: 'center',
             flexWrap: 'wrap',
           }}>
@@ -188,13 +188,13 @@ export default function CustomerResultsPage() {
               target="_blank"
               rel="noopener noreferrer"
               style={{
-                padding: '0.75rem 2rem',
+                padding: 'var(--space-3) var(--space-8)',
                 background: '#6c5ce7',
                 color: 'white',
                 border: 'none',
-                borderRadius: '0.5rem',
-                fontSize: '0.95rem',
-                fontWeight: 600,
+                borderRadius: 'var(--radius-lg)',
+                fontSize: 'var(--text-base)',
+                fontWeight: 'var(--font-semibold)',
                 textDecoration: 'none',
                 textAlign: 'center',
               }}
@@ -204,13 +204,13 @@ export default function CustomerResultsPage() {
             <Link
               href={customerPath('/try-leanscale/engagement')}
               style={{
-                padding: '0.75rem 2rem',
-                background: 'white',
-                color: '#6c5ce7',
-                border: '2px solid #6c5ce7',
-                borderRadius: '0.5rem',
-                fontSize: '0.95rem',
-                fontWeight: 600,
+                padding: 'var(--space-3) var(--space-8)',
+                background: 'var(--bg-white)',
+                color: 'var(--ls-purple-light)',
+                border: '2px solid var(--ls-purple-light)',
+                borderRadius: 'var(--radius-lg)',
+                fontSize: 'var(--text-base)',
+                fontWeight: 'var(--font-semibold)',
                 textDecoration: 'none',
                 textAlign: 'center',
               }}
@@ -229,10 +229,10 @@ export default function CustomerResultsPage() {
       {/* Footer */}
       <div style={{
         textAlign: 'center',
-        padding: '2rem 1rem',
-        borderTop: '1px solid #e2e8f0',
-        color: '#a0aec0',
-        fontSize: '0.8rem',
+        padding: 'var(--space-8) var(--space-4)',
+        borderTop: '1px solid var(--border-color)',
+        color: 'var(--text-muted)',
+        fontSize: 'var(--text-sm)',
       }}>
         Powered by LeanScale &bull; {new Date().getFullYear()}
       </div>

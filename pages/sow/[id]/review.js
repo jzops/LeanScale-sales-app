@@ -37,9 +37,10 @@ export default function SowReviewPage() {
           setVersions(json.versions || []);
 
           // Load linked diagnostic if available
-          if (json.data.diagnostic_result_id) {
+          const linkedDiagId = json.data.diagnostic_result_ids?.[0] || json.data.diagnostic_result_id;
+          if (linkedDiagId) {
             try {
-              const diagRes = await fetch(`/api/diagnostics/by-id?id=${json.data.diagnostic_result_id}`);
+              const diagRes = await fetch(`/api/diagnostics/by-id?id=${linkedDiagId}`);
               if (diagRes.ok) {
                 const diagJson = await diagRes.json();
                 if (diagJson.success) setDiagnosticResult(diagJson.data);
@@ -81,7 +82,7 @@ export default function SowReviewPage() {
   if (loading) {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-        <p style={{ color: '#718096', fontSize: '1rem' }}>Loading proposal...</p>
+        <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-base)' }}>Loading proposal...</p>
       </div>
     );
   }
@@ -90,19 +91,19 @@ export default function SowReviewPage() {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
         <div style={{ textAlign: 'center' }}>
-          <p style={{ color: '#9B2C2C', fontSize: '1rem', marginBottom: '1rem' }}>{error || 'Proposal not found.'}</p>
-          <a href="/" style={{ color: '#6c5ce7', textDecoration: 'underline' }}>Return home</a>
+          <p style={{ color: 'var(--status-warning-text)', fontSize: 'var(--text-base)', marginBottom: 'var(--space-4)' }}>{error || 'Proposal not found.'}</p>
+          <a href="/" style={{ color: 'var(--ls-purple-light)', textDecoration: 'underline' }}>Return home</a>
         </div>
       </div>
     );
   }
 
   return (
-    <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", minHeight: '100vh', background: '#f8fafc' }}>
+    <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", minHeight: '100vh', background: 'var(--bg-subtle)' }}>
       {/* Customer branded header */}
       <div style={{
         background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%)',
-        padding: '2.5rem 1.5rem 1.5rem',
+        padding: 'var(--space-10) var(--space-6) var(--space-6)',
         color: 'white',
         textAlign: 'center',
       }}>
@@ -110,17 +111,17 @@ export default function SowReviewPage() {
           <img
             src={customer.customerLogo}
             alt={customer.customerName}
-            style={{ height: '40px', marginBottom: '1rem', objectFit: 'contain' }}
+            style={{ height: '40px', marginBottom: 'var(--space-4)', objectFit: 'contain' }}
           />
         ) : (
-          <p style={{ fontSize: '0.85rem', color: '#c4b5fd', marginBottom: '0.5rem', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+          <p style={{ fontSize: 'var(--text-sm)', color: '#c4b5fd', marginBottom: 'var(--space-2)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
             {customer?.customerName || 'Proposal Review'}
           </p>
         )}
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 700, marginBottom: '0.25rem' }}>
+        <h1 style={{ fontSize: 'var(--text-3xl)', fontWeight: 'var(--font-bold)', marginBottom: '0.25rem' }}>
           {sow.title}
         </h1>
-        <p style={{ fontSize: '0.9rem', color: '#c4b5fd' }}>
+        <p style={{ fontSize: 'var(--text-sm)', color: '#c4b5fd' }}>
           Statement of Work &bull; {sow.sow_type} &bull; {new Date(sow.created_at).toLocaleDateString()}
         </p>
       </div>
@@ -141,10 +142,10 @@ export default function SowReviewPage() {
       {/* Footer */}
       <div style={{
         textAlign: 'center',
-        padding: '2rem 1rem',
-        borderTop: '1px solid #e2e8f0',
-        color: '#a0aec0',
-        fontSize: '0.8rem',
+        padding: 'var(--space-8) var(--space-4)',
+        borderTop: '1px solid var(--border-color)',
+        color: 'var(--text-muted)',
+        fontSize: 'var(--text-sm)',
       }}>
         Powered by LeanScale &bull; {new Date().getFullYear()}
       </div>

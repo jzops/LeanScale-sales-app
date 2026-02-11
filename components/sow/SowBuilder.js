@@ -347,13 +347,13 @@ export default function SowBuilder({
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          padding: '0.75rem 1.25rem',
-          background: '#FFF5F5',
-          border: '1px solid #FED7D7',
-          borderRadius: '0.75rem',
-          marginBottom: '1rem',
-          color: '#9B2C2C',
-          fontSize: '0.875rem',
+          padding: 'var(--space-3) var(--space-5)',
+          background: 'var(--status-warning-bg)',
+          border: '1px solid var(--status-warning-bg)',
+          borderRadius: 'var(--radius-xl)',
+          marginBottom: 'var(--space-4)',
+          color: 'var(--status-warning-text)',
+          fontSize: 'var(--text-sm)',
         }}>
           <span>{error}</span>
           <button
@@ -361,9 +361,9 @@ export default function SowBuilder({
             style={{
               background: 'none',
               border: 'none',
-              color: '#9B2C2C',
+              color: 'var(--status-warning-text)',
               cursor: 'pointer',
-              fontSize: '1rem',
+              fontSize: 'var(--text-base)',
               padding: '0 0.25rem',
             }}
           >
@@ -378,29 +378,29 @@ export default function SowBuilder({
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          padding: '0.75rem 1.25rem',
-          background: '#F0FFF4',
-          border: '1px solid #C6F6D5',
-          borderRadius: '0.75rem',
-          marginBottom: '1rem',
-          fontSize: '0.875rem',
-          color: '#276749',
+          padding: 'var(--space-3) var(--space-5)',
+          background: 'var(--status-healthy-bg)',
+          border: '1px solid var(--status-healthy-bg)',
+          borderRadius: 'var(--radius-xl)',
+          marginBottom: 'var(--space-4)',
+          fontSize: 'var(--text-sm)',
+          color: 'var(--status-healthy-text)',
         }}>
           <span>
             ✨ <strong>{sections.length} sections</strong> were auto-generated from your diagnostic results.
             Review and adjust hours, rates, and deliverables as needed.
           </span>
-          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
             <select
               value={groupBy}
               onChange={handleGroupByChange}
               style={{
                 padding: '0.3rem 0.5rem',
-                border: '1px solid #C6F6D5',
-                borderRadius: '0.375rem',
-                fontSize: '0.75rem',
-                background: 'white',
-                color: '#276749',
+                border: '1px solid var(--status-healthy-bg)',
+                borderRadius: 'var(--radius-md)',
+                fontSize: 'var(--text-xs)',
+                background: 'var(--bg-white)',
+                color: 'var(--status-healthy-text)',
               }}
             >
               <option value="function">Group by Function</option>
@@ -410,13 +410,13 @@ export default function SowBuilder({
               onClick={handleRegenerate}
               disabled={regenerating}
               style={{
-                padding: '0.35rem 0.75rem',
+                padding: 'var(--space-1) var(--space-3)',
                 background: '#276749',
                 color: 'white',
                 border: 'none',
-                borderRadius: '0.375rem',
-                fontSize: '0.75rem',
-                fontWeight: 500,
+                borderRadius: 'var(--radius-md)',
+                fontSize: 'var(--text-xs)',
+                fontWeight: 'var(--font-medium)',
                 cursor: regenerating ? 'wait' : 'pointer',
                 opacity: regenerating ? 0.7 : 1,
               }}
@@ -449,15 +449,15 @@ export default function SowBuilder({
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: '1rem 1.25rem',
-        background: '#F7FAFC',
-        border: '1px solid #E2E8F0',
-        borderRadius: '0.75rem',
-        marginBottom: '1.5rem',
+        padding: 'var(--space-4) var(--space-5)',
+        background: 'var(--bg-subtle)',
+        border: '1px solid var(--border-color)',
+        borderRadius: 'var(--radius-xl)',
+        marginBottom: 'var(--space-6)',
         flexWrap: 'wrap',
-        gap: '0.75rem',
+        gap: 'var(--space-3)',
       }}>
-        <div style={{ display: 'flex', gap: '1.5rem', fontSize: '0.875rem' }}>
+        <div style={{ display: 'flex', gap: 'var(--space-6)', fontSize: 'var(--text-sm)' }}>
           <SummaryItem label="Sections" value={sections.length} />
           <SummaryItem label="Total Hours" value={totalHours} />
           <SummaryItem label="Total Investment" value={`$${totalInvestment.toLocaleString()}`} color="#276749" />
@@ -466,18 +466,18 @@ export default function SowBuilder({
             <SummaryItem label="Unassigned" value={unassignedCount} color="#E53E3E" />
           )}
         </div>
-        <div style={{ display: 'flex', gap: '0.75rem' }}>
+        <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
           <button
             onClick={handleSaveAll}
             disabled={saving}
             style={{
-              padding: '0.5rem 1.25rem',
-              background: '#6C5CE7',
+              padding: 'var(--space-2) var(--space-5)',
+              background: 'var(--ls-purple-light)',
               color: 'white',
               border: 'none',
-              borderRadius: '0.375rem',
-              fontSize: '0.875rem',
-              fontWeight: 600,
+              borderRadius: 'var(--radius-md)',
+              fontSize: 'var(--text-sm)',
+              fontWeight: 'var(--font-semibold)',
               cursor: saving ? 'wait' : 'pointer',
               opacity: saving ? 0.7 : 1,
             }}
@@ -491,7 +491,7 @@ export default function SowBuilder({
       <div style={{
         display: 'grid',
         gridTemplateColumns: '1fr 1fr',
-        gap: '1.5rem',
+        gap: 'var(--space-6)',
         alignItems: 'start',
       }}>
         {/* Left panel: Diagnostic Item Picker */}
@@ -500,22 +500,22 @@ export default function SowBuilder({
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            marginBottom: '0.75rem',
+            marginBottom: 'var(--space-3)',
           }}>
-            <h3 style={{ fontSize: '1rem', fontWeight: 600, color: '#1a1a2e', margin: 0 }}>
+            <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 'var(--font-semibold)', color: 'var(--gray-900)', margin: 0 }}>
               Diagnostic Items
             </h3>
             {activeSection && unassignedCount > 0 && (
               <button
                 onClick={() => assignItemsToSection(activeSection)}
                 style={{
-                  padding: '0.35rem 0.75rem',
-                  background: '#6C5CE7',
+                  padding: 'var(--space-1) var(--space-3)',
+                  background: 'var(--ls-purple-light)',
                   color: 'white',
                   border: 'none',
-                  borderRadius: '0.375rem',
-                  fontSize: '0.75rem',
-                  fontWeight: 500,
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: 'var(--text-xs)',
+                  fontWeight: 'var(--font-medium)',
                   cursor: 'pointer',
                 }}
               >
@@ -537,22 +537,22 @@ export default function SowBuilder({
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            marginBottom: '0.75rem',
+            marginBottom: 'var(--space-3)',
           }}>
-            <h3 style={{ fontSize: '1rem', fontWeight: 600, color: '#1a1a2e', margin: 0 }}>
+            <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 'var(--font-semibold)', color: 'var(--gray-900)', margin: 0 }}>
               SOW Sections
             </h3>
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
               <button
                 onClick={() => setShowCatalog(true)}
                 style={{
-                  padding: '0.35rem 0.75rem',
-                  background: '#059669',
+                  padding: 'var(--space-1) var(--space-3)',
+                  background: 'var(--status-healthy)',
                   color: 'white',
                   border: 'none',
-                  borderRadius: '0.375rem',
-                  fontSize: '0.75rem',
-                  fontWeight: 500,
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: 'var(--text-xs)',
+                  fontWeight: 'var(--font-medium)',
                   cursor: 'pointer',
                 }}
               >
@@ -561,13 +561,13 @@ export default function SowBuilder({
               <button
                 onClick={addSection}
                 style={{
-                  padding: '0.35rem 0.75rem',
-                  background: '#6C5CE7',
+                  padding: 'var(--space-1) var(--space-3)',
+                  background: 'var(--ls-purple-light)',
                   color: 'white',
                   border: 'none',
-                  borderRadius: '0.375rem',
-                  fontSize: '0.75rem',
-                  fontWeight: 500,
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: 'var(--text-xs)',
+                  fontWeight: 'var(--font-medium)',
                   cursor: 'pointer',
                 }}
               >
@@ -578,24 +578,24 @@ export default function SowBuilder({
 
           {sections.length === 0 ? (
             <div style={{
-              padding: '3rem 2rem',
+              padding: 'var(--space-12) var(--space-8)',
               textAlign: 'center',
               border: '2px dashed #E2E8F0',
-              borderRadius: '0.75rem',
-              color: '#A0AEC0',
+              borderRadius: 'var(--radius-xl)',
+              color: 'var(--text-muted)',
             }}>
-              <p style={{ fontSize: '0.875rem', marginBottom: '0.75rem' }}>
+              <p style={{ fontSize: 'var(--text-sm)', marginBottom: 'var(--space-3)' }}>
                 No sections yet. Create sections to organize diagnostic items into SOW bundles.
               </p>
               <button
                 onClick={addSection}
                 style={{
-                  padding: '0.5rem 1rem',
-                  background: '#6C5CE7',
+                  padding: 'var(--space-2) var(--space-4)',
+                  background: 'var(--ls-purple-light)',
                   color: 'white',
                   border: 'none',
-                  borderRadius: '0.375rem',
-                  fontSize: '0.875rem',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: 'var(--text-sm)',
                   cursor: 'pointer',
                 }}
               >
@@ -603,7 +603,7 @@ export default function SowBuilder({
               </button>
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
               {sections.map((section, index) => (
                 <div
                   key={section.id}
@@ -616,7 +616,7 @@ export default function SowBuilder({
                   style={{
                     outline: activeSection === section.id ? '2px solid #6C5CE7' : 'none',
                     outlineOffset: '2px',
-                    borderRadius: '0.75rem',
+                    borderRadius: 'var(--radius-xl)',
                     cursor: 'grab',
                   }}
                 >
@@ -627,7 +627,7 @@ export default function SowBuilder({
                     diagnosticItems={processMap}
                   />
                   {section.diagnostic_items?.length > 0 && (
-                    <div style={{ padding: '0 0.75rem 0.5rem', fontSize: '0.7rem', color: '#A0AEC0' }}>
+                    <div style={{ padding: '0 0.75rem 0.5rem', fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
                       📊 Auto-generated from diagnostic ({section.diagnostic_items.length} items)
                     </div>
                   )}
@@ -659,10 +659,10 @@ export default function SowBuilder({
 function SummaryItem({ label, value, color }) {
   return (
     <div>
-      <div style={{ fontSize: '0.7rem', color: '#A0AEC0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+      <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
         {label}
       </div>
-      <div style={{ fontWeight: 600, color: color || '#1a1a2e' }}>
+      <div style={{ fontWeight: 'var(--font-semibold)', color: color || '#1a1a2e' }}>
         {value}
       </div>
     </div>

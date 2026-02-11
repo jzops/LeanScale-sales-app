@@ -110,7 +110,7 @@ function ItemTable({
                           background: 'none',
                           border: 'none',
                           cursor: 'pointer',
-                          fontSize: '0.8rem',
+                          fontSize: 'var(--text-sm)',
                           color: noteCount > 0 ? 'var(--ls-purple)' : 'var(--text-muted)',
                           padding: '0.2rem',
                         }}
@@ -119,7 +119,7 @@ function ItemTable({
                         {`💬 ${noteCount}`}
                       </button>
                     ) : readOnly ? (
-                      <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>—</span>
+                      <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)' }}>—</span>
                     ) : (
                       <button
                         onClick={() => onRowExpand?.(isExpanded ? null : item.name)}
@@ -127,7 +127,7 @@ function ItemTable({
                           background: 'none',
                           border: 'none',
                           cursor: 'pointer',
-                          fontSize: '0.8rem',
+                          fontSize: 'var(--text-sm)',
                           color: 'var(--text-muted)',
                           padding: '0.2rem',
                         }}
@@ -274,31 +274,31 @@ function StatusColorDot({ status }) {
  */
 function HealthOverviewCard({ label, stats }) {
   return (
-    <div style={{ padding: '1rem', borderRadius: '8px', background: 'rgba(255,255,255,0.08)' }}>
-      <div style={{ fontSize: '0.7rem', color: '#a5b4fc', marginBottom: '0.5rem' }}>{label}</div>
-      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+    <div style={{ padding: 'var(--space-4)', borderRadius: '8px', background: 'rgba(255,255,255,0.08)' }}>
+      <div style={{ fontSize: 'var(--text-xs)', color: '#a5b4fc', marginBottom: 'var(--space-2)' }}>{label}</div>
+      <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
         {stats.healthy > 0 && (
-          <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.75rem', color: '#4ade80' }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: 'var(--text-xs)', color: '#4ade80' }}>
             <StatusColorDot status="healthy" /> {stats.healthy}
           </span>
         )}
         {stats.careful > 0 && (
-          <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.75rem', color: '#facc15' }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: 'var(--text-xs)', color: '#facc15' }}>
             <StatusColorDot status="careful" /> {stats.careful}
           </span>
         )}
         {stats.warning > 0 && (
-          <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.75rem', color: '#f87171' }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: 'var(--text-xs)', color: '#f87171' }}>
             <StatusColorDot status="warning" /> {stats.warning}
           </span>
         )}
         {stats.unable > 0 && (
-          <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.75rem', color: '#9ca3af' }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: 'var(--text-xs)', color: '#9ca3af' }}>
             <StatusColorDot status="unable" /> {stats.unable}
           </span>
         )}
         {stats.na > 0 && (
-          <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.75rem', color: '#d1d5db' }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: 'var(--text-xs)', color: '#d1d5db' }}>
             <StatusColorDot status="na" /> {stats.na} N/A
           </span>
         )}
@@ -603,13 +603,13 @@ export default function DiagnosticResults({ diagnosticType, readOnly = false }) 
 
           {/* Edit mode toggle + Import button + Build SOW (only for non-demo customers, hidden in readOnly) */}
           {!isDemo && !readOnly && (
-            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', marginTop: '0.75rem', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: 'var(--space-2)', justifyContent: 'center', marginTop: 'var(--space-3)', flexWrap: 'wrap' }}>
               <button
                 onClick={() => setEditMode(!editMode)}
                 style={{
-                  padding: '0.4rem 1rem',
-                  fontSize: '0.8rem',
-                  fontWeight: 600,
+                  padding: 'var(--space-2) var(--space-4)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-semibold)',
                   background: editMode ? 'var(--ls-purple)' : 'var(--bg-subtle)',
                   color: editMode ? 'white' : 'var(--text-secondary)',
                   border: '1px solid var(--border-color)',
@@ -622,9 +622,9 @@ export default function DiagnosticResults({ diagnosticType, readOnly = false }) 
               <button
                 onClick={() => setQuickMode(!quickMode)}
                 style={{
-                  padding: '0.4rem 1rem',
-                  fontSize: '0.8rem',
-                  fontWeight: 600,
+                  padding: 'var(--space-2) var(--space-4)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-semibold)',
                   background: quickMode ? '#f59e0b' : 'var(--bg-subtle)',
                   color: quickMode ? 'white' : 'var(--text-secondary)',
                   border: '1px solid var(--border-color)',
@@ -637,8 +637,8 @@ export default function DiagnosticResults({ diagnosticType, readOnly = false }) 
               <button
                 onClick={() => setShowImport(true)}
                 style={{
-                  padding: '0.4rem 1rem',
-                  fontSize: '0.8rem',
+                  padding: 'var(--space-2) var(--space-4)',
+                  fontSize: 'var(--text-sm)',
                   background: 'var(--bg-subtle)',
                   color: 'var(--text-secondary)',
                   border: '1px solid var(--border-color)',
@@ -672,8 +672,8 @@ export default function DiagnosticResults({ diagnosticType, readOnly = false }) 
                     }
                   }}
                   style={{
-                    padding: '0.4rem 1rem',
-                    fontSize: '0.8rem',
+                    padding: 'var(--space-2) var(--space-4)',
+                    fontSize: 'var(--text-sm)',
                     background: 'var(--bg-subtle)',
                     color: 'var(--text-secondary)',
                     border: '1px solid var(--border-color)',
@@ -710,9 +710,9 @@ export default function DiagnosticResults({ diagnosticType, readOnly = false }) 
                     }
                   }}
                   style={{
-                    padding: '0.4rem 1rem',
-                    fontSize: '0.8rem',
-                    fontWeight: 600,
+                    padding: 'var(--space-2) var(--space-4)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--font-semibold)',
                     background: 'var(--ls-purple)',
                     color: 'white',
                     border: 'none',
@@ -724,7 +724,7 @@ export default function DiagnosticResults({ diagnosticType, readOnly = false }) 
                 </button>
               )}
               {saving && (
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', alignSelf: 'center' }}>
+                <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', alignSelf: 'center' }}>
                   Saving...
                 </span>
               )}
@@ -734,7 +734,7 @@ export default function DiagnosticResults({ diagnosticType, readOnly = false }) 
 
         {/* Markdown Import Modal */}
         {showImport && !readOnly && (
-          <div style={{ marginBottom: '2rem' }}>
+          <div style={{ marginBottom: 'var(--space-8)' }}>
             <MarkdownImport
               diagnosticType={diagnosticType}
               onImport={handleImport}
@@ -745,77 +745,77 @@ export default function DiagnosticResults({ diagnosticType, readOnly = false }) 
 
         {/* Loading indicator for customer data */}
         {loadingData && (
-          <div style={{ textAlign: 'center', padding: '1rem', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+          <div style={{ textAlign: 'center', padding: 'var(--space-4)', color: 'var(--text-secondary)', fontSize: 'var(--text-sm)' }}>
             Loading diagnostic data...
           </div>
         )}
 
         {/* Summary Stats Row */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
-          <div className="card" style={{ textAlign: 'center', padding: '1.25rem' }}>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Processes</div>
-            <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--ls-purple-light)' }}>{baseProcesses.length}</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 'var(--space-4)', marginBottom: 'var(--space-8)' }}>
+          <div className="card" style={{ textAlign: 'center', padding: 'var(--space-5)' }}>
+            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Processes</div>
+            <div style={{ fontSize: 'var(--text-3xl)', fontWeight: 'var(--font-bold)', color: 'var(--ls-purple-light)' }}>{baseProcesses.length}</div>
           </div>
           {toolsData && (
-            <div className="card" style={{ textAlign: 'center', padding: '1.25rem' }}>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Tools</div>
-              <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--ls-purple-light)' }}>{toolsData.length}</div>
+            <div className="card" style={{ textAlign: 'center', padding: 'var(--space-5)' }}>
+              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Tools</div>
+              <div style={{ fontSize: 'var(--text-3xl)', fontWeight: 'var(--font-bold)', color: 'var(--ls-purple-light)' }}>{toolsData.length}</div>
             </div>
           )}
           {power10Data && (
-            <div className="card" style={{ textAlign: 'center', padding: '1.25rem' }}>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Power10 Metrics</div>
-              <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--ls-purple-light)' }}>{power10Data.length}</div>
+            <div className="card" style={{ textAlign: 'center', padding: 'var(--space-5)' }}>
+              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Power10 Metrics</div>
+              <div style={{ fontSize: 'var(--text-3xl)', fontWeight: 'var(--font-bold)', color: 'var(--ls-purple-light)' }}>{power10Data.length}</div>
             </div>
           )}
           {!toolsData && !power10Data && (
-            <div className="card" style={{ textAlign: 'center', padding: '1.25rem' }}>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Categories</div>
-              <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--ls-purple-light)' }}>{categories ? categories.length : 0}</div>
+            <div className="card" style={{ textAlign: 'center', padding: 'var(--space-5)' }}>
+              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Categories</div>
+              <div style={{ fontSize: 'var(--text-3xl)', fontWeight: 'var(--font-bold)', color: 'var(--ls-purple-light)' }}>{categories ? categories.length : 0}</div>
             </div>
           )}
-          <div className="card" style={{ textAlign: 'center', padding: '1.25rem' }}>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Priority Items</div>
-            <div style={{ fontSize: '2rem', fontWeight: 700, color: '#ef4444' }}>{priorityCount}</div>
+          <div className="card" style={{ textAlign: 'center', padding: 'var(--space-5)' }}>
+            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Priority Items</div>
+            <div style={{ fontSize: 'var(--text-3xl)', fontWeight: 'var(--font-bold)', color: '#ef4444' }}>{priorityCount}</div>
           </div>
         </div>
 
         {/* Quick Insights Section - Dark Purple */}
-        <section className="card" style={{ padding: '1.5rem', marginBottom: '2rem', background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%)' }}>
-          <h2 style={{ marginBottom: '1rem', fontSize: '1.1rem', color: 'white', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <section className="card" style={{ padding: 'var(--space-6)', marginBottom: 'var(--space-8)', background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%)' }}>
+          <h2 style={{ marginBottom: 'var(--space-4)', fontSize: 'var(--text-lg)', color: 'white', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
             <span>{'\uD83C\uDFAF'}</span> Health Overview
           </h2>
-          <p style={{ color: '#c4b5fd', fontSize: '0.8rem', marginBottom: '1.25rem' }}>
+          <p style={{ color: '#c4b5fd', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-5)' }}>
             Status distribution across all {diagnosticType === 'gtm' ? 'GTM' : diagnosticType === 'clay' ? 'Clay' : 'Quote-to-Cash'} inspection points
           </p>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 'var(--space-4)', marginBottom: 'var(--space-6)' }}>
             {overviewItems.map((item) => (
               <HealthOverviewCard key={item.label} label={item.label} stats={item.stats} />
             ))}
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '1rem', padding: '1rem', background: 'rgba(0,0,0,0.2)', borderRadius: '8px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: 'var(--space-4)', padding: 'var(--space-4)', background: 'rgba(0,0,0,0.2)', borderRadius: '8px' }}>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: 'var(--text-2xs)', color: '#a5b4fc', marginBottom: '0.25rem' }}>Healthy</div>
-              <div style={{ fontSize: '1.25rem', fontWeight: 700, color: '#4ade80' }}>{totalHealthy}</div>
+              <div style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--font-bold)', color: '#4ade80' }}>{totalHealthy}</div>
             </div>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: 'var(--text-2xs)', color: '#a5b4fc', marginBottom: '0.25rem' }}>Careful</div>
-              <div style={{ fontSize: '1.25rem', fontWeight: 700, color: '#facc15' }}>{totalCareful}</div>
+              <div style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--font-bold)', color: '#facc15' }}>{totalCareful}</div>
             </div>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: 'var(--text-2xs)', color: '#a5b4fc', marginBottom: '0.25rem' }}>Warning</div>
-              <div style={{ fontSize: '1.25rem', fontWeight: 700, color: '#f87171' }}>{totalWarning}</div>
+              <div style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--font-bold)', color: '#f87171' }}>{totalWarning}</div>
             </div>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: 'var(--text-2xs)', color: '#a5b4fc', marginBottom: '0.25rem' }}>Unable to Report</div>
-              <div style={{ fontSize: '1.25rem', fontWeight: 700, color: '#9ca3af' }}>{totalUnable}</div>
+              <div style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--font-bold)', color: '#9ca3af' }}>{totalUnable}</div>
             </div>
             {totalNa > 0 && (
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: 'var(--text-2xs)', color: '#a5b4fc', marginBottom: '0.25rem' }}>N/A</div>
-                <div style={{ fontSize: '1.25rem', fontWeight: 700, color: '#d1d5db' }}>{totalNa}</div>
+                <div style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--font-bold)', color: '#d1d5db' }}>{totalNa}</div>
               </div>
             )}
           </div>
@@ -836,14 +836,14 @@ export default function DiagnosticResults({ diagnosticType, readOnly = false }) 
         </div>
 
         {/* Tab Content */}
-        <div style={{ marginTop: '2rem' }}>
+        <div style={{ marginTop: 'var(--space-8)' }}>
           {activeTab === 'power10' && power10Data && (
             <div>
-              <div className="diagnostic-charts-row" style={{ marginBottom: '1.5rem' }}>
-                <div className="card" style={{ padding: '1.5rem' }}>
+              <div className="diagnostic-charts-row" style={{ marginBottom: 'var(--space-6)' }}>
+                <div className="card" style={{ padding: 'var(--space-6)' }}>
                   <DonutChart data={power10Stats} title="Health Distribution" size={160} />
                 </div>
-                <div className="card" style={{ padding: '1.5rem' }}>
+                <div className="card" style={{ padding: 'var(--space-6)' }}>
                   <BarChart
                     data={power10Data.map(m => ({
                       name: m.name,
@@ -853,9 +853,9 @@ export default function DiagnosticResults({ diagnosticType, readOnly = false }) 
                   />
                 </div>
               </div>
-              <div className="card" style={{ padding: '1.5rem' }}>
-                <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem' }}>All Power10 Metrics</h3>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '0.75rem' }} className="power10-grid">
+              <div className="card" style={{ padding: 'var(--space-6)' }}>
+                <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-4)' }}>All Power10 Metrics</h3>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-3)' }} className="power10-grid">
                   {power10Data.map((metric) => (
                     <div
                       key={metric.name}
@@ -863,13 +863,13 @@ export default function DiagnosticResults({ diagnosticType, readOnly = false }) 
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
-                        padding: '0.75rem 1rem',
+                        padding: 'var(--space-3) var(--space-4)',
                         background: 'var(--bg-subtle)',
                         borderRadius: 'var(--radius-lg)',
                       }}
                     >
                       <span style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)' }}>{metric.name}</span>
-                      <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                      <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'center' }}>
                         <div style={{ textAlign: 'center' }}>
                           <div style={{ fontSize: '0.6rem', color: 'var(--text-muted)', marginBottom: '2px' }}>Report</div>
                           <StatusDot status={metric.ableToReport || 'unable'} />
@@ -888,16 +888,16 @@ export default function DiagnosticResults({ diagnosticType, readOnly = false }) 
 
           {activeTab === 'tools' && toolsData && (
             <div>
-              <div className="diagnostic-charts-row" style={{ marginBottom: '1.5rem' }}>
-                <div className="card" style={{ padding: '1.5rem' }}>
+              <div className="diagnostic-charts-row" style={{ marginBottom: 'var(--space-6)' }}>
+                <div className="card" style={{ padding: 'var(--space-6)' }}>
                   <DonutChart data={toolStats} title="Health Distribution" size={160} />
                 </div>
-                <div className="card" style={{ padding: '1.5rem' }}>
+                <div className="card" style={{ padding: 'var(--space-6)' }}>
                   <BarChart data={toolsData} title="GTM Tools Status" />
                 </div>
               </div>
-              <div className="card" style={{ padding: '1.5rem' }}>
-                <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem' }}>All GTM Tools</h3>
+              <div className="card" style={{ padding: 'var(--space-6)' }}>
+                <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-4)' }}>All GTM Tools</h3>
                 <ItemTable items={toolsData} showFunction={true} functionLabel={categoryLabel} />
               </div>
             </div>
@@ -910,32 +910,32 @@ export default function DiagnosticResults({ diagnosticType, readOnly = false }) 
                   background: '#fffbeb',
                   border: '1px solid #f59e0b',
                   borderRadius: 'var(--radius-md)',
-                  padding: '0.75rem 1rem',
-                  marginBottom: '1rem',
-                  fontSize: '0.85rem',
+                  padding: 'var(--space-3) var(--space-4)',
+                  marginBottom: 'var(--space-4)',
+                  fontSize: 'var(--text-sm)',
                   color: '#92400e',
                 }}>
                   ⚡ <strong>Quick Assessment:</strong> Showing {quickCount} high-impact items.{' '}
                   <button
                     onClick={() => setQuickMode(false)}
-                    style={{ background: 'none', border: 'none', color: '#b45309', textDecoration: 'underline', cursor: 'pointer', fontSize: '0.85rem' }}
+                    style={{ background: 'none', border: 'none', color: '#b45309', textDecoration: 'underline', cursor: 'pointer', fontSize: 'var(--text-sm)' }}
                   >
                     Switch to Full to see all {allProcesses.length}
                   </button>
                 </div>
               )}
-              <div className="diagnostic-charts-row" style={{ marginBottom: '1.5rem' }}>
-                <div className="card" style={{ padding: '1.5rem' }}>
+              <div className="diagnostic-charts-row" style={{ marginBottom: 'var(--space-6)' }}>
+                <div className="card" style={{ padding: 'var(--space-6)' }}>
                   <DonutChart data={scorableProcessStats} title="Health Distribution" size={160} />
                 </div>
-                <div className="card" style={{ padding: '1.5rem', overflow: 'auto' }}>
+                <div className="card" style={{ padding: 'var(--space-6)', overflow: 'auto' }}>
                   <BarChart data={processes} title="Process Health Overview" maxItems={Math.min(processes.length, 31)} />
                 </div>
               </div>
-              <div className="card" style={{ padding: '1.5rem' }}>
-                <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem' }}>
+              <div className="card" style={{ padding: 'var(--space-6)' }}>
+                <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-4)' }}>
                   {quickMode ? 'Quick Assessment' : 'All Processes'} — Showing {processes.length} of {allProcesses.length}
-                  {naCount > 0 && <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 400 }}> ({naCount} N/A excluded from scoring)</span>}
+                  {naCount > 0 && <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)', fontWeight: 400 }}> ({naCount} N/A excluded from scoring)</span>}
                 </h3>
                 <FilterBar
                   categories={categories || []}
@@ -962,11 +962,11 @@ export default function DiagnosticResults({ diagnosticType, readOnly = false }) 
           )}
 
           {activeTab === 'by-category' && categories && (
-            <div className="card" style={{ padding: '1.5rem' }}>
-              <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+            <div className="card" style={{ padding: 'var(--space-6)' }}>
+              <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-2)' }}>
                 Processes by {diagnosticType === 'gtm' ? 'GTM Function' : categoryLabel}
               </h3>
-              <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', marginBottom: '1.5rem' }}>
+              <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-6)' }}>
                 {processes.length} processes grouped by {diagnosticType === 'gtm' ? 'their GTM function' : `${diagnosticType === 'clay' ? 'Clay' : 'Q2C'} category`}
               </p>
               <GroupedView items={processes} groupByField={groupField} groupNames={categories} />
@@ -974,11 +974,11 @@ export default function DiagnosticResults({ diagnosticType, readOnly = false }) 
           )}
 
           {activeTab === 'by-outcome' && outcomes && (
-            <div className="card" style={{ padding: '1.5rem' }}>
-              <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+            <div className="card" style={{ padding: 'var(--space-6)' }}>
+              <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-2)' }}>
                 Processes by {diagnosticType === 'gtm' ? 'GTM ' : ''}Outcome
               </h3>
-              <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', marginBottom: '1.5rem' }}>
+              <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-6)' }}>
                 {processes.length} processes grouped by their desired business outcome
               </p>
               <GroupedView items={processes} groupByField="outcome" groupNames={outcomes} />
@@ -988,12 +988,12 @@ export default function DiagnosticResults({ diagnosticType, readOnly = false }) 
 
         {/* CTA Banner */}
         {readOnly ? (
-          <div className="cta-banner" style={{ marginTop: '2rem', background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)' }}>
+          <div className="cta-banner" style={{ marginTop: 'var(--space-8)', background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)' }}>
             <h3 className="cta-title">Want to learn more?</h3>
             <p className="cta-subtitle">Contact your LeanScale advisor to discuss these findings and recommended next steps.</p>
           </div>
         ) : (
-          <div className="cta-banner" style={{ marginTop: '2rem' }}>
+          <div className="cta-banner" style={{ marginTop: 'var(--space-8)' }}>
             <h3 className="cta-title">{cta.title}</h3>
             <p className="cta-subtitle">{cta.subtitle}</p>
             <div className="cta-buttons">

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Layout from '../../components/Layout';
 import { useCustomer } from '../../context/CustomerContext';
 import { FUNCTION_ORDER } from '../../lib/engagement-engine';
-import { statusToLabel } from '../../data/diagnostic-data';
+// statusToLabel available from ../../data/diagnostic-data if needed
 
 // ─── Colors ────────────────────────────────────────────────────────────────────
 
@@ -56,8 +56,8 @@ function useEngagementData() {
 function MetricBox({ label, value, color = 'white' }) {
   return (
     <div style={{ textAlign: 'center' }}>
-      <div style={{ fontSize: '1.75rem', fontWeight: 700, color }}>{value}</div>
-      <div style={{ fontSize: '0.7rem', color: '#c4b5fd', marginTop: '0.25rem' }}>{label}</div>
+      <div style={{ fontSize: 'var(--text-3xl)', fontWeight: 'var(--font-bold)', color }}>{value}</div>
+      <div style={{ fontSize: 'var(--text-xs)', color: '#c4b5fd', marginTop: '0.25rem' }}>{label}</div>
     </div>
   );
 }
@@ -72,11 +72,11 @@ function LoadingSkeleton() {
   return (
     <div className="container">
       <style>{`@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }`}</style>
-      <div style={{ ...shimmer, height: '180px', marginBottom: '1.5rem' }} />
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
+      <div style={{ ...shimmer, height: '180px', marginBottom: 'var(--space-6)' }} />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-4)', marginBottom: 'var(--space-6)' }}>
         {[1, 2, 3].map(i => <div key={i} style={{ ...shimmer, height: '120px' }} />)}
       </div>
-      <div style={{ ...shimmer, height: '300px', marginBottom: '1.5rem' }} />
+      <div style={{ ...shimmer, height: '300px', marginBottom: 'var(--space-6)' }} />
       <div style={{ ...shimmer, height: '200px' }} />
     </div>
   );
@@ -89,28 +89,28 @@ function EngagementSummaryCard({ summary, customerName, isDemoData }) {
 
   return (
     <section className="card" style={{
-      padding: '2rem',
+      padding: 'var(--space-8)',
       background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%)',
       color: 'white',
-      marginBottom: '2rem',
+      marginBottom: 'var(--space-8)',
     }}>
       {customerName && !isDemoData && (
-        <div style={{ fontSize: '0.75rem', color: '#a5b4fc', marginBottom: '0.5rem' }}>
+        <div style={{ fontSize: 'var(--text-xs)', color: '#a5b4fc', marginBottom: 'var(--space-2)' }}>
           Recommended for {customerName}
         </div>
       )}
-      <h2 style={{ fontSize: '1.5rem', margin: '0 0 1.5rem' }}>
+      <h2 style={{ fontSize: 'var(--text-2xl)', margin: '0 0 1.5rem' }}>
         {recommendedTier.label} Engagement — {recommendedTier.hours} hrs/mo
       </h2>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '1rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: 'var(--space-4)' }}>
         <MetricBox label="Projects" value={projectCount} />
         <MetricBox label="Total Hours" value={avgProjectHours} />
         <MetricBox label="Duration" value={`~${estimatedDurationMonths} mo`} />
         <MetricBox label="Investment (6mo)" value={`$${(estimatedInvestment / 1000).toFixed(0)}K`} />
       </div>
 
-      <div style={{ marginTop: '1rem', fontSize: '0.8rem', color: '#c4b5fd' }}>
+      <div style={{ marginTop: 'var(--space-4)', fontSize: 'var(--text-sm)', color: '#c4b5fd' }}>
         {highPriorityCount} high-priority · {managedServiceCount} managed services ({managedHoursPerMonth} hrs/mo)
       </div>
     </section>
@@ -119,34 +119,34 @@ function EngagementSummaryCard({ summary, customerName, isDemoData }) {
 
 function TierComparison({ tiers }) {
   return (
-    <section style={{ marginBottom: '2rem' }}>
-      <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>Tier Comparison</h2>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+    <section style={{ marginBottom: 'var(--space-8)' }}>
+      <h2 style={{ fontSize: 'var(--text-xl)', marginBottom: 'var(--space-4)' }}>Tier Comparison</h2>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--space-4)' }}>
         {tiers.map(tier => (
           <div key={tier.id} className="card" style={{
-            padding: '1.5rem',
-            border: tier.isRecommended ? '2px solid #7c3aed' : '1px solid #e5e7eb',
+            padding: 'var(--space-6)',
+            border: tier.isRecommended ? '2px solid var(--ls-purple-light)' : '1px solid #e5e7eb',
             position: 'relative',
           }}>
             {tier.isRecommended && (
               <div style={{
                 position: 'absolute', top: '-10px', left: '50%', transform: 'translateX(-50%)',
-                background: '#7c3aed', color: 'white', fontSize: '0.65rem', fontWeight: 700,
+                background: '#7c3aed', color: 'white', fontSize: 'var(--text-2xs)', fontWeight: 'var(--font-bold)',
                 padding: '0.2rem 0.75rem', borderRadius: '10px',
               }}>
                 RECOMMENDED
               </div>
             )}
-            <div style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: '#7c3aed', marginBottom: '0.5rem' }}>
+            <div style={{ fontSize: 'var(--text-xs)', fontWeight: 'var(--font-semibold)', textTransform: 'uppercase', color: 'var(--ls-purple-light)', marginBottom: 'var(--space-2)' }}>
               {tier.label}
             </div>
-            <div style={{ fontSize: '2rem', fontWeight: 700 }}>
-              {tier.hours} <span style={{ fontSize: '0.875rem', fontWeight: 400, color: '#666' }}>hrs/mo</span>
+            <div style={{ fontSize: 'var(--text-3xl)', fontWeight: 'var(--font-bold)' }}>
+              {tier.hours} <span style={{ fontSize: 'var(--text-sm)', fontWeight: 400, color: '#666' }}>hrs/mo</span>
             </div>
-            <div style={{ fontSize: '0.875rem', color: '#666', marginTop: '0.25rem' }}>
+            <div style={{ fontSize: 'var(--text-sm)', color: '#666', marginTop: '0.25rem' }}>
               ${tier.price.toLocaleString()}/mo
             </div>
-            <div style={{ fontSize: '1rem', fontWeight: 600, marginTop: '0.75rem' }}>
+            <div style={{ fontSize: 'var(--text-base)', fontWeight: 'var(--font-semibold)', marginTop: 'var(--space-3)' }}>
               ~{tier.estimatedMonths} months
             </div>
           </div>
@@ -162,29 +162,29 @@ function ProjectRow({ project }) {
       display: 'flex', justifyContent: 'space-between', alignItems: 'center',
       padding: '0.5rem 0', borderBottom: '1px solid #f3f4f6',
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', flex: 1 }}>
         <span style={{
           width: '8px', height: '8px', borderRadius: '50%',
           background: statusColors[project.status] || '#9ca3af',
           flexShrink: 0,
         }} />
         <div>
-          <div style={{ fontWeight: 500, fontSize: '0.875rem' }}>{project.name}</div>
+          <div style={{ fontWeight: 'var(--font-medium)', fontSize: 'var(--text-sm)' }}>{project.name}</div>
           {project.outcome && (
-            <div style={{ fontSize: '0.7rem', color: '#888' }}>{project.outcome}</div>
+            <div style={{ fontSize: 'var(--text-xs)', color: '#888' }}>{project.outcome}</div>
           )}
         </div>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexShrink: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)', flexShrink: 0 }}>
         <span style={{
-          fontSize: '0.7rem', padding: '0.15rem 0.5rem', borderRadius: '4px',
+          fontSize: 'var(--text-xs)', padding: '0.15rem 0.5rem', borderRadius: '4px',
           background: project.priorityLabel === 'High' ? '#fef2f2' : '#f3f4f6',
           color: project.priorityLabel === 'High' ? '#dc2626' : '#374151',
-          fontWeight: 500,
+          fontWeight: 'var(--font-medium)',
         }}>
           {project.priorityLabel}
         </span>
-        <span style={{ fontSize: '0.8rem', fontWeight: 500, color: '#7c3aed', whiteSpace: 'nowrap' }}>
+        <span style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', color: 'var(--ls-purple-light)', whiteSpace: 'nowrap' }}>
           {project.hoursLow}–{project.hoursHigh}h
         </span>
       </div>
@@ -194,8 +194,8 @@ function ProjectRow({ project }) {
 
 function FunctionBreakdown({ functionGroups }) {
   return (
-    <section style={{ marginBottom: '2rem' }}>
-      <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>Recommended Projects</h2>
+    <section style={{ marginBottom: 'var(--space-8)' }}>
+      <h2 style={{ fontSize: 'var(--text-xl)', marginBottom: 'var(--space-4)' }}>Recommended Projects</h2>
       {FUNCTION_ORDER.map(func => {
         const projects = functionGroups[func];
         if (!projects?.length) return null;
@@ -204,9 +204,9 @@ function FunctionBreakdown({ functionGroups }) {
         const groupHoursHigh = projects.reduce((s, p) => s + p.hoursHigh, 0);
 
         return (
-          <div key={func} className="card" style={{ marginBottom: '1rem', padding: '1.25rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-              <h3 style={{ fontSize: '1rem', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <div key={func} className="card" style={{ marginBottom: 'var(--space-4)', padding: 'var(--space-5)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-3)' }}>
+              <h3 style={{ fontSize: 'var(--text-base)', margin: 0, display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
                 <span style={{
                   width: '12px', height: '12px', borderRadius: '3px',
                   background: functionColors[func]?.bg || '#e5e7eb',
@@ -215,7 +215,7 @@ function FunctionBreakdown({ functionGroups }) {
                 }} />
                 {func} ({projects.length} project{projects.length > 1 ? 's' : ''})
               </h3>
-              <span style={{ fontSize: '0.85rem', color: '#7c3aed', fontWeight: 600 }}>
+              <span style={{ fontSize: 'var(--text-sm)', color: 'var(--ls-purple-light)', fontWeight: 'var(--font-semibold)' }}>
                 {groupHoursLow}–{groupHoursHigh} hours
               </span>
             </div>
@@ -239,13 +239,13 @@ function EngagementTimeline({ projectSequence, totalWeeks = 26 }) {
   if (!projectSequence?.length) return null;
 
   return (
-    <section style={{ marginBottom: '2rem' }}>
-      <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>Suggested Timeline</h2>
-      <div className="card" style={{ padding: '1rem', overflowX: 'auto' }}>
+    <section style={{ marginBottom: 'var(--space-8)' }}>
+      <h2 style={{ fontSize: 'var(--text-xl)', marginBottom: 'var(--space-4)' }}>Suggested Timeline</h2>
+      <div className="card" style={{ padding: 'var(--space-4)', overflowX: 'auto' }}>
         <div style={{ minWidth: '1200px' }}>
           {/* Week headers */}
-          <div style={{ display: 'grid', gridTemplateColumns: `280px repeat(${totalWeeks}, 1fr)`, gap: '2px', marginBottom: '0.5rem' }}>
-            <div style={{ fontWeight: 600, fontSize: '0.75rem', padding: '0.5rem' }}>Project</div>
+          <div style={{ display: 'grid', gridTemplateColumns: `280px repeat(${totalWeeks}, 1fr)`, gap: '2px', marginBottom: 'var(--space-2)' }}>
+            <div style={{ fontWeight: 'var(--font-semibold)', fontSize: 'var(--text-xs)', padding: '0.5rem' }}>Project</div>
             {weeks.map(w => (
               <div key={w} style={{ fontSize: '0.6rem', textAlign: 'center', padding: '0.25rem', background: w % 2 === 0 ? '#f9fafb' : '#fff', borderRadius: '2px' }}>
                 {w % 4 === 1 ? getWeekLabel(w) : ''}
@@ -256,7 +256,7 @@ function EngagementTimeline({ projectSequence, totalWeeks = 26 }) {
           {/* Project bars */}
           {projectSequence.map(project => (
             <div key={project.name} style={{ display: 'grid', gridTemplateColumns: `280px repeat(${totalWeeks}, 1fr)`, gap: '2px', marginBottom: '4px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem', fontSize: '0.75rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', padding: '0.5rem', fontSize: 'var(--text-xs)' }}>
                 <span style={{
                   width: '6px', height: '6px', borderRadius: '50%',
                   background: statusColors[project.status] || '#9ca3af',
@@ -289,9 +289,9 @@ function EngagementTimeline({ projectSequence, totalWeeks = 26 }) {
       </div>
 
       {/* Legend */}
-      <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 'var(--space-2)', marginTop: 'var(--space-2)', flexWrap: 'wrap' }}>
         {Object.entries(functionColors).map(([func, colors]) => (
-          <div key={func} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.75rem' }}>
+          <div key={func} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: 'var(--text-xs)' }}>
             <div style={{ width: '16px', height: '16px', background: colors.bg, border: `2px solid ${colors.border}`, borderRadius: '3px' }} />
             <span>{func}</span>
           </div>
@@ -326,21 +326,21 @@ function BuildSowCTA({ recommendation, customerPath: getPath }) {
 
   return (
     <div className="card" style={{
-      padding: '2rem',
+      padding: 'var(--space-8)',
       background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)',
       color: 'white',
       textAlign: 'center',
     }}>
-      <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.25rem' }}>Ready to formalize this engagement?</h3>
+      <h3 style={{ margin: '0 0 0.5rem 0', fontSize: 'var(--text-xl)' }}>Ready to formalize this engagement?</h3>
       <p style={{ margin: '0 0 1rem 0', opacity: 0.9 }}>
         Build a SOW pre-populated with {recommendation.summary.projectCount} projects
         and {recommendation.summary.avgProjectHours} estimated hours.
       </p>
-      <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
         <button
           onClick={handleBuildSow}
           className="btn"
-          style={{ background: 'white', color: '#7c3aed', border: 'none', fontWeight: 700, padding: '0.75rem 2rem' }}
+          style={{ background: 'var(--bg-white)', color: 'var(--ls-purple-light)', border: 'none', fontWeight: 'var(--font-bold)', padding: 'var(--space-3) var(--space-8)' }}
         >
           Build SOW from Recommendations
         </button>
@@ -397,14 +397,14 @@ export default function EngagementOverview() {
         {isDemoData && (
           <div style={{
             background: '#fef3c7', border: '1px solid #fbbf24',
-            borderRadius: '8px', padding: '0.75rem 1rem',
-            fontSize: '0.85rem', marginBottom: '1.5rem',
-            display: 'flex', alignItems: 'center', gap: '0.5rem',
+            borderRadius: '8px', padding: 'var(--space-3) var(--space-4)',
+            fontSize: 'var(--text-sm)', marginBottom: 'var(--space-6)',
+            display: 'flex', alignItems: 'center', gap: 'var(--space-2)',
           }}>
             <span>ℹ️</span>
             <span>
               This is a sample engagement overview. Complete your{' '}
-              <Link href={customerPath('/try-leanscale/diagnostic')} style={{ color: '#7c3aed', fontWeight: 600 }}>
+              <Link href={customerPath('/try-leanscale/diagnostic')} style={{ color: 'var(--ls-purple-light)', fontWeight: 'var(--font-semibold)' }}>
                 GTM Diagnostic
               </Link>
               {' '}to see personalized recommendations.

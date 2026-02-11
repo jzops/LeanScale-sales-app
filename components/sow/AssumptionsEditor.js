@@ -117,16 +117,16 @@ function BulletListEditor({ items, onChange, placeholder = 'Add item...' }) {
               style={{
                 display: 'flex',
                 alignItems: 'flex-start',
-                gap: '0.5rem',
+                gap: 'var(--space-2)',
                 padding: '0.4rem 0',
                 borderBottom: '1px solid #F7FAFC',
                 cursor: 'grab',
               }}
             >
-              <span style={{ color: '#A0AEC0', fontSize: '0.75rem', marginTop: '0.15rem', flexShrink: 0 }}>
+              <span style={{ color: 'var(--text-muted)', fontSize: 'var(--text-xs)', marginTop: '0.15rem', flexShrink: 0 }}>
                 ⠿
               </span>
-              <span style={{ color: '#6C5CE7', fontSize: '0.8rem', marginTop: '0.1rem', flexShrink: 0 }}>•</span>
+              <span style={{ color: 'var(--ls-purple-light)', fontSize: 'var(--text-sm)', marginTop: '0.1rem', flexShrink: 0 }}>•</span>
               {editingIndex === index ? (
                 <input
                   type="text"
@@ -139,8 +139,8 @@ function BulletListEditor({ items, onChange, placeholder = 'Add item...' }) {
                     flex: 1,
                     padding: '0.25rem 0.5rem',
                     border: '1px solid #6C5CE7',
-                    borderRadius: '0.25rem',
-                    fontSize: '0.85rem',
+                    borderRadius: 'var(--radius-sm)',
+                    fontSize: 'var(--text-sm)',
                     outline: 'none',
                   }}
                 />
@@ -149,8 +149,8 @@ function BulletListEditor({ items, onChange, placeholder = 'Add item...' }) {
                   onClick={() => handleEditStart(index)}
                   style={{
                     flex: 1,
-                    fontSize: '0.85rem',
-                    color: '#4A5568',
+                    fontSize: 'var(--text-sm)',
+                    color: 'var(--text-primary)',
                     lineHeight: 1.5,
                     cursor: 'text',
                   }}
@@ -163,9 +163,9 @@ function BulletListEditor({ items, onChange, placeholder = 'Add item...' }) {
                 style={{
                   background: 'none',
                   border: 'none',
-                  color: '#CBD5E0',
+                  color: 'var(--gray-300)',
                   cursor: 'pointer',
-                  fontSize: '0.9rem',
+                  fontSize: 'var(--text-sm)',
                   padding: '0 0.25rem',
                   flexShrink: 0,
                 }}
@@ -178,7 +178,7 @@ function BulletListEditor({ items, onChange, placeholder = 'Add item...' }) {
         </ul>
       )}
 
-      <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+      <div style={{ display: 'flex', gap: 'var(--space-2)', marginTop: 'var(--space-2)' }}>
         <input
           type="text"
           value={newText}
@@ -187,23 +187,23 @@ function BulletListEditor({ items, onChange, placeholder = 'Add item...' }) {
           placeholder={placeholder}
           style={{
             flex: 1,
-            padding: '0.4rem 0.75rem',
-            border: '1px solid #E2E8F0',
-            borderRadius: '0.375rem',
-            fontSize: '0.85rem',
+            padding: 'var(--space-2) var(--space-3)',
+            border: '1px solid var(--border-color)',
+            borderRadius: 'var(--radius-md)',
+            fontSize: 'var(--text-sm)',
           }}
         />
         <button
           onClick={handleAdd}
           disabled={!newText.trim()}
           style={{
-            padding: '0.4rem 0.75rem',
+            padding: 'var(--space-2) var(--space-3)',
             background: newText.trim() ? '#6C5CE7' : '#E2E8F0',
             color: newText.trim() ? 'white' : '#A0AEC0',
             border: 'none',
-            borderRadius: '0.375rem',
-            fontSize: '0.8rem',
-            fontWeight: 500,
+            borderRadius: 'var(--radius-md)',
+            fontSize: 'var(--text-sm)',
+            fontWeight: 'var(--font-medium)',
             cursor: newText.trim() ? 'pointer' : 'default',
           }}
         >
@@ -292,38 +292,38 @@ export default function AssumptionsEditor({
 
   return (
     <div style={{
-      background: 'white',
-      border: '1px solid #E2E8F0',
-      borderRadius: '0.75rem',
-      padding: '1.25rem',
-      marginTop: '1.5rem',
+      background: 'var(--bg-white)',
+      border: '1px solid var(--border-color)',
+      borderRadius: 'var(--radius-xl)',
+      padding: 'var(--space-5)',
+      marginTop: 'var(--space-6)',
     }}>
       <div style={{
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: '1rem',
+        marginBottom: 'var(--space-4)',
       }}>
-        <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#1a1a2e' }}>
+        <label style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', color: 'var(--gray-900)' }}>
           Assumptions & Acceptance Criteria
         </label>
-        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
           {saving && (
-            <span style={{ fontSize: '0.75rem', color: '#A0AEC0' }}>Saving...</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>Saving...</span>
           )}
           {saved && (
-            <span style={{ fontSize: '0.75rem', color: '#38A169' }}>✓ Saved</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: '#38A169' }}>✓ Saved</span>
           )}
           <button
             onClick={handleResetDefaults}
             style={{
-              padding: '0.3rem 0.75rem',
-              background: '#EDF2F7',
-              color: '#4A5568',
-              border: '1px solid #E2E8F0',
-              borderRadius: '0.375rem',
-              fontSize: '0.75rem',
-              fontWeight: 500,
+              padding: 'var(--space-1) var(--space-3)',
+              background: 'var(--gray-100)',
+              color: 'var(--text-primary)',
+              border: '1px solid var(--border-color)',
+              borderRadius: 'var(--radius-md)',
+              fontSize: 'var(--text-xs)',
+              fontWeight: 'var(--font-medium)',
               cursor: 'pointer',
             }}
           >
@@ -333,12 +333,12 @@ export default function AssumptionsEditor({
       </div>
 
       {/* Assumptions */}
-      <div style={{ marginBottom: '1.25rem' }}>
+      <div style={{ marginBottom: 'var(--space-5)' }}>
         <h4 style={{
-          fontSize: '0.8rem',
-          fontWeight: 600,
-          color: '#4A5568',
-          marginBottom: '0.5rem',
+          fontSize: 'var(--text-sm)',
+          fontWeight: 'var(--font-semibold)',
+          color: 'var(--text-primary)',
+          marginBottom: 'var(--space-2)',
           textTransform: 'uppercase',
           letterSpacing: '0.05em',
         }}>
@@ -354,10 +354,10 @@ export default function AssumptionsEditor({
       {/* Acceptance Criteria */}
       <div>
         <h4 style={{
-          fontSize: '0.8rem',
-          fontWeight: 600,
-          color: '#4A5568',
-          marginBottom: '0.5rem',
+          fontSize: 'var(--text-sm)',
+          fontWeight: 'var(--font-semibold)',
+          color: 'var(--text-primary)',
+          marginBottom: 'var(--space-2)',
           textTransform: 'uppercase',
           letterSpacing: '0.05em',
         }}>
