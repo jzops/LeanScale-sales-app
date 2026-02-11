@@ -7,6 +7,7 @@ const prospectSections = [
   {
     name: 'why',
     label: 'Why LeanScale?',
+    type: 'dropdown',
     links: [
       { href: '/why-leanscale', label: 'Overview' },
       { href: '/why-leanscale/about', label: 'About Us' },
@@ -19,6 +20,7 @@ const prospectSections = [
   {
     name: 'try',
     label: 'Try LeanScale',
+    type: 'dropdown',
     links: [
       { href: '/try-leanscale', label: 'Overview' },
       { href: '/try-leanscale/start', label: 'Start Diagnostic' },
@@ -34,6 +36,7 @@ const prospectSections = [
   {
     name: 'buy',
     label: 'Buy LeanScale',
+    type: 'dropdown',
     links: [
       { href: '/buy-leanscale/availability', label: 'Cohort Availability' },
       { href: '/buy-leanscale/one-time-projects', label: 'One-Time Projects' },
@@ -48,46 +51,27 @@ const prospectSections = [
 
 // Diagnostic type → nav link config
 const diagnosticConfig = {
-  gtm: { href: '/try-leanscale/diagnostic', label: 'GTM Diagnostic' },
-  clay: { href: '/try-leanscale/clay-diagnostic', label: 'Clay Diagnostic' },
-  cpq: { href: '/try-leanscale/cpq-diagnostic', label: 'Q2C Diagnostic' },
-};
-
-// Diagnostic type → intake form link
-const intakeConfig = {
-  gtm: { href: '/try-leanscale/start', label: 'Diagnostic Intake' },
-  clay: { href: '/buy-leanscale/clay-intake', label: 'Clay Project Intake' },
-  cpq: { href: '/buy-leanscale/q2c-intake', label: 'Q2C Assessment' },
+  gtm: { href: '/try-leanscale/diagnostic', label: 'Diagnostic' },
+  clay: { href: '/try-leanscale/clay-diagnostic', label: 'Diagnostic' },
+  cpq: { href: '/try-leanscale/cpq-diagnostic', label: 'Diagnostic' },
 };
 
 /**
- * Build customer-specific nav sections based on their configured diagnostic type.
- * Each customer sees: their diagnostic, their intake form, engagement, SOWs.
+ * Build customer-specific nav items.
+ * Core flow is flat links: Diagnostic → Engagement → SOW
+ * Secondary items go in a single "More" dropdown.
  */
-function buildCustomerSections(diagnosticType) {
+function buildCustomerNav(diagnosticType) {
   const diagLink = diagnosticConfig[diagnosticType] || diagnosticConfig.gtm;
-  const intake = intakeConfig[diagnosticType] || intakeConfig.gtm;
 
   return [
+    { name: 'diagnostic', label: diagLink.label, type: 'link', href: diagLink.href },
+    { name: 'engagement', label: 'Engagement', type: 'link', href: '/try-leanscale/engagement' },
+    { name: 'sow', label: 'SOW', type: 'link', href: '/sow' },
     {
-      name: 'diagnostic',
-      label: diagLink.label,
-      links: [
-        diagLink,
-        { href: '/try-leanscale/engagement', label: 'Engagement Overview' },
-      ],
-    },
-    {
-      name: 'projects',
-      label: 'Projects',
-      links: [
-        intake,
-        { href: '/sow', label: 'Statements of Work' },
-      ],
-    },
-    {
-      name: 'resources',
-      label: 'Resources',
+      name: 'more',
+      label: 'More',
+      type: 'dropdown',
       links: [
         { href: '/why-leanscale/services', label: 'Services Catalog' },
         { href: '/buy-leanscale/team', label: 'Your Team' },
@@ -114,8 +98,8 @@ export default function Navigation() {
   const showCustomerBranding = !isDemo && displayName;
   const isActive = customerType === 'active';
   const diagnosticType = customer.diagnosticType || 'gtm';
-  const sections = useMemo(
-    () => isActive ? buildCustomerSections(diagnosticType) : prospectSections,
+  const navItems = useMemo(
+    () => isActive ? buildCustomerNav(diagnosticType) : prospectSections,
     [isActive, diagnosticType]
   );
 
@@ -152,23 +136,34 @@ export default function Navigation() {
       </button>
 
       <div className={`nav-links ${mobileMenuOpen ? 'nav-links-open' : ''}`}>
-        {sections.map((section) => (
-          <div className="nav-item" key={section.name}>
-            <button
+        {navItems.map((item) =>
+          item.type === 'link' ? (
+            <Link
+              key={item.name}
+              href={customerPath(item.href)}
               className="nav-button"
-              onClick={() => toggleDropdown(section.name)}
+              onClick={closeMenu}
             >
-              {section.label} <span>&#9662;</span>
-            </button>
-            <div className={`nav-dropdown ${openDropdown === section.name ? 'nav-dropdown-open' : ''}`}>
-              {section.links.map((link) => (
-                <Link href={customerPath(link.href)} onClick={closeMenu} key={link.href}>
-                  {link.label}
-                </Link>
-              ))}
+              {item.label}
+            </Link>
+          ) : (
+            <div className="nav-item" key={item.name}>
+              <button
+                className="nav-button"
+                onClick={() => toggleDropdown(item.name)}
+              >
+                {item.label} <span>&#9662;</span>
+              </button>
+              <div className={`nav-dropdown ${openDropdown === item.name ? 'nav-dropdown-open' : ''}`}>
+                {item.links.map((link) => (
+                  <Link href={customerPath(link.href)} onClick={closeMenu} key={link.href}>
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        )}
 
         {isActive ? (
           <Link href={customerPath('/dashboard')} className="nav-cta" onClick={closeMenu}>
