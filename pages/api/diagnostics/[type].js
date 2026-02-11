@@ -8,25 +8,23 @@
  */
 
 import { getDiagnosticResult, upsertDiagnosticResult, getNotes } from '../../../lib/diagnostics';
-import { getCustomerBySlug } from '../../../lib/supabase';
+import { getCustomerServer } from '../../../lib/getCustomer';
 
 const VALID_TYPES = ['gtm', 'clay', 'cpq'];
 
 /**
- * Resolve the customer slug from the request (set by middleware)
- * and validate that the requested customerId belongs to that customer.
+ * Validate that the requested customerId belongs to the session's customer.
+ * Uses the shared getCustomerServer helper for slug resolution.
  */
 async function validateCustomerAccess(req, customerId) {
   // Admin paths bypass customer checks
   const referer = req.headers.referer || '';
   if (referer.includes('/admin/')) return true;
 
-  const slug = req.headers['x-customer-slug'] || req.cookies?.['customer-slug'];
-  if (!slug) return true; // No customer context = allow (demo/admin)
-
   try {
-    const customer = await getCustomerBySlug(slug);
-    if (!customer) return false;
+    const customer = await getCustomerServer({ req, query: req.query });
+    if (!customer) return true; // No customer context = allow (demo/admin)
+    if (customer.isDemo) return true; // Demo customer can access demo data
     return customer.id === customerId;
   } catch {
     return false;
