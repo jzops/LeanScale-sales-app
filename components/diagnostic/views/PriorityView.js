@@ -23,6 +23,7 @@ export default function PriorityView({
   linkedSows = [],
   highlightedItem,
   customerPath,
+  onOpenModal,
 }) {
   return (
     <div>
@@ -45,6 +46,7 @@ export default function PriorityView({
           linkedSows={linkedSows}
           highlightedItem={highlightedItem}
           customerPath={customerPath}
+          onOpenModal={onOpenModal}
         />
       )}
 
@@ -60,6 +62,7 @@ export default function PriorityView({
           linkedSows={linkedSows}
           highlightedItem={highlightedItem}
           customerPath={customerPath}
+          onOpenModal={onOpenModal}
         />
       )}
 
@@ -75,6 +78,7 @@ export default function PriorityView({
           linkedSows={linkedSows}
           highlightedItem={highlightedItem}
           customerPath={customerPath}
+          onOpenModal={onOpenModal}
         />
       )}
 
@@ -90,6 +94,7 @@ export default function PriorityView({
           linkedSows={linkedSows}
           highlightedItem={highlightedItem}
           customerPath={customerPath}
+          onOpenModal={onOpenModal}
         />
       )}
 

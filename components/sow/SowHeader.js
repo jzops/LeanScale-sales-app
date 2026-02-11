@@ -30,6 +30,7 @@ export default function SowHeader({
   onFieldChange,
   onStatusUpdate,
   customerSlug,
+  customerPath,
   onPushToTeamwork,
   teamworkLoading = false,
 }) {
@@ -160,9 +161,7 @@ export default function SowHeader({
           {!readOnly && (
             <>
               <Link
-                href={customerSlug && customerSlug !== 'demo'
-                  ? `/c/${customerSlug}/sow/${sow.id}/build`
-                  : `/sow/${sow.id}/build`}
+                href={customerPath ? customerPath(`/sow/${sow.id}/build`) : `/sow/${sow.id}/build`}
                 style={{
                   padding: '0.5rem 1rem',
                   background: '#6C5CE7',

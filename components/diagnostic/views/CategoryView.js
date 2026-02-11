@@ -22,6 +22,7 @@ export default function CategoryView({
   linkedSows = [],
   highlightedItem,
   customerPath,
+  onOpenModal,
 }) {
   const grouped = groupBy(processes, groupField);
 
@@ -44,6 +45,7 @@ export default function CategoryView({
             linkedSows={linkedSows}
             highlightedItem={highlightedItem}
             customerPath={customerPath}
+            onOpenModal={onOpenModal}
           />
         );
       })}
@@ -51,7 +53,7 @@ export default function CategoryView({
   );
 }
 
-function CategoryGroup({ name, items, editMode, onStatusChange, onPriorityToggle, notes, onOpenNotes, linkedSows, highlightedItem, customerPath }) {
+function CategoryGroup({ name, items, editMode, onStatusChange, onPriorityToggle, notes, onOpenNotes, linkedSows, highlightedItem, customerPath, onOpenModal }) {
   const [expanded, setExpanded] = useState(false);
   const stats = countStatuses(items);
   const total = items.length;
@@ -170,6 +172,7 @@ function CategoryGroup({ name, items, editMode, onStatusChange, onPriorityToggle
                     linkedSows={linkedSows}
                     highlighted={highlightedItem === item.name}
                     customerPath={customerPath}
+                    onOpenModal={onOpenModal}
                   />
                 );
               })}

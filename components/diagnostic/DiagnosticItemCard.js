@@ -22,6 +22,7 @@ export default function DiagnosticItemCard({
   linkedSows = [],
   highlighted = false,
   customerPath,
+  onOpenModal,
 }) {
   const noteCount = notes.filter(n => n.process_name === item.name).length;
 
@@ -49,10 +50,14 @@ export default function DiagnosticItemCard({
       variants={fadeUpItem}
       whileHover={cardHover}
       layout
-      style={highlighted ? {
-        boxShadow: '0 0 0 2px #6C5CE7, 0 0 12px rgba(108, 92, 231, 0.3)',
-        transition: 'box-shadow 0.3s',
-      } : undefined}
+      onClick={() => { if (editMode && onOpenModal) onOpenModal(item); }}
+      style={{
+        ...(editMode && onOpenModal ? { cursor: 'pointer' } : {}),
+        ...(highlighted ? {
+          boxShadow: '0 0 0 2px #6C5CE7, 0 0 12px rgba(108, 92, 231, 0.3)',
+          transition: 'box-shadow 0.3s',
+        } : {}),
+      }}
     >
       {/* Header: name + status */}
       <div className="diagnostic-item-card-header">
@@ -131,10 +136,10 @@ export default function DiagnosticItemCard({
             className="diagnostic-item-card-sow-link"
             style={{
               fontSize: '0.7rem',
-              color: '#6C5CE7',
+              color: '#9F8FEF',
               textDecoration: 'none',
-              opacity: 0,
-              transition: 'opacity 0.15s',
+              opacity: 1,
+              transition: 'color 0.15s',
             }}
           >
             View in SOW

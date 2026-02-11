@@ -11,6 +11,7 @@ export default function OutcomeView({
   onPriorityToggle,
   notes,
   onOpenNotes,
+  onOpenModal,
 }) {
   return (
     <CategoryView
@@ -23,6 +24,7 @@ export default function OutcomeView({
       onPriorityToggle={onPriorityToggle}
       notes={notes}
       onOpenNotes={onOpenNotes}
+      onOpenModal={onOpenModal}
     />
   );
 }

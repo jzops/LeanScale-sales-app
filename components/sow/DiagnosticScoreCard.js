@@ -31,6 +31,7 @@ export default function DiagnosticScoreCard({
   diagnosticItems = [],
   diagnosticType = 'gtm',
   customerSlug,
+  customerPath,
   overallRating = 'moderate',
 }) {
   // Count statuses
@@ -48,10 +49,9 @@ export default function DiagnosticScoreCard({
     clay: 'clay-diagnostic',
     cpq: 'cpq-diagnostic',
   };
-  const diagPath = diagnosticTypeToPath[diagnosticType] || 'diagnostic';
-  const diagUrl = customerSlug
-    ? `/c/${customerSlug}/try-leanscale/${diagPath}`
-    : `/try-leanscale/${diagPath}`;
+  const diagPathSegment = diagnosticTypeToPath[diagnosticType] || 'diagnostic';
+  const tryPath = `/try-leanscale/${diagPathSegment}`;
+  const diagUrl = customerPath ? customerPath(tryPath) : tryPath;
 
   // Mini donut chart via SVG
   const segments = Object.entries(counts).filter(([, v]) => v > 0);

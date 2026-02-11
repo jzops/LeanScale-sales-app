@@ -41,6 +41,7 @@ export default function PrioritySection({
   linkedSows = [],
   highlightedItem,
   customerPath,
+  onOpenModal,
 }) {
   const config = TIER_CONFIG[tier] || TIER_CONFIG.moderate;
   const [expanded, setExpanded] = useState(config.defaultExpanded);
@@ -140,6 +141,7 @@ export default function PrioritySection({
                       linkedSows={linkedSows}
                       highlighted={highlightedItem === item.name}
                       customerPath={customerPath}
+                      onOpenModal={onOpenModal}
                     />
                   ))}
                 </motion.div>

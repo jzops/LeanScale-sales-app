@@ -15,6 +15,7 @@ import TableView from './views/TableView';
 import MetricsView from './views/MetricsView';
 import MarkdownImport from './MarkdownImport';
 import DiagnosticSkeleton from './DiagnosticSkeleton';
+import DiagnosticItemModal from './DiagnosticItemModal';
 
 /**
  * Sort processes into priority tiers.
@@ -64,6 +65,7 @@ export default function DiagnosticResults({ diagnosticType }) {
   const [linkedSows, setLinkedSows] = useState([]);
   const [syncToast, setSyncToast] = useState(null);
   const [highlightedItem, setHighlightedItem] = useState(null);
+  const [modalItem, setModalItem] = useState(null);
   const saveTimerRef = useRef(null);
 
   if (!config) {
@@ -362,6 +364,7 @@ export default function DiagnosticResults({ diagnosticType }) {
               linkedSows={linkedSows}
               highlightedItem={highlightedItem}
               customerPath={customerPath}
+              onOpenModal={editMode ? setModalItem : undefined}
             />
           )}
 
@@ -379,6 +382,7 @@ export default function DiagnosticResults({ diagnosticType }) {
               linkedSows={linkedSows}
               highlightedItem={highlightedItem}
               customerPath={customerPath}
+              onOpenModal={editMode ? setModalItem : undefined}
             />
           )}
 
@@ -391,6 +395,7 @@ export default function DiagnosticResults({ diagnosticType }) {
               onPriorityToggle={handlePriorityToggle}
               notes={notes}
               onOpenNotes={(name) => setExpandedRow(name === expandedRow ? null : name)}
+              onOpenModal={editMode ? setModalItem : undefined}
             />
           )}
 
@@ -406,6 +411,7 @@ export default function DiagnosticResults({ diagnosticType }) {
               onAddNote={handleAddNote}
               onDeleteNote={handleDeleteNote}
               categoryLabel={categoryLabel}
+              onOpenModal={editMode ? setModalItem : undefined}
             />
           )}
 
@@ -433,6 +439,31 @@ export default function DiagnosticResults({ diagnosticType }) {
           <p className="cta-subtitle">
             View prioritized projects and timeline based on your diagnostic results.
           </p>
+          <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.25rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+            {!isDemo && diagnosticResultId ? (
+              <>
+                <a href={customerPath('/sow')} className="nav-cta" style={{ textDecoration: 'none' }}>
+                  View Statement of Work
+                </a>
+                <a
+                  href={customerPath('/try-leanscale/engagement')}
+                  className="nav-cta"
+                  style={{
+                    textDecoration: 'none',
+                    background: 'transparent',
+                    border: '2px solid var(--primary)',
+                    color: 'var(--primary)',
+                  }}
+                >
+                  View Engagement Overview
+                </a>
+              </>
+            ) : (
+              <a href={customerPath('/try-leanscale/start')} className="nav-cta" style={{ textDecoration: 'none' }}>
+                Start Your Diagnostic
+              </a>
+            )}
+          </div>
         </div>
 
         {/* Sync Toast */}
@@ -501,6 +532,25 @@ export default function DiagnosticResults({ diagnosticType }) {
             </motion.div>
           )}
         </AnimatePresence>
+        {/* Diagnostic Item Detail Modal */}
+        <DiagnosticItemModal
+          item={modalItem}
+          open={!!modalItem}
+          onClose={() => setModalItem(null)}
+          editMode={editMode}
+          onStatusChange={(name, status) => {
+            handleStatusChange(name, status);
+            // Update modalItem in place so the modal reflects the change
+            setModalItem(prev => prev && prev.name === name ? { ...prev, status } : prev);
+          }}
+          onPriorityToggle={(name) => {
+            handlePriorityToggle(name);
+            setModalItem(prev => prev && prev.name === name ? { ...prev, addToEngagement: !prev.addToEngagement } : prev);
+          }}
+          notes={notes}
+          onAddNote={handleAddNote}
+          onDeleteNote={handleDeleteNote}
+        />
       </div>
     </Layout>
   );

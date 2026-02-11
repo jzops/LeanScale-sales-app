@@ -28,6 +28,7 @@ import VersionHistory from './VersionHistory';
 import TeamworkPreview from './TeamworkPreview';
 import DiagnosticSyncBanner from './DiagnosticSyncBanner';
 import SowRecalculateBar from './SowRecalculateBar';
+import EditableList from './EditableList';
 import SowPreview from '../SowPreview';
 import { staggerContainer, fadeUpItem } from '../../lib/animations';
 
@@ -41,7 +42,10 @@ export default function SowPage({
   onSowUpdate,
   customerSlug,
   customerName,
+  customerPath: customerPathProp,
 }) {
+  // Fallback customerPath if not provided
+  const customerPath = customerPathProp || ((path) => customerSlug ? `/c/${customerSlug}${path}` : path);
   // --- Local editable state ---
   const [localSow, setLocalSow] = useState(serverSow);
   const [localSections, setLocalSections] = useState(serverSow?.sections || []);
@@ -51,6 +55,7 @@ export default function SowPage({
   const [showTeamwork, setShowTeamwork] = useState(false);
   const [teamworkPreview, setTeamworkPreview] = useState(null);
   const [teamworkLoading, setTeamworkLoading] = useState(false);
+  const [addingSectionLoading, setAddingSectionLoading] = useState(false);
 
   // Ref for tracking the server state to revert to
   const serverSowRef = useRef(serverSow);
@@ -107,6 +112,68 @@ export default function SowPage({
     }
   }
 
+  // --- Add new blank section ---
+  async function handleAddSection() {
+    setAddingSectionLoading(true);
+    setErrorMsg(null);
+    try {
+      const res = await fetch(`/api/sow/${localSow.id}/sections`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: 'New Section',
+          description: '',
+          hours: 0,
+          rate: 0,
+          sortOrder: localSections.length,
+        }),
+      });
+      if (!res.ok) throw new Error('Failed to create section');
+      const json = await res.json();
+      const newSection = json.data;
+      setLocalSections(prev => [...prev, newSection]);
+      serverSectionsRef.current = [...serverSectionsRef.current, newSection];
+    } catch (err) {
+      console.error('Error adding section:', err);
+      setErrorMsg('Failed to add new section');
+    } finally {
+      setAddingSectionLoading(false);
+    }
+  }
+
+  // --- Move section (reorder) ---
+  async function handleMoveSection(sectionId, direction) {
+    const idx = localSections.findIndex(s => s.id === sectionId);
+    if (idx === -1) return;
+    const swapIdx = direction === 'up' ? idx - 1 : idx + 1;
+    if (swapIdx < 0 || swapIdx >= localSections.length) return;
+
+    const newSections = [...localSections];
+    [newSections[idx], newSections[swapIdx]] = [newSections[swapIdx], newSections[idx]];
+    // Update sort_order values
+    const reordered = newSections.map((s, i) => ({ ...s, sort_order: i }));
+    setLocalSections(reordered);
+
+    // Save immediately via PUT /api/sow/{id}/sections
+    try {
+      const ordering = reordered.map(s => ({ id: s.id, sortOrder: s.sort_order }));
+      const res = await fetch(`/api/sow/${localSow.id}/sections`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ordering }),
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.data) {
+          serverSectionsRef.current = json.data;
+        }
+      }
+    } catch (err) {
+      console.error('Error reordering sections:', err);
+      setErrorMsg('Failed to reorder sections');
+    }
+  }
+
   // --- Calculate projected totals ---
   const projectedHours = localSections.reduce((sum, s) => sum + (parseFloat(s.hours) || 0), 0);
   const projectedInvestment = localSections.reduce((sum, s) => {
@@ -122,7 +189,8 @@ export default function SowPage({
       // 1. Save SOW-level changes
       const sowUpdates = {};
       if (dirtyFields.has('sow.title')) sowUpdates.title = localSow.title;
-      if (dirtyFields.has('content.executive_summary')) {
+      const hasContentChanges = [...dirtyFields].some(f => f.startsWith('content.'));
+      if (hasContentChanges) {
         sowUpdates.content = { ...localSow.content };
       }
       // Always update totals
@@ -252,6 +320,7 @@ export default function SowPage({
         onFieldChange={handleSowFieldChange}
         onStatusUpdate={handleStatusUpdate}
         customerSlug={customerSlug}
+        customerPath={customerPath}
         onPushToTeamwork={handlePushToTeamwork}
         teamworkLoading={teamworkLoading}
       />
@@ -314,7 +383,7 @@ export default function SowPage({
       )}
 
       {/* ===== TOP GRID: Executive Summary + Diagnostic Score ===== */}
-      <div style={{
+      <div className="sow-top-grid" style={{
         display: 'grid',
         gridTemplateColumns: diagnosticProcesses.length > 0 ? '1fr 280px' : '1fr',
         gap: '1.5rem',
@@ -331,6 +400,7 @@ export default function SowPage({
             diagnosticItems={linkedDiagnosticItems.length > 0 ? linkedDiagnosticItems : diagnosticProcesses}
             diagnosticType={diagnosticResult?.diagnostic_type || 'gtm'}
             customerSlug={customerSlug}
+            customerPath={customerPath}
             overallRating={localSow.overall_rating || 'moderate'}
           />
         )}
@@ -346,7 +416,7 @@ export default function SowPage({
             animate="show"
             style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
           >
-            {localSections.map((section) => (
+            {localSections.map((section, idx) => (
               <SowScopeSection
                 key={section.id}
                 section={section}
@@ -355,10 +425,87 @@ export default function SowPage({
                 diagnosticProcesses={diagnosticProcesses}
                 diagnosticResult={diagnosticResult}
                 customerSlug={customerSlug}
+                customerPath={customerPath}
                 onDeleteSection={readOnly ? undefined : handleDeleteSection}
+                onMoveSection={readOnly ? undefined : handleMoveSection}
+                isFirst={idx === 0}
+                isLast={idx === localSections.length - 1}
               />
             ))}
+
+            {/* Add Section Button */}
+            {!readOnly && (
+              <motion.button
+                variants={fadeUpItem}
+                onClick={handleAddSection}
+                disabled={addingSectionLoading}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.5rem',
+                  width: '100%',
+                  padding: '1.25rem',
+                  background: 'transparent',
+                  border: '2px dashed #CBD5E0',
+                  borderRadius: '0.75rem',
+                  color: '#718096',
+                  fontSize: '0.9375rem',
+                  fontWeight: 500,
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                  cursor: addingSectionLoading ? 'wait' : 'pointer',
+                  transition: 'all 0.2s ease',
+                  opacity: addingSectionLoading ? 0.6 : 1,
+                }}
+                onMouseEnter={(e) => {
+                  if (!addingSectionLoading) {
+                    e.currentTarget.style.borderColor = '#6C5CE7';
+                    e.currentTarget.style.color = '#6C5CE7';
+                    e.currentTarget.style.background = 'rgba(108, 92, 231, 0.04)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = '#CBD5E0';
+                  e.currentTarget.style.color = '#718096';
+                  e.currentTarget.style.background = 'transparent';
+                }}
+              >
+                <span style={{ fontSize: '1.25rem', lineHeight: 1 }}>+</span>
+                {addingSectionLoading ? 'Adding…' : 'Add Section'}
+              </motion.button>
+            )}
           </motion.div>
+        </div>
+      )}
+
+      {/* ===== ADD FIRST SECTION (when no sections exist) ===== */}
+      {!hasSections && !readOnly && (
+        <div style={{ marginBottom: '2rem' }}>
+          <h2 style={sectionHeadingStyle}>Scope of Work</h2>
+          <button
+            onClick={handleAddSection}
+            disabled={addingSectionLoading}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.5rem',
+              width: '100%',
+              padding: '1.25rem',
+              background: 'transparent',
+              border: '2px dashed #CBD5E0',
+              borderRadius: '0.75rem',
+              color: '#718096',
+              fontSize: '0.9375rem',
+              fontWeight: 500,
+              fontFamily: "'Plus Jakarta Sans', sans-serif",
+              cursor: addingSectionLoading ? 'wait' : 'pointer',
+              opacity: addingSectionLoading ? 0.6 : 1,
+            }}
+          >
+            <span style={{ fontSize: '1.25rem', lineHeight: 1 }}>+</span>
+            {addingSectionLoading ? 'Adding…' : 'Add Section'}
+          </button>
         </div>
       )}
 
@@ -379,13 +526,15 @@ export default function SowPage({
       {hasSections && (
         <div style={{ marginBottom: '2rem' }}>
           <h2 style={sectionHeadingStyle}>Investment</h2>
-          <InvestmentTable
-            sections={localSections}
-            totalHours={localSow.total_hours ? parseFloat(localSow.total_hours) : undefined}
-            totalInvestment={localSow.total_investment ? parseFloat(localSow.total_investment) : undefined}
-            readOnly={readOnly}
-            onSectionChange={readOnly ? undefined : handleSectionChange}
-          />
+          <div className="sow-investment-wrapper">
+            <InvestmentTable
+              sections={localSections}
+              totalHours={localSow.total_hours ? parseFloat(localSow.total_hours) : undefined}
+              totalInvestment={localSow.total_investment ? parseFloat(localSow.total_investment) : undefined}
+              readOnly={readOnly}
+              onSectionChange={readOnly ? undefined : handleSectionChange}
+            />
+          </div>
         </div>
       )}
 
@@ -410,19 +559,13 @@ export default function SowPage({
               padding: '1.5rem',
             }}>
               <h2 style={sectionHeadingStyle}>Team</h2>
-              {Array.isArray(content.team) ? (
-                <ul style={{ margin: 0, paddingLeft: '1.25rem' }}>
-                  {content.team.map((member, idx) => (
-                    <li key={idx} style={{ fontSize: '0.875rem', color: '#4A5568', marginBottom: '0.35rem', lineHeight: 1.5 }}>
-                      {typeof member === 'string' ? member : `${member.name}${member.role ? ` — ${member.role}` : ''}`}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p style={{ fontSize: '0.875rem', color: '#4A5568', lineHeight: 1.7, margin: 0 }}>
-                  {content.team}
-                </p>
-              )}
+              <EditableList
+                items={Array.isArray(content.team) ? content.team : [content.team]}
+                onCommit={(val) => handleContentFieldChange('team', val)}
+                readOnly={readOnly}
+                placeholder="Add team member..."
+                formatItem={(item) => typeof item === 'string' ? item : `${item.name}${item.role ? ` — ${item.role}` : ''}`}
+              />
             </div>
           )}
 
@@ -435,19 +578,12 @@ export default function SowPage({
                 padding: '1.5rem',
               }}>
                 <h2 style={sectionHeadingStyle}>Assumptions</h2>
-                {Array.isArray(content.assumptions) ? (
-                  <ul style={{ margin: 0, paddingLeft: '1.25rem' }}>
-                    {content.assumptions.map((item, idx) => (
-                      <li key={idx} style={{ fontSize: '0.875rem', color: '#4A5568', marginBottom: '0.35rem', lineHeight: 1.5 }}>
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p style={{ fontSize: '0.875rem', color: '#4A5568', lineHeight: 1.7, margin: 0 }}>
-                    {content.assumptions}
-                  </p>
-                )}
+                <EditableList
+                  items={Array.isArray(content.assumptions) ? content.assumptions : [content.assumptions]}
+                  onCommit={(val) => handleContentFieldChange('assumptions', val)}
+                  readOnly={readOnly}
+                  placeholder="Add assumption..."
+                />
               </div>
             )}
 
@@ -459,19 +595,12 @@ export default function SowPage({
                 padding: '1.5rem',
               }}>
                 <h2 style={sectionHeadingStyle}>Acceptance Criteria</h2>
-                {Array.isArray(content.acceptance_criteria) ? (
-                  <ul style={{ margin: 0, paddingLeft: '1.25rem' }}>
-                    {content.acceptance_criteria.map((item, idx) => (
-                      <li key={idx} style={{ fontSize: '0.875rem', color: '#4A5568', marginBottom: '0.35rem', lineHeight: 1.5 }}>
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p style={{ fontSize: '0.875rem', color: '#4A5568', lineHeight: 1.7, margin: 0 }}>
-                    {content.acceptance_criteria}
-                  </p>
-                )}
+                <EditableList
+                  items={Array.isArray(content.acceptance_criteria) ? content.acceptance_criteria : [content.acceptance_criteria]}
+                  onCommit={(val) => handleContentFieldChange('acceptance_criteria', val)}
+                  readOnly={readOnly}
+                  placeholder="Add acceptance criterion..."
+                />
               </div>
             )}
           </div>

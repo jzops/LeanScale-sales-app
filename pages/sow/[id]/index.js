@@ -127,8 +127,13 @@ export default function SowDetail() {
     }
   }
 
-  // Determine if this is a customer-facing (read-only) view
-  const isReadOnly = customer?.isDemo === false;
+  // Read-only logic: customer portal views (/c/{slug}/sow/{id}) are read-only,
+  // direct visits (/sow/{id}) are editable. The ?edit=true query param overrides
+  // read-only for admin use in the customer portal.
+  // TODO: Replace with proper auth/role check once authentication is implemented.
+  const isCustomerPortal = !!customer?.slug && !customer?.isDemo;
+  const editOverride = router.query.edit === 'true';
+  const isReadOnly = isCustomerPortal && !editOverride;
 
   return (
     <Layout title={sow ? sow.title : 'SOW Detail'}>
@@ -172,6 +177,7 @@ export default function SowDetail() {
             onExport={handleExport}
             onSowUpdate={(updatedSow) => setSow(updatedSow)}
             customerSlug={customer?.slug}
+            customerPath={customerPath}
             customerName={customer?.customerName}
           />
         )}

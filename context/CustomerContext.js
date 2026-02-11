@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/router';
 
 /**
  * Customer Context
@@ -33,13 +34,16 @@ const defaultAvailability = [
 ];
 
 export function CustomerProvider({ children, initialCustomer = null }) {
+  const router = useRouter();
   const [customer, setCustomer] = useState(initialCustomer || defaultCustomer);
   const [availability, setAvailability] = useState(defaultAvailability);
   const [loading, setLoading] = useState(!initialCustomer);
   const [error, setError] = useState(null);
 
+  // Re-load customer data when the route changes (asPath includes /c/slug prefix)
+  // This ensures navigating between /c/formance/... and / picks up the
+  // middleware-set cookie and fetches the correct customer config.
   useEffect(() => {
-    // Skip if we already have initial customer data from SSR
     if (initialCustomer) {
       setLoading(false);
       return;
@@ -89,7 +93,7 @@ export function CustomerProvider({ children, initialCustomer = null }) {
     }
 
     loadCustomer();
-  }, [initialCustomer]);
+  }, [initialCustomer, router.asPath]);
 
   const isDemo = customer.slug === 'demo' || customer.customerName === 'Demo' || customer.isDemo;
 

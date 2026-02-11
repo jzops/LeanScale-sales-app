@@ -48,10 +48,11 @@ export async function middleware(request) {
   // Extract customer slug from subdomain or query param
   let customerSlug = extractCustomerSlug(hostname, searchParams);
 
-  // Default to 'demo' for direct access without customer context
-  // IMPORTANT: Always reset to demo when not on a /c/ path to prevent
-  // cookie persistence from showing customer branding on main site
   if (!customerSlug) {
+    // No customer context on this route — clear any persistent cookie
+    // from a previous /c/{slug}/ visit to prevent cross-contamination.
+    // We delete first to ensure the maxAge:86400 cookie is removed,
+    // then set a fresh session-scoped 'demo' cookie.
     customerSlug = 'demo';
   }
 
@@ -62,6 +63,11 @@ export async function middleware(request) {
   const response = NextResponse.next({
     request: { headers: requestHeaders },
   });
+
+  // Clear persistent cookie if falling back to demo
+  if (customerSlug === 'demo') {
+    response.cookies.delete('customer-slug');
+  }
 
   // Set cookie for client-side access
   // Using session cookie (no maxAge) for non-path-based routing
