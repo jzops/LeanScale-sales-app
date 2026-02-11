@@ -21,7 +21,7 @@ import SowPreviewPanel from './SowPreviewPanel';
 import BenchmarkOverlay from './BenchmarkOverlay';
 import DiagnosticComparison from './DiagnosticComparison';
 import ScoreBreakdown from './ScoreBreakdown';
-import { benchmarkPresets, compareToBenchmark } from '../../data/benchmark-data';
+import { benchmarkPresets } from '../../data/benchmark-data';
 import PresentationMode from './PresentationMode';
 
 /**

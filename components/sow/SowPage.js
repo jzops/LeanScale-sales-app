@@ -709,8 +709,6 @@ function ScopeCard({ section, diagnosticProcesses = [], diagnosticResult, custom
   const [expanded, setExpanded] = useState(false);
 
   const h = parseFloat(section.hours) || 0;
-  const r = parseFloat(section.rate) || 0;
-  const subtotal = h * r;
   const linkedItems = section.diagnostic_items || [];
   const deliverables = section.deliverables || [];
 
@@ -761,11 +759,7 @@ function ScopeCard({ section, diagnosticProcesses = [], diagnosticResult, custom
           {h > 0 && (
             <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>{h}h</span>
           )}
-          {subtotal > 0 && (
-            <span style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', color: 'var(--status-healthy-text)' }}>
-              ${subtotal.toLocaleString()}
-            </span>
-          )}
+{/* Pricing is retainer-based — no per-section cost */}
           <span style={{ color: 'var(--text-muted)', fontSize: 'var(--text-base)' }}>
             {expanded ? '▾' : '▸'}
           </span>

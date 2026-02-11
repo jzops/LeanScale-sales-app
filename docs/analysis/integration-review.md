@@ -1,176 +1,81 @@
-# Integration Review — feature/sales-diagnostic-sow-flow
+# Integration Review — Post 30-Agent Iteration
 
-**Date:** 2026-02-11  
-**Reviewer:** Integration Review Sub-Agent
+**Date:** 2026-02-11
+**Branch:** feature/sales-diagnostic-sow-flow
+**Reviewer:** Automated integration review (subagent)
 
----
+## Summary
 
-## Commits on Branch (most recent first)
+30 sub-agents committed ~22K lines across 88 files in ~30 minutes. This review checked for conflicts, broken imports, inconsistent data models, and duplicate code.
+
+## Commit Log (last 30)
 
 ```
+58b8871 fix: correct pricing model to retainer-based tiers (not rate × hours)
+caabffd feat: full SOW configurability - hours, timeline, deliverables, tier selection
+9ad1fd3 feat: diagnostic benchmarking and comparison
+3e52259 feat: diagnostic presentation mode for sales calls
+c427d21 feat: SOW scenario modeling - Good/Better/Best option comparison
+391ffa8 feat: WYSIWYG SOW builder with live preview
+01d93e6 feat: diagnostic dashboard with health score, heatmap, priority matrix
+fd4ff99 feat: integrated scope builder mode on diagnostic page
+3651188 feat: inline item detail editor with hours, rate, impact, action overrides
+91f3100 feat: live SOW preview panel during diagnostic editing
+c0f7d5a docs: add developer guides - getting started, architecture, changelog
+41509be fix: integration review - resolve cross-feature conflicts and missing connections
+860b3f8 fix: styling consistency - align new components with design system
 02ad8e3 feat: read-only customer views for diagnostics and SOW
 53372e7 feat: SOW executive summary and assumptions editors
 66a3616 feat: diagnostic PDF export for post-call sharing
 b6a95ea feat: API hardening - auth middleware, validation, error handling, schema consolidation
 11fa1a0 feat: auto SOW builder - generate sections from diagnostic results
 a295556 feat: dynamic engagement page driven by diagnostic results
-6b7782d Merge pull request #6 from LeanScaleTeam/fix/nav-flat-links
-ee3a682 Fix SOW 404 error: use admin client for reads to bypass RLS
-32f39e6 Simplify active customer nav with flat links for core flow
-6ff9eea Merge pull request #5 from LeanScaleTeam/fix/customer-links-and-defaults
-5aed4f1 Fix customer link prefixes and default customer_type to active
-c182084 Merge pull request #4 from LeanScaleTeam/feature/diagnostic-to-sow-redesign
-c3cfca7 Add customer URL prefix persistence and config-driven navigation
-a74ff27 Merge pull request #3 from LeanScaleTeam/feature/diagnostic-to-sow-redesign
-a520b59 Diagnostic-to-SOW redesign: section-based builder, PDF export, Teamwork push, service catalog
-615241f Merge pull request #2 from LeanScaleTeam/feature/configurable-diagnostics
-fde6f23 Add configurable per-customer diagnostics with inline editing, notes, and markdown import
-1c05956 Merge pull request #1 from LeanScaleTeam/feature/sales-app-v2
-bf0db26 Fix Netlify build: pin react-test-renderer to React 18
-9ebe6ec Fix n8n SOW workflow: align schema with app and SKILL.md
+(+ earlier commits)
 ```
 
----
+## File Statistics
 
-## New Files Created Across All Phases
+- **88 files changed**, +21,995 / -1,410 lines
+- Highest-risk files: DiagnosticResults.js (679+ lines), SowBuilder.js (392+), SowPage.js (453+), SowPdfDocument.js (366+), globals.css (1101+)
 
-### Components
-- `components/diagnostic/DiagnosticPdfDocument.js` — PDF template for diagnostic export
-- `components/diagnostic/DiagnosticResults.js` — Unified diagnostic results page
-- `components/diagnostic/FilterBar.js` — Search/filter bar for diagnostics
-- `components/diagnostic/StatusLegend.js` — Status dot/badge components
-- `components/diagnostic/StatusPicker.js` — Status cycling picker for edit mode
-- `components/diagnostic/SummaryCard.js` — Summary statistics card
-- `components/sow/AssumptionsEditor.js` — Bullet-list editor for assumptions
-- `components/sow/ExecutiveSummaryEditor.js` — Rich text editor for exec summary
-- `components/sow/SowBuilder.js` — Two-panel SOW builder
-- `components/sow/SowPage.js` — Full SOW view component
-- `components/sow/SowPdfDocument.js` — PDF template for SOW export
+## Issues Found & Fixed
 
-### Libraries
-- `lib/api-errors.js` — Standardized API error classes
-- `lib/api-middleware.js` — Auth middleware (withAuth)
-- `lib/api-validation.js` — Request body validation schemas
-- `lib/case-transform.js` — camelCase ↔ snake_case transforms
-- `lib/engagement-engine.js` — Pure function recommendation engine
-- `lib/sow-auto-builder.js` — Auto-generate SOW sections from diagnostics
-- `lib/sow-export.js` — SOW PDF export utilities
+### Critical (0)
+No merge conflicts, no syntax errors, no missing files. All imports resolve correctly.
 
-### API Endpoints
-- `pages/api/diagnostics/[type].js` — GET/PUT diagnostic data by type
-- `pages/api/diagnostics/export.js` — GET diagnostic PDF export
-- `pages/api/engagement.js` — GET engagement recommendation
-- `pages/api/service-catalog/index.js` — GET service catalog
-- `pages/api/sow/[id]/export.js` — GET SOW PDF export
-- `pages/api/sow/[id]/index.js` — GET/PUT SOW by ID
-- `pages/api/sow/auto-generate.js` — POST auto-generate SOW sections
-- `pages/api/sow/from-diagnostic.js` — POST create SOW from diagnostic
-- `pages/api/sow/index.js` — GET/POST SOW list
+### Major (5 fixed)
 
-### Pages
-- `pages/sow/[id]/review.js` — Customer-facing read-only SOW review
-- `pages/try-leanscale/engagement.js` — Dynamic engagement overview
-- `pages/try-leanscale/results.js` — Customer-facing diagnostic results
+1. **ItemDetailEditor.js — rate × hours pricing** (lines 7, 88, 217, 309): Used `DEFAULT_RATE = 200` and computed `hours * rate` per item. Fixed: removed rate field, changed "Est. Cost" to "Est. Hours", added "Retainer-based" pricing note.
 
-### Data & Config
-- `data/customer-config.js` — Customer configuration
-- `data/diagnostic-data.js` — Static diagnostic data
-- `supabase/migrations/001_consolidated_schema.sql` — DB schema
+2. **DiagnosticItemCard.js — default_rate display** (line 154): Showed `${catalogEntry.default_rate}/hr`. Fixed: now shows "hours estimated" without rate.
 
-### Docs
-- `docs/analysis/code-review.md`
-- `docs/analysis/user-experience-review.md`
-- `docs/specs/api-hardening-guide.md`
-- `docs/specs/auto-sow-builder.md`
-- `docs/specs/diagnostic-ux-improvements.md`
-- `docs/specs/dynamic-engagement-page.md`
-- `docs/specs/user-flow-guide.md`
+3. **SowPage.js ScopeCard — rate × hours subtotal** (line 712): Computed `h * r` (section rate × hours). Fixed: removed rate-based subtotal, added comment about retainer model.
 
----
+4. **CatalogPicker.js — default_rate/hr display** (lines 233-241): Showed per-hour rate from catalog. Fixed: removed, added retainer-model comment.
 
-## Issues Found
+5. **pages/api/sow/auto-generate.js — defaultRate parameter** (lines 11, 35, 75): Accepted and passed `defaultRate = 200`. Fixed: deprecated the parameter with comment.
 
-### 🔴 Critical: Missing API Endpoint — `/api/sow/from-engagement`
+### Minor (1 fixed)
 
-**File:** `pages/try-leanscale/engagement.js:309`  
-**Issue:** The engagement page's "Build SOW from Recommendations" button calls `POST /api/sow/from-engagement`, but this endpoint did not exist.  
-**Impact:** Clicking "Build SOW" on the engagement page would 404.  
-**Fix:** Created `pages/api/sow/from-engagement.js` with full implementation: creates SOW, runs auto-builder, creates sections, links diagnostic.
+1. **DiagnosticResults.js — unused import**: `compareToBenchmark` imported but never used. Fixed: removed.
 
-### 🔴 Critical: Missing API Endpoint — `/api/diagnostics/by-id`
+## Verified Clean
 
-**File:** `pages/sow/[id]/review.js:42`  
-**Issue:** The SOW review page fetches `/api/diagnostics/by-id?id=...` to load linked diagnostic data, but this endpoint did not exist.  
-**Impact:** SOW review page would fail to load diagnostic context (silent failure, degrades gracefully but loses data).  
-**Fix:** Created `pages/api/diagnostics/by-id.js` with supabaseAdmin query.
+- **SowBuilder.js**: Clean. TierSelector won over InvestmentConfigurator (not imported). Retainer model throughout. ExecutiveSummaryEditor, AssumptionsEditor, SectionConfigurator, TimelineConfigurator all properly integrated.
+- **SowPdfDocument.js**: Clean. Retainer-based investment table (hours breakdown + tier summary, no rate column).
+- **Navigation.js**: Clean. Workflow stepper link added correctly.
+- **lib/sow-auto-builder.js**: Clean. Uses `RETAINER_TIERS`, no rate references.
+- **lib/engagement-engine.js**: Clean. Uses `TIERS` array with hours/price, no rate calculations.
+- **lib/api-validation.js**: Clean. Zod schemas have no rate fields, explicit comment about retainer model.
+- **globals.css**: Clean. Duplicate `.pres-notes-toggle` selector is intentional (base + position override). No conflicting values.
+- **All imported components exist**: Verified all 25+ component imports in critical files — all files present.
 
-### 🟡 Medium: Field Name Mismatch — `diagnostic_result_id` vs `diagnostic_result_ids`
+## Remaining Known Issues
 
-**File:** `pages/sow/[id]/review.js:40`  
-**Issue:** Review page checks `json.data.diagnostic_result_id` (singular) but the DB schema and all SOW creation code uses `diagnostic_result_ids` (UUID array). The SOW API returns the raw DB row which has the array field.  
-**Fix:** Changed to `json.data.diagnostic_result_ids?.[0] || json.data.diagnostic_result_id` for backwards compatibility.
+1. **ServiceEditor.js / ServiceCatalogTable.js** still reference `default_rate` for the admin catalog management UI. This is acceptable — the catalog DB table has a `default_rate` column for reference, but it's not used in pricing calculations.
 
-### 🟡 Low: Unused Import — `statusToLabel`
+2. **lib/service-catalog.js** selects `default_rate` from DB. Same as above — admin reference data, not used for customer-facing pricing.
 
-**File:** `pages/try-leanscale/engagement.js:7`  
-**Issue:** `statusToLabel` is imported from `../../data/diagnostic-data` but never used in the file. Won't break builds but triggers linter warnings.  
-**Fix:** Converted to comment.
+## Overall Health Assessment
 
----
-
-## Cross-Feature Data Flow Verification
-
-### Diagnostic → Engagement Engine ✅
-- `DiagnosticResults.js` stores processes with `{ name, status, function, outcome, addToEngagement, serviceId, serviceType }`
-- `engagement-engine.js` `filterPriorityItems()` filters on `addToEngagement`
-- `enrichWithCatalog()` matches via `serviceId` slug → catalog lookup
-- Data shapes match correctly.
-
-### Engagement Engine → Auto SOW Builder ✅
-- `engagement-engine.js` outputs `{ functionGroups, projectSequence, summary }` with enriched items
-- `sow-auto-builder.js` `selectPriorityItems()` independently filters from raw processes (warning/unable/addToEngagement)
-- Both systems work from the same diagnostic processes array — compatible but independent paths
-- The auto-generate endpoint (`/api/sow/auto-generate`) calls `sow-auto-builder` directly from diagnostic data, not from engagement output. This is correct — engagement is a preview, SOW builder is the canonical generator.
-
-### Auto SOW Builder → SOW Page → PDF Export ✅
-- `sow-auto-builder.js` returns `{ sections, executiveSummary }` with section shape: `{ title, description, hours, rate, deliverables, diagnosticItems, sortOrder }`
-- `SowBuilder.js` consumes sections array with matching shape
-- `SowPdfDocument.js` renders from SOW + sections data
-- `/api/sow/[id]/export.js` calls renderToBuffer with SowPdfDocument
-
-### Diagnostic → PDF Export ✅
-- `DiagnosticPdfDocument.js` accepts `{ processes, notes, customerName, diagnosticType }`
-- `/api/diagnostics/export.js` fetches these via `getDiagnosticResult()` + `getNotes()`
-
----
-
-## Consistency Review: DiagnosticResults.js & SowBuilder.js
-
-### DiagnosticResults.js ✅
-- No duplicate function definitions
-- Clean imports — all referenced components exist
-- Props are consistent: `diagnosticType` and `readOnly` used throughout
-- Style uses CSS variables consistently (`var(--ls-purple)`, `var(--space-*)`, etc.)
-- One large component file but well-organized with clear sub-components
-
-### SowBuilder.js ✅
-- No duplicate function definitions
-- Imports `ExecutiveSummaryEditor` and `AssumptionsEditor` (both exist and were added in same phase)
-- `SummaryItem` helper defined at bottom — clean
-- No conflicting prop additions across phases
-- Style uses hex colors (not CSS variables) — minor inconsistency with DiagnosticResults but not a bug
-
----
-
-## Overall Assessment
-
-**Status: GOOD — 2 critical issues fixed, 2 minor issues fixed**
-
-The multi-agent development produced clean, well-structured code with good separation of concerns. The main issues were **missing API endpoints** — features built in isolation without their corresponding backend routes. Specifically:
-
-1. The engagement page was built with a CTA that calls an endpoint the SOW phase never created
-2. The SOW review page references a diagnostic lookup endpoint that was never implemented
-
-These are classic integration gaps when multiple agents work on adjacent features. All data flow shapes are compatible and the architectural decisions are consistent across phases.
-
-No merge conflicts, no duplicate definitions, no broken imports (after fixes).
+**✅ GOOD** — The 30-agent iteration produced clean, well-structured code. The pricing model inconsistency (rate × hours vs retainer tiers) was the main issue, affecting 5 files. All critical integrations (DiagnosticResults → SowBuilder → SowPdfDocument → SowPage) are properly connected and use consistent data shapes. No broken imports, no duplicate components, no conflicting props.

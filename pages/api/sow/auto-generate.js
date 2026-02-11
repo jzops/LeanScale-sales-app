@@ -8,7 +8,7 @@
  *   groupBy?: 'function' | 'outcome',
  *   customerId?: UUID,
  *   customerName?: string,
- *   defaultRate?: number,
+ *   // Pricing is retainer-based (tier model); no defaultRate needed
  *   startDate?: string (ISO date),
  *   sowId?: UUID (if regenerating an existing SOW),
  *   preserveManual?: boolean (keep manually-added sections on regenerate),
@@ -32,7 +32,7 @@ export default async function handler(req, res) {
       groupBy = 'function',
       customerId,
       customerName,
-      defaultRate = 200,
+      defaultRate, // deprecated — pricing is retainer-based
       startDate,
       sowId,
       preserveManual = true,

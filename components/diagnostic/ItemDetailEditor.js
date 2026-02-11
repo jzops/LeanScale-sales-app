@@ -4,7 +4,7 @@ import { StatusBadge } from './StatusLegend';
 
 const RECOMMENDED_ACTIONS = ['Implement', 'Optimize', 'Replace', 'Train', 'Defer'];
 const DEFAULT_HOURS = 40;
-const DEFAULT_RATE = 200;
+// Note: Pricing is retainer-based (tier model), not rate × hours. Rate field kept for reference only.
 
 function StarRating({ value, onChange, readOnly = false }) {
   const [hover, setHover] = useState(0);
@@ -85,7 +85,7 @@ export default function ItemDetailEditor({
 
   const itemNotes = notes.filter(n => n.process_name === item.name);
   const hours = item.hoursOverride ?? DEFAULT_HOURS;
-  const rate = item.rateOverride ?? DEFAULT_RATE;
+  // Pricing is retainer-based; no per-item rate calculation
 
   // Compact row
   return (
@@ -204,29 +204,14 @@ export default function ItemDetailEditor({
             )}
           </div>
 
-          {/* Rate Override */}
+          {/* Pricing Note — retainer model, no per-item rate */}
           <div>
             <label style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', display: 'block', marginBottom: 'var(--space-1)' }}>
-              Hourly Rate ($)
+              Pricing
             </label>
-            {editMode ? (
-              <input
-                type="number"
-                min="0"
-                step="25"
-                defaultValue={item.rateOverride ?? DEFAULT_RATE}
-                onChange={(e) => handleNumberChange('rateOverride', e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: 'var(--space-2)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: 'var(--radius-sm)',
-                  fontSize: 'var(--text-sm)',
-                }}
-              />
-            ) : (
-              <div style={{ fontSize: 'var(--text-sm)', padding: 'var(--space-2) 0' }}>${rate}/hr</div>
-            )}
+            <div style={{ fontSize: 'var(--text-sm)', padding: 'var(--space-2) 0', color: 'var(--text-muted)' }}>
+              Retainer-based
+            </div>
           </div>
 
           {/* Impact Rating */}
@@ -295,10 +280,10 @@ export default function ItemDetailEditor({
             </div>
           )}
 
-          {/* Estimated Cost */}
+          {/* Hours Summary */}
           <div>
             <label style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', display: 'block', marginBottom: 'var(--space-1)' }}>
-              Est. Cost
+              Est. Hours
             </label>
             <div style={{
               fontSize: 'var(--text-base)',
@@ -306,7 +291,7 @@ export default function ItemDetailEditor({
               color: 'var(--ls-purple)',
               padding: 'var(--space-2) 0',
             }}>
-              ${(hours * rate).toLocaleString()}
+              {hours}h
             </div>
           </div>
 

@@ -151,7 +151,7 @@ export default function DiagnosticItemCard({
             </div>
           )}
           <div style={{ marginTop: '4px', color: '#a5b4fc' }}>
-            {catalogEntry.hours_low}–{catalogEntry.hours_high}h · ${catalogEntry.default_rate}/hr
+            {catalogEntry.hours_low}–{catalogEntry.hours_high}h estimated
           </div>
         </div>
       )}

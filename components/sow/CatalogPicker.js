@@ -230,17 +230,7 @@ export default function CatalogPicker({ onSelect, onCancel }) {
                         {hoursDisplay}
                       </span>
                     )}
-                    {service.default_rate && (
-                      <span style={{
-                        fontSize: '0.75rem',
-                        color: '#276749',
-                        background: '#C6F6D5',
-                        padding: '0.15rem 0.5rem',
-                        borderRadius: '9999px',
-                      }}>
-                        ${parseFloat(service.default_rate).toLocaleString()}/hr
-                      </span>
-                    )}
+                    {/* Pricing is retainer-based; rate not shown */}
                   </div>
                 </div>
               </div>
