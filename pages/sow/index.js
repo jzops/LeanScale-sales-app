@@ -1,106 +1,92 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 import Layout from '../../components/Layout';
+import SowPage from '../../components/sow/SowPage';
 import { useCustomer } from '../../context/CustomerContext';
-
-const STATUS_COLORS = {
-  draft: { bg: '#EDF2F7', color: '#4A5568' },
-  generated: { bg: '#EBF8FF', color: '#2B6CB0' },
-  review: { bg: '#FEFCBF', color: '#975A16' },
-  approved: { bg: '#C6F6D5', color: '#276749' },
-  sent: { bg: '#E9D8FD', color: '#553C9A' },
-  accepted: { bg: '#C6F6D5', color: '#276749' },
-  declined: { bg: '#FED7D7', color: '#9B2C2C' },
-};
-
-function StatusBadge({ status }) {
-  const colors = STATUS_COLORS[status] || STATUS_COLORS.draft;
-  return (
-    <span style={{
-      display: 'inline-block',
-      padding: '0.2rem 0.6rem',
-      borderRadius: '9999px',
-      fontSize: '0.75rem',
-      fontWeight: 600,
-      background: colors.bg,
-      color: colors.color,
-    }}>
-      {status}
-    </span>
-  );
-}
 
 const DIAG_TYPE_TO_SOW_TYPE = { gtm: 'embedded', clay: 'clay', cpq: 'q2c' };
 
 export default function SowIndex() {
   const { customer, customerPath, isDemo } = useCustomer();
-  const router = useRouter();
-  const [sows, setSows] = useState([]);
+
+  const [sow, setSow] = useState(null);
+  const [diagnosticResult, setDiagnosticResult] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [autoCreating, setAutoCreating] = useState(false);
+  const [noDiagnostic, setNoDiagnostic] = useState(false);
 
   useEffect(() => {
-    async function fetchAndAutoCreate() {
-      try {
-        const customerId = customer?.id;
-        const url = customerId
-          ? `/api/sow?customerId=${customerId}`
-          : '/api/sow';
-        const res = await fetch(url);
+    async function loadOrCreateSow() {
+      const customerId = customer?.id;
+      if (!customerId || isDemo) {
+        setLoading(false);
+        setNoDiagnostic(true);
+        return;
+      }
 
-        if (!res.ok) {
-          setError('Failed to load statements of work.');
+      try {
+        const diagType = customer.diagnosticType || 'gtm';
+
+        // Fetch existing SOWs and diagnostic in parallel
+        const [sowRes, diagRes] = await Promise.all([
+          fetch(`/api/sow?customerId=${customerId}`),
+          fetch(`/api/diagnostics/${diagType}?customerId=${customerId}`),
+        ]);
+
+        const sowJson = await sowRes.json();
+        const diagJson = await diagRes.json();
+
+        // No diagnostic → can't show SOW
+        if (!diagJson.success || !diagJson.data) {
+          setNoDiagnostic(true);
           setLoading(false);
           return;
         }
 
-        const json = await res.json();
-        const existingSows = json.data || [];
+        setDiagnosticResult(diagJson.data);
 
-        // Auto-create SOW if: real customer, no SOWs, and diagnostic exists
-        if (existingSows.length === 0 && customerId && !isDemo) {
-          setAutoCreating(true);
-          const diagType = customer.diagnosticType || 'gtm';
+        const existingSows = sowJson.data || [];
+        let sowData;
 
-          // Check if diagnostic result exists
-          const diagRes = await fetch(`/api/diagnostics/${diagType}?customerId=${customerId}`);
-          const diagJson = await diagRes.json();
-
-          if (diagJson.success && diagJson.data) {
-            // Auto-create SOW from diagnostic
-            const sowRes = await fetch('/api/sow/from-diagnostic', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                customerId,
-                diagnosticResultId: diagJson.data.id,
-                diagnosticType: diagType,
-                customerName: customer.customerName,
-                sowType: DIAG_TYPE_TO_SOW_TYPE[diagType] || 'custom',
-                createdBy: 'auto',
-              }),
-            });
-            const sowJson = await sowRes.json();
-            if (sowJson.success && sowJson.data?.id) {
-              router.replace(customerPath(`/sow/${sowJson.data.id}`));
-              return;
-            }
+        if (existingSows.length > 0) {
+          // Load the most recent SOW with sections
+          const detailRes = await fetch(`/api/sow/${existingSows[0].id}`);
+          const detailJson = await detailRes.json();
+          sowData = detailJson.data;
+        } else {
+          // Auto-create SOW from diagnostic
+          const createRes = await fetch('/api/sow/from-diagnostic', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              customerId,
+              diagnosticResultId: diagJson.data.id,
+              diagnosticType: diagType,
+              customerName: customer.customerName,
+              sowType: DIAG_TYPE_TO_SOW_TYPE[diagType] || 'custom',
+              createdBy: 'auto',
+            }),
+          });
+          const createJson = await createRes.json();
+          if (createJson.success && createJson.data) {
+            sowData = createJson.data;
+          } else {
+            setError('Failed to generate statement of work.');
+            setLoading(false);
+            return;
           }
-          setAutoCreating(false);
         }
 
-        setSows(existingSows);
+        setSow(sowData);
       } catch (err) {
-        console.error('Error fetching SOWs:', err);
-        setError('An error occurred while loading statements of work.');
+        console.error('Error loading SOW:', err);
+        setError('An error occurred while loading the statement of work.');
       } finally {
         setLoading(false);
       }
     }
 
-    fetchAndAutoCreate();
+    loadOrCreateSow();
   }, [customer?.id]);
 
   const diagnosticHref = {
@@ -109,62 +95,44 @@ export default function SowIndex() {
     cpq: '/try-leanscale/cpq-diagnostic',
   }[customer?.diagnosticType || 'gtm'] || '/try-leanscale/diagnostic';
 
+  async function handleExport() {
+    if (!sow?.id) return;
+    try {
+      const res = await fetch(`/api/sow/${sow.id}/export`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          exportedBy: customer?.customerName || 'Unknown',
+          customerName: customer?.customerName || '',
+        }),
+      });
+      if (res.ok) {
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = res.headers.get('Content-Disposition')?.match(/filename="(.+)"/)?.[1] || 'SOW.pdf';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+    } catch (err) {
+      console.error('Error exporting PDF:', err);
+    }
+  }
+
   return (
-    <Layout title="Statements of Work">
-      <div style={{
-        background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
-        color: 'white',
-        padding: '3rem 0 2rem',
-        textAlign: 'center',
-      }}>
-        <div className="container">
-          <h1 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '0.5rem' }}>
-            Statements of Work
-          </h1>
-          <p style={{ color: '#94a3b8', maxWidth: 500, margin: '0 auto' }}>
-            View, manage, and generate statements of work for your engagements.
-          </p>
-        </div>
-      </div>
-
+    <Layout title="Statement of Work">
       <div className="container" style={{ maxWidth: 960, margin: '0 auto', padding: '2rem 1rem' }}>
-        {/* Header Row */}
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '1.5rem',
-        }}>
-          <h2 style={{
-            fontSize: '1.25rem',
-            fontWeight: 600,
-            color: '#1a1a2e',
-            margin: 0,
-          }}>
-            All SOWs
-          </h2>
-          <Link href={customerPath(diagnosticHref)} style={{
-            display: 'inline-block',
-            padding: '0.6rem 1.25rem',
-            background: '#6C5CE7',
-            color: 'white',
-            borderRadius: '0.5rem',
-            fontSize: '0.875rem',
-            fontWeight: 600,
-            textDecoration: 'none',
-          }}>
-            New SOW from Diagnostic
-          </Link>
-        </div>
-
-        {/* Loading / Auto-creating State */}
-        {(loading || autoCreating) && (
+        {/* Loading */}
+        {loading && (
           <div style={{ textAlign: 'center', padding: '3rem 1rem', color: '#718096' }}>
-            <p>{autoCreating ? 'Generating SOW from your diagnostic...' : 'Loading statements of work...'}</p>
+            <p>Loading statement of work...</p>
           </div>
         )}
 
-        {/* Error State */}
+        {/* Error */}
         {error && !loading && (
           <div style={{
             textAlign: 'center',
@@ -178,8 +146,8 @@ export default function SowIndex() {
           </div>
         )}
 
-        {/* Empty State */}
-        {!loading && !autoCreating && !error && sows.length === 0 && (
+        {/* No diagnostic available */}
+        {noDiagnostic && !loading && !error && (
           <div style={{
             textAlign: 'center',
             padding: '3rem 1rem',
@@ -187,8 +155,11 @@ export default function SowIndex() {
             border: '1px solid #E2E8F0',
             borderRadius: '0.75rem',
           }}>
-            <p style={{ fontSize: '1rem', color: '#4A5568', marginBottom: '1rem' }}>
-              No statements of work yet. Complete a diagnostic to auto-generate your SOW.
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: '#1a1a2e', marginBottom: '0.75rem' }}>
+              No Statement of Work Yet
+            </h2>
+            <p style={{ fontSize: '0.95rem', color: '#4A5568', marginBottom: '1.25rem', maxWidth: 500, margin: '0 auto 1.25rem' }}>
+              Complete your diagnostic assessment first. Your statement of work will be automatically generated from the results.
             </p>
             <Link href={customerPath(diagnosticHref)} style={{
               display: 'inline-block',
@@ -205,71 +176,14 @@ export default function SowIndex() {
           </div>
         )}
 
-        {/* SOW List */}
-        {!loading && !error && sows.length > 0 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            {sows.map((sow) => (
-              <div key={sow.id} style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '1rem',
-                padding: '1rem 1.25rem',
-                background: 'white',
-                border: '1px solid #E2E8F0',
-                borderRadius: '0.75rem',
-                transition: 'border-color 0.2s',
-              }}>
-                {/* Title */}
-                <div style={{ flex: 1 }}>
-                  <Link href={customerPath(`/sow/${sow.id}`)} style={{
-                    fontSize: '0.95rem',
-                    fontWeight: 600,
-                    color: '#6C5CE7',
-                    textDecoration: 'none',
-                  }}>
-                    {sow.title}
-                  </Link>
-                </div>
-
-                {/* Type */}
-                <div style={{
-                  fontSize: '0.8rem',
-                  color: '#718096',
-                  minWidth: '70px',
-                  textAlign: 'center',
-                }}>
-                  {sow.sow_type}
-                </div>
-
-                {/* Status */}
-                <div style={{ minWidth: '90px', textAlign: 'center' }}>
-                  <StatusBadge status={sow.status} />
-                </div>
-
-                {/* Created */}
-                <div style={{
-                  fontSize: '0.8rem',
-                  color: '#A0AEC0',
-                  minWidth: '100px',
-                  textAlign: 'right',
-                }}>
-                  {sow.created_at
-                    ? new Date(sow.created_at).toLocaleDateString()
-                    : '-'}
-                </div>
-
-                {/* View Link */}
-                <Link href={customerPath(`/sow/${sow.id}`)} style={{
-                  fontSize: '0.8rem',
-                  color: '#6C5CE7',
-                  textDecoration: 'none',
-                  fontWeight: 500,
-                }}>
-                  View
-                </Link>
-              </div>
-            ))}
-          </div>
+        {/* SOW Content */}
+        {sow && !loading && !error && (
+          <SowPage
+            sow={sow}
+            diagnosticResult={diagnosticResult}
+            onExport={handleExport}
+            customerSlug={customer?.slug}
+          />
         )}
       </div>
     </Layout>

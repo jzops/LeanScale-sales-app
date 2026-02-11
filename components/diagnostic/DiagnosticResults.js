@@ -554,7 +554,7 @@ export default function DiagnosticResults({ diagnosticType }) {
           </h1>
           <p className="page-subtitle">{config.subtitle}</p>
 
-          {/* Edit mode toggle + Import button + Build SOW (only for non-demo customers) */}
+          {/* Edit mode toggle + Import button + View SOW (only for non-demo customers) */}
           {!isDemo && (
             <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', marginTop: '0.75rem' }}>
               <button
@@ -586,44 +586,22 @@ export default function DiagnosticResults({ diagnosticType }) {
               >
                 Import Markdown
               </button>
-              {diagnosticResultId && (
-                <button
-                  onClick={async () => {
-                    try {
-                      const res = await fetch('/api/sow/from-diagnostic', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                          customerId: customer.id,
-                          diagnosticResultId,
-                          diagnosticType,
-                          customerName: customer.customerName,
-                          sowType: diagnosticType === 'clay' ? 'clay' : diagnosticType === 'cpq' ? 'q2c' : 'embedded',
-                          createdBy: 'sales-app',
-                        }),
-                      });
-                      const json = await res.json();
-                      if (json.success && json.data?.id) {
-                        router.push(customerPath(`/sow/${json.data.id}`));
-                      }
-                    } catch (err) {
-                      console.error('Error creating SOW from diagnostic:', err);
-                    }
-                  }}
-                  style={{
-                    padding: '0.4rem 1rem',
-                    fontSize: '0.8rem',
-                    fontWeight: 600,
-                    background: 'var(--ls-purple)',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: 'var(--radius-sm)',
-                    cursor: 'pointer',
-                  }}
-                >
-                  Build SOW
-                </button>
-              )}
+              <Link
+                href={customerPath('/sow')}
+                style={{
+                  padding: '0.4rem 1rem',
+                  fontSize: '0.8rem',
+                  fontWeight: 600,
+                  background: 'var(--ls-purple)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: 'var(--radius-sm)',
+                  textDecoration: 'none',
+                  display: 'inline-block',
+                }}
+              >
+                View Statement of Work
+              </Link>
               {saving && (
                 <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', alignSelf: 'center' }}>
                   Saving...

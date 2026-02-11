@@ -1,16 +1,13 @@
 /**
- * SowPage - Rich interactive SOW display
+ * SowPage - Auto-generated SOW display
  *
- * Replaces the old SowPreview with a section-based, diagnostic-linked
- * presentation. Shows header, executive summary, diagnostic score card,
- * scope sections, timeline, investment table, and version history.
+ * Read-only presentation of a diagnostic-driven SOW.
+ * Shows header, executive summary, diagnostic score card,
+ * scope sections, Gantt timeline, and investment table.
  *
  * Props:
  *   sow              - The SOW object (includes sections array from API)
  *   diagnosticResult - Linked diagnostic result (optional, for score card)
- *   versions         - Array of sow_versions
- *   readOnly         - If true, hide edit/action buttons (customer view)
- *   onStatusUpdate(status) - Callback for status changes
  *   onExport()       - Callback for PDF export
  *   customerSlug     - For diagnostic link URL
  */
@@ -20,12 +17,6 @@ import Link from 'next/link';
 import DiagnosticScoreCard from './DiagnosticScoreCard';
 import InvestmentTable from './InvestmentTable';
 import SowTimeline from './SowTimeline';
-import VersionHistory from './VersionHistory';
-import TeamworkPreview from './TeamworkPreview';
-import DiagnosticSyncBanner from './DiagnosticSyncBanner';
-import SowPreview from '../SowPreview';
-
-const STATUS_OPTIONS = ['draft', 'review', 'sent', 'accepted', 'declined'];
 
 const STATUS_COLORS = {
   draft: { bg: '#EDF2F7', color: '#4A5568' },
@@ -38,20 +29,9 @@ const STATUS_COLORS = {
 export default function SowPage({
   sow,
   diagnosticResult,
-  versions = [],
-  readOnly = false,
-  onStatusUpdate,
   onExport,
   customerSlug,
-  customerName,
 }) {
-  const [selectedStatus, setSelectedStatus] = useState(sow?.status || 'draft');
-  const [statusUpdating, setStatusUpdating] = useState(false);
-  const [showTeamwork, setShowTeamwork] = useState(false);
-  const [teamworkPreview, setTeamworkPreview] = useState(null);
-  const [teamworkLoading, setTeamworkLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState(null);
-
   if (!sow) return null;
 
   const sections = sow.sections || [];
@@ -70,40 +50,7 @@ export default function SowPage({
     });
   });
 
-  async function handleStatusUpdate() {
-    if (!selectedStatus || selectedStatus === sow.status) return;
-    setStatusUpdating(true);
-    try {
-      await onStatusUpdate?.(selectedStatus);
-    } finally {
-      setStatusUpdating(false);
-    }
-  }
-
-  async function handlePushToTeamwork() {
-    setTeamworkLoading(true);
-    try {
-      const res = await fetch(`/api/sow/${sow.id}/push-to-teamwork`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ customerName: customerName || sow.title }),
-      });
-      const json = await res.json();
-      if (res.ok && json.data) {
-        setTeamworkPreview(json.data);
-        setShowTeamwork(true);
-      } else {
-        setErrorMsg(json.error || 'Failed to generate Teamwork preview.');
-      }
-    } catch (err) {
-      setErrorMsg('Failed to connect to Teamwork. Please try again.');
-    } finally {
-      setTeamworkLoading(false);
-    }
-  }
-
   const statusColors = STATUS_COLORS[sow.status] || STATUS_COLORS.draft;
-  const canPushToTeamwork = !readOnly && ['review', 'sent', 'accepted'].includes(sow.status) && !sow.teamwork_project_id;
 
   return (
     <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
@@ -135,11 +82,6 @@ export default function SowPage({
             <span style={{ fontSize: '0.8rem', color: '#718096' }}>
               Type: {sow.sow_type}
             </span>
-            {sow.created_by && (
-              <span style={{ fontSize: '0.8rem', color: '#718096' }}>
-                by {sow.created_by}
-              </span>
-            )}
             {sow.created_at && (
               <span style={{ fontSize: '0.8rem', color: '#A0AEC0' }}>
                 {new Date(sow.created_at).toLocaleDateString()}
@@ -158,169 +100,25 @@ export default function SowPage({
           </div>
         </div>
 
-        {/* Action buttons (internal only) */}
-        {!readOnly && (
-          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
-            <Link
-              href={customerSlug && customerSlug !== 'demo' ? `/c/${customerSlug}/sow/${sow.id}/build` : `/sow/${sow.id}/build`}
-              style={{
-                padding: '0.5rem 1rem',
-                background: '#6C5CE7',
-                color: 'white',
-                border: 'none',
-                borderRadius: '0.375rem',
-                fontSize: '0.875rem',
-                fontWeight: 500,
-                textDecoration: 'none',
-              }}
-            >
-              Builder
-            </Link>
-            {canPushToTeamwork && (
-              <button
-                onClick={handlePushToTeamwork}
-                disabled={teamworkLoading}
-                style={{
-                  padding: '0.5rem 1rem',
-                  background: teamworkLoading ? '#9CA3AF' : '#0F766E',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '0.375rem',
-                  fontSize: '0.875rem',
-                  fontWeight: 500,
-                  cursor: teamworkLoading ? 'wait' : 'pointer',
-                }}
-              >
-                {teamworkLoading ? 'Loading...' : 'Push to Teamwork'}
-              </button>
-            )}
-            {sow.teamwork_project_url && (
-              <a
-                href={sow.teamwork_project_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  padding: '0.5rem 1rem',
-                  background: '#F0FDF4',
-                  color: '#16A34A',
-                  border: '1px solid #BBF7D0',
-                  borderRadius: '0.375rem',
-                  fontSize: '0.875rem',
-                  fontWeight: 500,
-                  textDecoration: 'none',
-                }}
-              >
-                View in Teamwork
-              </a>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* ===== ERROR BANNER ===== */}
-      {errorMsg && (
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: '0.75rem 1.25rem',
-          background: '#FFF5F5',
-          border: '1px solid #FED7D7',
-          borderRadius: '0.75rem',
-          marginBottom: '1rem',
-          color: '#9B2C2C',
-          fontSize: '0.875rem',
-        }}>
-          <span>{errorMsg}</span>
+        {/* Export button */}
+        {onExport && (
           <button
-            onClick={() => setErrorMsg(null)}
+            onClick={onExport}
             style={{
-              background: 'none',
-              border: 'none',
-              color: '#9B2C2C',
-              cursor: 'pointer',
-              fontSize: '1rem',
-              padding: '0 0.25rem',
-            }}
-          >
-            x
-          </button>
-        </div>
-      )}
-
-      {/* ===== STATUS BAR (internal only) ===== */}
-      {!readOnly && (
-        <div style={{
-          display: 'flex',
-          gap: '0.75rem',
-          alignItems: 'center',
-          marginBottom: '2rem',
-          padding: '0.75rem 1rem',
-          background: '#F7FAFC',
-          borderRadius: '0.5rem',
-          border: '1px solid #E2E8F0',
-        }}>
-          <label style={{ fontSize: '0.875rem', fontWeight: 500, color: '#4A5568' }}>
-            Status:
-          </label>
-          <select
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-            style={{
-              padding: '0.4rem 0.75rem',
-              border: '1px solid #E2E8F0',
-              borderRadius: '0.375rem',
-              fontSize: '0.875rem',
-              background: 'white',
-              color: '#4A5568',
-            }}
-          >
-            {STATUS_OPTIONS.map((s) => (
-              <option key={s} value={s}>{s}</option>
-            ))}
-          </select>
-          <button
-            onClick={handleStatusUpdate}
-            disabled={statusUpdating || selectedStatus === sow.status}
-            style={{
-              padding: '0.4rem 1rem',
+              padding: '0.5rem 1rem',
               background: '#6C5CE7',
               color: 'white',
               border: 'none',
               borderRadius: '0.375rem',
               fontSize: '0.875rem',
               fontWeight: 500,
-              cursor: statusUpdating ? 'wait' : 'pointer',
-              opacity: (statusUpdating || selectedStatus === sow.status) ? 0.5 : 1,
+              cursor: 'pointer',
             }}
           >
-            {statusUpdating ? 'Updating...' : 'Update'}
+            Export PDF
           </button>
-        </div>
-      )}
-
-      {/* ===== DIAGNOSTIC SYNC BANNER ===== */}
-      {!readOnly && diagnosticResult && (
-        <DiagnosticSyncBanner sowId={sow.id} />
-      )}
-
-      {/* ===== TEAMWORK PREVIEW ===== */}
-      {showTeamwork && (
-        <div style={{ marginBottom: '2rem' }}>
-          <TeamworkPreview
-            sowId={sow.id}
-            preview={teamworkPreview}
-            teamworkUrl={sow.teamwork_project_url}
-            onPushComplete={(result) => {
-              if (result?.project?.url) {
-                sow.teamwork_project_id = result.project.id;
-                sow.teamwork_project_url = result.project.url;
-              }
-            }}
-            onClose={() => setShowTeamwork(false)}
-          />
-        </div>
-      )}
+        )}
+      </div>
 
       {/* ===== TOP GRID: Executive Summary + Diagnostic Score ===== */}
       <div style={{
@@ -399,7 +197,6 @@ export default function SowPage({
           gap: '1.5rem',
           marginBottom: '2rem',
         }}>
-          {/* Team Members */}
           {content.team && (
             <div style={{
               background: 'white',
@@ -424,7 +221,6 @@ export default function SowPage({
             </div>
           )}
 
-          {/* Assumptions + Acceptance Criteria stacked */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             {content.assumptions && (
               <div style={{
@@ -476,31 +272,6 @@ export default function SowPage({
           </div>
         </div>
       )}
-
-      {/* ===== LEGACY CONTENT (if no sections but has old content) ===== */}
-      {!hasSections && Object.keys(content).length > 1 && (
-        <div style={{
-          background: 'white',
-          border: '1px solid #E2E8F0',
-          borderRadius: '0.75rem',
-          padding: '2rem',
-          marginBottom: '2rem',
-        }}>
-          <SowPreview content={content} />
-        </div>
-      )}
-
-      {/* ===== VERSION HISTORY ===== */}
-      <div style={{ marginBottom: '2rem' }}>
-        <h2 style={sectionHeadingStyle}>Versions</h2>
-        <VersionHistory
-          versions={versions}
-          currentVersion={sow.current_version || 0}
-          sowId={sow.id}
-          onExport={onExport}
-          readOnly={readOnly}
-        />
-      </div>
     </div>
   );
 }
@@ -646,7 +417,6 @@ function ScopeCard({ section, diagnosticProcesses = [], diagnosticResult, custom
                     transition: 'border-color 0.15s',
                   };
 
-                  // If we have a diagnostic type and customer slug, link to the diagnostic page
                   const diagType = diagnosticResult?.diagnostic_type;
                   const diagUrl = diagType && customerSlug
                     ? `/c/${customerSlug}/try-leanscale/${diagType === 'gtm' ? 'diagnostic' : `${diagType}-diagnostic`}`
