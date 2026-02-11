@@ -71,7 +71,7 @@ export default function AdminCustomers() {
       assigned_team: 'izzy, brian, dave, kavean',
       is_demo: false,
       diagnostic_type: 'gtm',
-      customer_type: 'prospect',
+      customer_type: 'active',
     });
     setError(null);
     setShowModal(true);
@@ -91,7 +91,7 @@ export default function AdminCustomers() {
       assigned_team: (customer.assigned_team || []).join(', '),
       is_demo: customer.is_demo || false,
       diagnostic_type: customer.diagnostic_type || 'gtm',
-      customer_type: customer.customer_type || 'prospect',
+      customer_type: customer.customer_type || 'active',
     });
     setError(null);
     setShowModal(true);
@@ -358,7 +358,7 @@ export default function AdminCustomers() {
                           background: customer.customer_type === 'active' ? '#dcfce7' : customer.customer_type === 'churned' ? '#fee2e2' : '#f3e8ff',
                           color: customer.customer_type === 'active' ? '#166534' : customer.customer_type === 'churned' ? '#991b1b' : '#6b21a8',
                         }}>
-                          {customer.customer_type || 'prospect'}
+                          {customer.customer_type || 'active'}
                         </span>
                       </td>
                       <td style={{ padding: '0.75rem 1rem', fontSize: '0.875rem', textTransform: 'uppercase' }}>

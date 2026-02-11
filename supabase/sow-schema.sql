@@ -73,5 +73,5 @@ CREATE POLICY "Allow service_role full access on diagnostic_snapshots"
 -- ADD CUSTOMER_TYPE TO CUSTOMERS
 -- ============================================
 ALTER TABLE customers
-  ADD COLUMN IF NOT EXISTS customer_type TEXT DEFAULT 'prospect'
+  ADD COLUMN IF NOT EXISTS customer_type TEXT DEFAULT 'active'
     CHECK (customer_type IN ('prospect', 'active', 'churned'));

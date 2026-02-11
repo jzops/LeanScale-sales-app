@@ -118,8 +118,8 @@ export function CustomerProvider({ children, initialCustomer = null }) {
     isDemo,
     // Helper to get customer name for display (returns null for demo)
     displayName: customer.customerName && customer.customerName !== 'Demo' ? customer.customerName : null,
-    // Customer type: 'prospect' (default), 'active', or 'churned'
-    customerType: customer.customerType || 'prospect',
+    // Customer type: 'active' (default), 'prospect', or 'churned'
+    customerType: customer.customerType || 'active',
     // Prefix paths with /c/slug/ for real customers
     customerPath,
   };

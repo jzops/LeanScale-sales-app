@@ -123,7 +123,7 @@ export default function Home() {
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 {section.links.map((link) => (
-                  <Link key={link.href} href={link.href} className="quick-link">
+                  <Link key={link.href} href={customerPath(link.href)} className="quick-link">
                     {link.label}
                   </Link>
                 ))}

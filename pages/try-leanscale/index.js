@@ -153,7 +153,7 @@ export default function TryLeanScale() {
             { href: '/try-leanscale/process-health', label: 'Process Health', icon: '⚙️' },
             { href: '/try-leanscale/engagement', label: 'Engagement Overview', icon: '📋' },
           ].map((link) => (
-            <Link key={link.href} href={link.href} className="quick-link" style={{
+            <Link key={link.href} href={customerPath(link.href)} className="quick-link" style={{
               display: 'flex',
               alignItems: 'center',
               gap: '0.5rem',

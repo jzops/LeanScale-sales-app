@@ -607,7 +607,7 @@ export default function BuyLeanScale() {
             ].map((link) => (
               <Link 
                 key={link.href} 
-                href={link.href}
+                href={customerPath(link.href)}
                 style={{
                   padding: '0.5rem 1rem',
                   background: 'white',

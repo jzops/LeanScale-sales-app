@@ -123,7 +123,7 @@ async function handlePost(req, res) {
         assigned_team: assigned_team || [],
         is_demo: is_demo || false,
         diagnostic_type: diagnostic_type || 'gtm',
-        customer_type: customer_type || 'prospect',
+        customer_type: customer_type || 'active',
       })
       .select()
       .single();
@@ -171,7 +171,7 @@ async function handlePut(req, res) {
         assigned_team: assigned_team || [],
         is_demo: is_demo || false,
         diagnostic_type: diagnostic_type || 'gtm',
-        customer_type: customer_type || 'prospect',
+        customer_type: customer_type || 'active',
       })
       .eq('id', id)
       .select()

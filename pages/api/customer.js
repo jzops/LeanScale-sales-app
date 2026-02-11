@@ -24,7 +24,7 @@ export default async function handler(req, res) {
     // Add customerType (not in shared helper transform)
     const config = {
       ...customer,
-      customerType: customer.customerType || 'prospect',
+      customerType: customer.customerType || 'active',
     };
 
     // Cache for 5 minutes

@@ -857,10 +857,10 @@ export default function DiagnosticResults({ diagnosticType }) {
           <h3 className="cta-title">{cta.title}</h3>
           <p className="cta-subtitle">{cta.subtitle}</p>
           <div className="cta-buttons">
-            <Link href={cta.primaryLink} className="btn cta-btn-primary">
+            <Link href={customerPath(cta.primaryLink)} className="btn cta-btn-primary">
               {cta.primaryLabel}
             </Link>
-            <Link href={cta.secondaryLink} className="btn cta-btn-secondary">
+            <Link href={customerPath(cta.secondaryLink)} className="btn cta-btn-secondary">
               {cta.secondaryLabel}
             </Link>
           </div>

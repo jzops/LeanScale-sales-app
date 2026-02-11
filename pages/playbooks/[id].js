@@ -374,7 +374,7 @@ export default function PlaybookDetail() {
 
         <div style={{ marginTop: '2rem', textAlign: 'center' }}>
           <Link 
-            href="/try-leanscale/start" 
+            href={customerPath("/try-leanscale/start")}
             className="btn btn-primary"
             style={{ marginRight: '1rem' }}
           >
