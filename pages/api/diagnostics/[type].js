@@ -8,147 +8,83 @@
  */
 
 import { getDiagnosticResult, upsertDiagnosticResult, getNotes } from '../../../lib/diagnostics';
-import { getCustomerServer } from '../../../lib/getCustomer';
+import { withAuth } from '../../../lib/api-middleware';
+import { withErrorHandler, Errors } from '../../../lib/api-errors';
+import { validate, diagnosticGetQuery, diagnosticPutBody } from '../../../lib/api-validation';
 
 const VALID_TYPES = ['gtm', 'clay', 'cpq'];
 
-/**
- * Validate that the requested customerId belongs to the session's customer.
- * Uses the shared getCustomerServer helper for slug resolution.
- */
-async function validateCustomerAccess(req, customerId) {
-  // Admin paths bypass customer checks
-  const referer = req.headers.referer || '';
-  if (referer.includes('/admin/')) return true;
-
-  try {
-    const customer = await getCustomerServer({ req, query: req.query });
-    if (!customer) return true; // No customer context = allow (demo/admin)
-    if (customer.isDemo) return true; // Demo customer can access demo data
-    return customer.id === customerId;
-  } catch {
-    return false;
-  }
-}
-
-export default async function handler(req, res) {
+async function handler(req, res) {
   const { type } = req.query;
 
   if (!VALID_TYPES.includes(type)) {
-    return res.status(400).json({
-      success: false,
-      error: `Invalid diagnostic type. Must be one of: ${VALID_TYPES.join(', ')}`,
-    });
+    throw Errors.validation(`Invalid diagnostic type. Must be one of: ${VALID_TYPES.join(', ')}`);
   }
 
   if (req.method === 'GET') {
     return handleGet(req, res, type);
   } else if (req.method === 'PUT') {
     return handlePut(req, res, type);
-  } else {
-    return res.status(405).json({ success: false, error: 'Method not allowed' });
   }
+
+  throw Errors.methodNotAllowed(req.method);
 }
 
 async function handleGet(req, res, type) {
   const { customerId } = req.query;
 
   if (!customerId) {
-    return res.status(400).json({
-      success: false,
-      error: 'customerId query parameter is required',
-    });
+    throw Errors.validation('customerId query parameter is required');
   }
 
-  // Validate customer access
-  const hasAccess = await validateCustomerAccess(req, customerId);
-  if (!hasAccess) {
-    return res.status(403).json({
-      success: false,
-      error: 'Access denied — customerId does not match your session',
-    });
+  // Verify customer access — req.customer is set by withAuth
+  if (req.customer && !req.customer.isDemo && req.customer.id !== customerId) {
+    throw Errors.forbidden('Access denied — customerId does not match your session');
   }
 
-  try {
-    const result = await getDiagnosticResult(customerId, type);
+  const result = await getDiagnosticResult(customerId, type);
 
-    if (!result) {
-      // No saved data — client should use static/demo data
-      return res.status(200).json({
-        success: true,
-        data: null,
-        notes: [],
-      });
-    }
-
-    // Also fetch notes for this result
-    const notes = await getNotes(result.id);
-
+  if (!result) {
     return res.status(200).json({
       success: true,
-      data: result,
-      notes,
-    });
-  } catch (error) {
-    console.error('Error fetching diagnostic result:', error);
-    return res.status(500).json({
-      success: false,
-      error: 'Internal server error',
+      data: null,
+      notes: [],
     });
   }
+
+  const notes = await getNotes(result.id);
+
+  return res.status(200).json({
+    success: true,
+    data: result,
+    notes,
+  });
 }
 
 async function handlePut(req, res, type) {
-  const { customerId, processes, tools, createdBy } = req.body;
+  const data = validate(diagnosticPutBody, req.body);
 
-  if (!customerId) {
-    return res.status(400).json({
-      success: false,
-      error: 'customerId is required',
-    });
+  // Verify customer access
+  if (req.customer && !req.customer.isDemo && req.customer.id !== data.customerId) {
+    throw Errors.forbidden('Access denied — customerId does not match your session');
   }
 
-  if (!processes || !Array.isArray(processes)) {
-    return res.status(400).json({
-      success: false,
-      error: 'processes must be an array',
-    });
+  const result = await upsertDiagnosticResult({
+    customerId: data.customerId,
+    diagnosticType: type,
+    processes: data.processes,
+    tools: data.tools,
+    createdBy: data.createdBy,
+  });
+
+  if (!result) {
+    throw Errors.internal('Failed to save diagnostic results');
   }
 
-  // Validate customer access
-  const hasAccess = await validateCustomerAccess(req, customerId);
-  if (!hasAccess) {
-    return res.status(403).json({
-      success: false,
-      error: 'Access denied — customerId does not match your session',
-    });
-  }
-
-  try {
-    const result = await upsertDiagnosticResult({
-      customerId,
-      diagnosticType: type,
-      processes,
-      tools,
-      createdBy,
-    });
-
-    if (!result) {
-      return res.status(500).json({
-        success: false,
-        error: 'Failed to save diagnostic results',
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      data: result,
-    });
-  } catch (error) {
-    console.error('Error saving diagnostic result:', error);
-    return res.status(500).json({
-      success: false,
-      error: 'Internal server error',
-    });
-  }
+  return res.status(200).json({
+    success: true,
+    data: result,
+  });
 }
+
+export default withAuth(withErrorHandler(handler), { level: 'customer' });

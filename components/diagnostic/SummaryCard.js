@@ -1,7 +1,9 @@
 import DonutChart from '../charts/DonutChart';
 
 export default function SummaryCard({ title, icon, data, onClick, isActive = false }) {
-  const total = Object.values(data).reduce((a, b) => a + b, 0);
+  // Exclude N/A from the total count for percentage calculations
+  const naCount = data.na || 0;
+  const total = Object.values(data).reduce((a, b) => a + b, 0) - naCount;
 
   return (
     <div

@@ -193,6 +193,11 @@ function GroupedView({ items, groupByField, groupNames }) {
                     <StatusDot status="unable" size={8} /> {stats.unable}
                   </span>
                 )}
+                {stats.na > 0 && (
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }}>
+                    <StatusDot status="na" size={8} /> {stats.na}
+                  </span>
+                )}
               </div>
             </div>
             <div style={{ padding: 'var(--space-2)' }}>
@@ -269,6 +274,11 @@ function HealthOverviewCard({ label, stats }) {
         {stats.unable > 0 && (
           <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.75rem', color: '#9ca3af' }}>
             <StatusColorDot status="unable" /> {stats.unable}
+          </span>
+        )}
+        {stats.na > 0 && (
+          <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.75rem', color: '#d1d5db' }}>
+            <StatusColorDot status="na" /> {stats.na} N/A
           </span>
         )}
       </div>
@@ -499,12 +509,16 @@ export default function DiagnosticResults({ diagnosticType }) {
     }
   }, [router.query]);
 
-  const processStats = countStatuses(processes);
+  // Use baseProcesses (not filtered) for overall stats, but exclude N/A from health scoring
+  const scorableProcesses = baseProcesses.filter(p => p.status !== 'na');
+  const processStats = countStatuses(baseProcesses);
+  const scorableProcessStats = countStatuses(scorableProcesses);
   const toolStats = toolsData ? countStatuses(toolsData) : null;
   const power10Stats = power10Data
     ? countStatuses(power10Data.map(m => ({ status: m.ableToReport || 'unable' })))
     : null;
-  const priorityCount = processes.filter(p => p.addToEngagement).length;
+  const priorityCount = baseProcesses.filter(p => p.addToEngagement).length;
+  const naCount = processStats.na || 0;
 
   // Build the overview items for the health overview section
   const overviewItems = [];
@@ -514,13 +528,14 @@ export default function DiagnosticResults({ diagnosticType }) {
   if (toolStats) {
     overviewItems.push({ label: 'GTM Tools', stats: toolStats, count: toolsData.length });
   }
-  overviewItems.push({ label: 'Processes', stats: processStats, count: processes.length });
+  overviewItems.push({ label: 'Processes', stats: processStats, count: baseProcesses.length });
 
-  // Total stats for the aggregate row
+  // Total stats for the aggregate row (excluding N/A from main counts)
   const totalHealthy = overviewItems.reduce((sum, item) => sum + item.stats.healthy, 0);
   const totalCareful = overviewItems.reduce((sum, item) => sum + item.stats.careful, 0);
   const totalWarning = overviewItems.reduce((sum, item) => sum + item.stats.warning, 0);
   const totalUnable = overviewItems.reduce((sum, item) => sum + item.stats.unable, 0);
+  const totalNa = overviewItems.reduce((sum, item) => sum + (item.stats.na || 0), 0);
 
   // CTA config per diagnostic type
   const ctaConfig = {
@@ -566,7 +581,7 @@ export default function DiagnosticResults({ diagnosticType }) {
 
           {/* Edit mode toggle + Import button + Build SOW (only for non-demo customers) */}
           {!isDemo && (
-            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', marginTop: '0.75rem' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', marginTop: '0.75rem', flexWrap: 'wrap' }}>
               <button
                 onClick={() => setEditMode(!editMode)}
                 style={{
@@ -581,6 +596,21 @@ export default function DiagnosticResults({ diagnosticType }) {
                 }}
               >
                 {editMode ? 'Exit Edit Mode' : 'Edit Mode'}
+              </button>
+              <button
+                onClick={() => setQuickMode(!quickMode)}
+                style={{
+                  padding: '0.4rem 1rem',
+                  fontSize: '0.8rem',
+                  fontWeight: 600,
+                  background: quickMode ? '#f59e0b' : 'var(--bg-subtle)',
+                  color: quickMode ? 'white' : 'var(--text-secondary)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: 'var(--radius-sm)',
+                  cursor: 'pointer',
+                }}
+              >
+                {quickMode ? `Quick Scan (${quickCount})` : `Full Assessment (${allProcesses.length})`}
               </button>
               <button
                 onClick={() => setShowImport(true)}
@@ -665,7 +695,7 @@ export default function DiagnosticResults({ diagnosticType }) {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
           <div className="card" style={{ textAlign: 'center', padding: '1.25rem' }}>
             <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Processes</div>
-            <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--ls-purple-light)' }}>{processes.length}</div>
+            <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--ls-purple-light)' }}>{baseProcesses.length}</div>
           </div>
           {toolsData && (
             <div className="card" style={{ textAlign: 'center', padding: '1.25rem' }}>
@@ -723,6 +753,12 @@ export default function DiagnosticResults({ diagnosticType }) {
               <div style={{ fontSize: 'var(--text-2xs)', color: '#a5b4fc', marginBottom: '0.25rem' }}>Unable to Report</div>
               <div style={{ fontSize: '1.25rem', fontWeight: 700, color: '#9ca3af' }}>{totalUnable}</div>
             </div>
+            {totalNa > 0 && (
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: 'var(--text-2xs)', color: '#a5b4fc', marginBottom: '0.25rem' }}>N/A</div>
+                <div style={{ fontSize: '1.25rem', fontWeight: 700, color: '#d1d5db' }}>{totalNa}</div>
+              </div>
+            )}
           </div>
         </section>
 
@@ -810,16 +846,44 @@ export default function DiagnosticResults({ diagnosticType }) {
 
           {activeTab === 'processes' && (
             <div>
+              {quickMode && (
+                <div style={{
+                  background: '#fffbeb',
+                  border: '1px solid #f59e0b',
+                  borderRadius: 'var(--radius-md)',
+                  padding: '0.75rem 1rem',
+                  marginBottom: '1rem',
+                  fontSize: '0.85rem',
+                  color: '#92400e',
+                }}>
+                  ⚡ <strong>Quick Assessment:</strong> Showing {quickCount} high-impact items.{' '}
+                  <button
+                    onClick={() => setQuickMode(false)}
+                    style={{ background: 'none', border: 'none', color: '#b45309', textDecoration: 'underline', cursor: 'pointer', fontSize: '0.85rem' }}
+                  >
+                    Switch to Full to see all {allProcesses.length}
+                  </button>
+                </div>
+              )}
               <div className="diagnostic-charts-row" style={{ marginBottom: '1.5rem' }}>
                 <div className="card" style={{ padding: '1.5rem' }}>
-                  <DonutChart data={processStats} title="Health Distribution" size={160} />
+                  <DonutChart data={scorableProcessStats} title="Health Distribution" size={160} />
                 </div>
                 <div className="card" style={{ padding: '1.5rem', overflow: 'auto' }}>
                   <BarChart data={processes} title="Process Health Overview" maxItems={Math.min(processes.length, 31)} />
                 </div>
               </div>
               <div className="card" style={{ padding: '1.5rem' }}>
-                <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem' }}>All Processes ({processes.length})</h3>
+                <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem' }}>
+                  {quickMode ? 'Quick Assessment' : 'All Processes'} — Showing {processes.length} of {allProcesses.length}
+                  {naCount > 0 && <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 400 }}> ({naCount} N/A excluded from scoring)</span>}
+                </h3>
+                <FilterBar
+                  categories={categories || []}
+                  outcomes={outcomes || []}
+                  filters={filters}
+                  onChange={setFilters}
+                />
                 <ItemTable
                   items={processes}
                   showFunction={true}
