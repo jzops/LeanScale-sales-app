@@ -318,9 +318,28 @@ export default function DiagnosticResults({ diagnosticType }) {
   const { processes: staticProcesses, tools: staticTools, categories, outcomes, power10Metrics: power10Data } = config;
 
   // Use customer-specific data when available, otherwise static
-  const processes = editableProcesses || staticProcesses;
+  const allProcesses = editableProcesses || staticProcesses;
   const toolsData = editableTools || staticTools;
   const hasCustomerData = editableProcesses !== null;
+
+  // Quick mode: filter to quickAssessment items
+  const baseProcesses = quickMode
+    ? allProcesses.filter(p => p.quickAssessment)
+    : allProcesses;
+
+  // Apply search & filter bar
+  const processes = useMemo(() => {
+    return baseProcesses.filter(p => {
+      if (filters.search && !p.name.toLowerCase().includes(filters.search.toLowerCase())) return false;
+      if (filters.status !== 'all' && p.status !== filters.status) return false;
+      if (filters.function !== 'all' && p.function !== filters.function) return false;
+      if (filters.outcome !== 'all' && p.outcome !== filters.outcome) return false;
+      if (filters.priorityOnly && !p.addToEngagement) return false;
+      return true;
+    });
+  }, [baseProcesses, filters]);
+
+  const quickCount = allProcesses.filter(p => p.quickAssessment).length;
 
   // --- Load customer-specific diagnostic data ---
   useEffect(() => {
@@ -377,7 +396,7 @@ export default function DiagnosticResults({ diagnosticType }) {
 
   // --- Edit handlers ---
   function handleStatusChange(processName, newStatus) {
-    const updated = processes.map(p =>
+    const updated = allProcesses.map(p =>
       p.name === processName ? { ...p, status: newStatus } : p
     );
     setEditableProcesses(updated);
@@ -385,7 +404,7 @@ export default function DiagnosticResults({ diagnosticType }) {
   }
 
   function handlePriorityToggle(processName) {
-    const updated = processes.map(p =>
+    const updated = allProcesses.map(p =>
       p.name === processName ? { ...p, addToEngagement: !p.addToEngagement } : p
     );
     setEditableProcesses(updated);
