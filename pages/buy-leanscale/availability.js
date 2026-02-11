@@ -1,8 +1,10 @@
 import Layout from '../../components/Layout';
 import AvailabilityCalendar from '../../components/AvailabilityCalendar';
 import Link from 'next/link';
+import { useCustomer } from '../../context/CustomerContext';
 
 export default function Availability() {
+  const { customerPath } = useCustomer();
   return (
     <Layout title="Cohort Availability">
       <div className="container" style={{ maxWidth: 900, margin: '0 auto' }}>
@@ -31,7 +33,7 @@ export default function Availability() {
           <p style={{ opacity: 0.9, marginBottom: '1.5rem' }}>
             Configure your engagement and secure your cohort spot today.
           </p>
-          <Link href="/buy-leanscale" style={{ textDecoration: 'none' }}>
+          <Link href={customerPath('/buy-leanscale')} style={{ textDecoration: 'none' }}>
             <button className="btn" style={{ 
               background: 'white', 
               color: '#7c3aed', 

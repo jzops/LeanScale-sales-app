@@ -89,6 +89,8 @@ async function handlePost(req, res) {
       google_slides_embed_url,
       assigned_team,
       is_demo,
+      diagnostic_type,
+      customer_type,
     } = req.body;
 
     // Validate required fields
@@ -120,6 +122,8 @@ async function handlePost(req, res) {
         google_slides_embed_url: google_slides_embed_url || null,
         assigned_team: assigned_team || [],
         is_demo: is_demo || false,
+        diagnostic_type: diagnostic_type || 'gtm',
+        customer_type: customer_type || 'prospect',
       })
       .select()
       .single();
@@ -146,6 +150,8 @@ async function handlePut(req, res) {
       google_slides_embed_url,
       assigned_team,
       is_demo,
+      diagnostic_type,
+      customer_type,
     } = req.body;
 
     if (!id) {
@@ -164,6 +170,8 @@ async function handlePut(req, res) {
         google_slides_embed_url: google_slides_embed_url || null,
         assigned_team: assigned_team || [],
         is_demo: is_demo || false,
+        diagnostic_type: diagnostic_type || 'gtm',
+        customer_type: customer_type || 'prospect',
       })
       .eq('id', id)
       .select()

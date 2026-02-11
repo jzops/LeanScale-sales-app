@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Layout from '../../components/Layout';
 import { playbookContent } from '../../data/playbook-content';
+import { useCustomer } from '../../context/CustomerContext';
 
 const projects = [
   { 
@@ -220,6 +221,7 @@ function renderMarkdownContent(text) {
 }
 
 export default function OneTimeProjects() {
+  const { customerPath } = useCustomer();
   const [selectedProject, setSelectedProject] = useState(null);
 
   const getProjectContent = (project) => {
@@ -397,13 +399,13 @@ export default function OneTimeProjects() {
 
             <div style={{ marginTop: '1.5rem', display: 'flex', gap: '1rem', justifyContent: 'center' }}>
               {selectedProject.playbookId && (
-                <Link href={`/playbooks/${selectedProject.playbookId}`} style={{ textDecoration: 'none' }}>
+                <Link href={customerPath(`/playbooks/${selectedProject.playbookId}`)} style={{ textDecoration: 'none' }}>
                   <button className="btn" style={{ background: 'white', border: '1px solid #e5e7eb', color: '#374151' }}>
                     View Full Playbook
                   </button>
                 </Link>
               )}
-              <Link href="/buy-leanscale" style={{ textDecoration: 'none' }}>
+              <Link href={customerPath('/buy-leanscale')} style={{ textDecoration: 'none' }}>
                 <button className="btn btn-primary">
                   Start Engagement →
                 </button>
@@ -417,7 +419,7 @@ export default function OneTimeProjects() {
             <p style={{ color: '#6b7280', marginBottom: '1rem' }}>
               Click on any project above to see full details, or start your engagement now.
             </p>
-            <Link href="/buy-leanscale">
+            <Link href={customerPath('/buy-leanscale')}>
               <button className="btn btn-primary">
                 Start Engagement →
               </button>

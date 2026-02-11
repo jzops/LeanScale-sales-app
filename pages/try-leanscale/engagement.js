@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Layout from '../../components/Layout';
 import { processes, managedServicesHealth, statusToLabel } from '../../data/diagnostic-data';
 import { strategicProjects, managedServices } from '../../data/services-catalog';
+import { useCustomer } from '../../context/CustomerContext';
 
 const allStrategicProjects = [
   ...strategicProjects.crossFunctional,
@@ -47,6 +48,7 @@ function getServiceDetails(serviceId, serviceType) {
 }
 
 export default function EngagementOverview() {
+  const { customerPath } = useCustomer();
   const engagementItems = useMemo(() => {
     const priorityProcesses = processes
       .filter(p => p.addToEngagement)
@@ -257,7 +259,7 @@ export default function EngagementOverview() {
                     <span>{project.icon}</span>
                     <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{project.name}</span>
                     {project.hasPlaybook && (
-                      <Link href={`/playbooks/${project.serviceId}`} style={{ color: '#7c3aed', fontSize: '0.65rem' }}>
+                      <Link href={customerPath(`/playbooks/${project.serviceId}`)} style={{ color: '#7c3aed', fontSize: '0.65rem' }}>
                         Playbook
                       </Link>
                     )}
@@ -393,7 +395,7 @@ export default function EngagementOverview() {
                     <td style={{ fontSize: '0.75rem' }}>{project.outcome}</td>
                     <td>
                       {project.hasPlaybook && project.serviceId ? (
-                        <Link href={`/playbooks/${project.serviceId}`} style={{ color: '#7c3aed', fontSize: '0.75rem', textDecoration: 'underline' }}>
+                        <Link href={customerPath(`/playbooks/${project.serviceId}`)} style={{ color: '#7c3aed', fontSize: '0.75rem', textDecoration: 'underline' }}>
                           View Playbook
                         </Link>
                       ) : (
@@ -449,12 +451,12 @@ export default function EngagementOverview() {
           <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.25rem' }}>Ready to Get Started?</h3>
           <p style={{ margin: '0 0 1rem 0', opacity: 0.9 }}>Let's discuss your engagement plan and timeline.</p>
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link href="/buy-leanscale/availability">
+            <Link href={customerPath('/buy-leanscale/availability')}>
               <button className="btn" style={{ background: 'white', color: '#7c3aed', border: 'none', padding: '0.75rem 1.5rem' }}>
                 Check Cohort Availability
               </button>
             </Link>
-            <Link href="/buy-leanscale">
+            <Link href={customerPath('/buy-leanscale')}>
               <button className="btn" style={{ background: 'transparent', color: 'white', border: '2px solid white', padding: '0.75rem 1.5rem' }}>
                 Start Engagement
               </button>

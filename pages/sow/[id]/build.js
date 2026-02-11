@@ -17,7 +17,7 @@ import { useCustomer } from '../../../context/CustomerContext';
 export default function SowBuildPage() {
   const router = useRouter();
   const { id } = router.query;
-  const { customer } = useCustomer();
+  const { customer, customerPath } = useCustomer();
 
   const [sow, setSow] = useState(null);
   const [sections, setSections] = useState([]);
@@ -78,13 +78,13 @@ export default function SowBuildPage() {
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '1.5rem 1rem' }}>
         {/* Breadcrumb */}
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '1.5rem', fontSize: '0.875rem' }}>
-          <Link href="/sow" style={{ color: '#6C5CE7', textDecoration: 'none' }}>
+          <Link href={customerPath('/sow')} style={{ color: '#6C5CE7', textDecoration: 'none' }}>
             Statements of Work
           </Link>
           <span style={{ color: '#A0AEC0' }}>/</span>
           {sow && (
             <>
-              <Link href={`/sow/${id}`} style={{ color: '#6C5CE7', textDecoration: 'none' }}>
+              <Link href={customerPath(`/sow/${id}`)} style={{ color: '#6C5CE7', textDecoration: 'none' }}>
                 {sow.title}
               </Link>
               <span style={{ color: '#A0AEC0' }}>/</span>

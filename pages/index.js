@@ -50,7 +50,7 @@ const quickLinks = [
 ];
 
 export default function Home() {
-  const { customer } = useCustomer();
+  const { customer, customerPath } = useCustomer();
 
   return (
     <Layout title="LeanScale">
@@ -209,10 +209,10 @@ export default function Home() {
             Take our diagnostic to identify the highest-impact opportunities.
           </p>
           <div className="cta-buttons">
-            <Link href="/try-leanscale/start" className="btn cta-btn-primary">
+            <Link href={customerPath('/try-leanscale/start')} className="btn cta-btn-primary">
               Start Diagnostic
             </Link>
-            <Link href="/buy-leanscale" className="btn cta-btn-secondary">
+            <Link href={customerPath('/buy-leanscale')} className="btn cta-btn-secondary">
               Get Started
             </Link>
           </div>

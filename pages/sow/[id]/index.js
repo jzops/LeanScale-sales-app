@@ -8,7 +8,7 @@ import { useCustomer } from '../../../context/CustomerContext';
 export default function SowDetail() {
   const router = useRouter();
   const { id } = router.query;
-  const { customer } = useCustomer();
+  const { customer, customerPath } = useCustomer();
 
   const [sow, setSow] = useState(null);
   const [diagnosticResult, setDiagnosticResult] = useState(null);
@@ -131,7 +131,7 @@ export default function SowDetail() {
       <div className="container" style={{ maxWidth: 960, margin: '0 auto', padding: '2rem 1rem' }}>
         {/* Back Link */}
         <div style={{ marginBottom: '1.5rem' }}>
-          <Link href="/sow" style={{
+          <Link href={customerPath('/sow')} style={{
             fontSize: '0.875rem',
             color: '#6C5CE7',
             textDecoration: 'none',

@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Layout from '../../components/Layout';
 import AvailabilityCalendar from '../../components/AvailabilityCalendar';
+import { useCustomer } from '../../context/CustomerContext';
 
 const engagementTypes = [
   {
@@ -43,6 +44,7 @@ const paymentOptions = [
 
 export default function BuyLeanScale() {
   const router = useRouter();
+  const { customerPath } = useCustomer();
   const [step, setStep] = useState(0);
   const [engagementType, setEngagementType] = useState('embedded');
   const [selectedHours, setSelectedHours] = useState(hourTiers[1]);
@@ -269,7 +271,7 @@ export default function BuyLeanScale() {
                 style={{ padding: '0.875rem 2rem', fontSize: '1rem' }}
                 onClick={() => {
                   if (engagementType === 'one-time') {
-                    router.push('/buy-leanscale/one-time-projects');
+                    router.push(customerPath('/buy-leanscale/one-time-projects'));
                   } else {
                     setStep(1);
                   }

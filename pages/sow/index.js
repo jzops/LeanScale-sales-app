@@ -31,7 +31,7 @@ function StatusBadge({ status }) {
 }
 
 export default function SowIndex() {
-  const { customer } = useCustomer();
+  const { customer, customerPath } = useCustomer();
   const [sows, setSows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -98,7 +98,7 @@ export default function SowIndex() {
           }}>
             All SOWs
           </h2>
-          <Link href="/sow/generate" style={{
+          <Link href={customerPath('/sow/generate')} style={{
             display: 'inline-block',
             padding: '0.6rem 1.25rem',
             background: '#6C5CE7',
@@ -145,7 +145,7 @@ export default function SowIndex() {
             <p style={{ fontSize: '1rem', color: '#4A5568', marginBottom: '1rem' }}>
               No statements of work yet.
             </p>
-            <Link href="/sow/generate" style={{
+            <Link href={customerPath('/sow/generate')} style={{
               display: 'inline-block',
               padding: '0.6rem 1.25rem',
               background: '#6C5CE7',
@@ -176,7 +176,7 @@ export default function SowIndex() {
               }}>
                 {/* Title */}
                 <div style={{ flex: 1 }}>
-                  <Link href={`/sow/${sow.id}`} style={{
+                  <Link href={customerPath(`/sow/${sow.id}`)} style={{
                     fontSize: '0.95rem',
                     fontWeight: 600,
                     color: '#6C5CE7',
@@ -214,7 +214,7 @@ export default function SowIndex() {
                 </div>
 
                 {/* View Link */}
-                <Link href={`/sow/${sow.id}`} style={{
+                <Link href={customerPath(`/sow/${sow.id}`)} style={{
                   fontSize: '0.8rem',
                   color: '#6C5CE7',
                   textDecoration: 'none',

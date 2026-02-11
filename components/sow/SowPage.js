@@ -162,7 +162,7 @@ export default function SowPage({
         {!readOnly && (
           <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
             <Link
-              href={`/sow/${sow.id}/build`}
+              href={customerSlug && customerSlug !== 'demo' ? `/c/${customerSlug}/sow/${sow.id}/build` : `/sow/${sow.id}/build`}
               style={{
                 padding: '0.5rem 1rem',
                 background: '#6C5CE7',

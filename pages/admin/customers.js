@@ -23,6 +23,8 @@ export default function AdminCustomers() {
     google_slides_embed_url: '',
     assigned_team: '',
     is_demo: false,
+    diagnostic_type: 'gtm',
+    customer_type: 'prospect',
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
@@ -68,6 +70,8 @@ export default function AdminCustomers() {
       google_slides_embed_url: 'https://docs.google.com/presentation/d/e/2PACX-1vSGSLvHvPn9Cus6N3BpGnK6AkZsUiEdh8cARVVBiZ4w54uUCjHHJ-lHfymW8wfPPraAXMfgXtePxIwf/pubembed?start=true&loop=true&delayms=3000',
       assigned_team: 'izzy, brian, dave, kavean',
       is_demo: false,
+      diagnostic_type: 'gtm',
+      customer_type: 'prospect',
     });
     setError(null);
     setShowModal(true);
@@ -86,6 +90,8 @@ export default function AdminCustomers() {
       google_slides_embed_url: customer.google_slides_embed_url || '',
       assigned_team: (customer.assigned_team || []).join(', '),
       is_demo: customer.is_demo || false,
+      diagnostic_type: customer.diagnostic_type || 'gtm',
+      customer_type: customer.customer_type || 'prospect',
     });
     setError(null);
     setShowModal(true);
@@ -292,7 +298,8 @@ export default function AdminCustomers() {
                   <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 500, fontSize: '0.875rem' }}>Name</th>
                   <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 500, fontSize: '0.875rem' }}>Slug</th>
                   <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 500, fontSize: '0.875rem' }}>Password</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 500, fontSize: '0.875rem' }}>Team</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 500, fontSize: '0.875rem' }}>Type</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 500, fontSize: '0.875rem' }}>Diagnostic</th>
                   <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontWeight: 500, fontSize: '0.875rem' }}>Portal URL</th>
                   <th style={{ padding: '0.75rem 1rem', textAlign: 'right', fontWeight: 500, fontSize: '0.875rem' }}>Actions</th>
                 </tr>
@@ -300,13 +307,13 @@ export default function AdminCustomers() {
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan={6} style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>
+                    <td colSpan={7} style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>
                       Loading...
                     </td>
                   </tr>
                 ) : customers.length === 0 ? (
                   <tr>
-                    <td colSpan={6} style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>
+                    <td colSpan={7} style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>
                       No customers yet. Click "Add Customer" to create one.
                     </td>
                   </tr>
@@ -343,7 +350,19 @@ export default function AdminCustomers() {
                         {customer.password}
                       </td>
                       <td style={{ padding: '0.75rem 1rem', fontSize: '0.875rem' }}>
-                        {(customer.assigned_team || []).join(', ')}
+                        <span style={{
+                          padding: '0.125rem 0.5rem',
+                          borderRadius: '4px',
+                          fontSize: '0.75rem',
+                          fontWeight: 500,
+                          background: customer.customer_type === 'active' ? '#dcfce7' : customer.customer_type === 'churned' ? '#fee2e2' : '#f3e8ff',
+                          color: customer.customer_type === 'active' ? '#166534' : customer.customer_type === 'churned' ? '#991b1b' : '#6b21a8',
+                        }}>
+                          {customer.customer_type || 'prospect'}
+                        </span>
+                      </td>
+                      <td style={{ padding: '0.75rem 1rem', fontSize: '0.875rem', textTransform: 'uppercase' }}>
+                        {customer.diagnostic_type || 'gtm'}
                       </td>
                       <td style={{ padding: '0.75rem 1rem' }}>
                         <a
@@ -591,6 +610,49 @@ export default function AdminCustomers() {
                   <label htmlFor="is_demo" style={{ fontSize: '0.875rem' }}>
                     Mark as Demo Account
                   </label>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 500, fontSize: '0.875rem' }}>
+                    Diagnostic Type
+                  </label>
+                  <select
+                    value={formData.diagnostic_type}
+                    onChange={(e) => setFormData({ ...formData, diagnostic_type: e.target.value })}
+                    style={{
+                      width: '100%',
+                      padding: '0.5rem',
+                      border: '1px solid #ddd',
+                      borderRadius: '6px',
+                      fontSize: '0.875rem',
+                    }}
+                  >
+                    <option value="gtm">GTM Diagnostic</option>
+                    <option value="clay">Clay Diagnostic</option>
+                    <option value="cpq">Q2C Diagnostic</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 500, fontSize: '0.875rem' }}>
+                    Customer Type
+                  </label>
+                  <select
+                    value={formData.customer_type}
+                    onChange={(e) => setFormData({ ...formData, customer_type: e.target.value })}
+                    style={{
+                      width: '100%',
+                      padding: '0.5rem',
+                      border: '1px solid #ddd',
+                      borderRadius: '6px',
+                      fontSize: '0.875rem',
+                    }}
+                  >
+                    <option value="prospect">Prospect</option>
+                    <option value="active">Active Customer</option>
+                    <option value="churned">Churned</option>
+                  </select>
                 </div>
               </div>
 

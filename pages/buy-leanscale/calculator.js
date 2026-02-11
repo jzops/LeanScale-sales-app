@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Layout from '../../components/Layout';
+import { useCustomer } from '../../context/CustomerContext';
 
 const hourTiers = [
   { hours: 50, price: 15000 },
@@ -21,6 +22,7 @@ const paymentOptions = [
 ];
 
 export default function EngagementCalculator() {
+  const { customerPath } = useCustomer();
   const [selectedHours, setSelectedHours] = useState(hourTiers[0]);
   const [cancellation, setCancellation] = useState(cancellationOptions[1]);
   const [payment, setPayment] = useState(paymentOptions[1]);
@@ -152,7 +154,7 @@ export default function EngagementCalculator() {
 
         {/* CTA */}
         <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-          <Link href="/buy-leanscale/start">
+          <Link href={customerPath('/buy-leanscale/start')}>
             <button className="btn btn-primary" style={{ padding: '1rem 2rem', fontSize: '1rem' }}>
               Continue to Getting Started →
             </button>

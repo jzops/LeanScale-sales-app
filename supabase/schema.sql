@@ -21,6 +21,8 @@ CREATE TABLE IF NOT EXISTS customers (
   youtube_video_id TEXT,
   google_slides_embed_url TEXT,
   is_demo BOOLEAN DEFAULT FALSE,
+  diagnostic_type TEXT DEFAULT 'gtm' CHECK (diagnostic_type IN ('gtm', 'clay', 'cpq')),
+  customer_type TEXT DEFAULT 'prospect' CHECK (customer_type IN ('prospect', 'active', 'churned')),
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );

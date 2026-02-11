@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Layout from '../../components/Layout';
 import { playbooks } from '../../data/services-catalog';
 import { playbookContent } from '../../data/playbook-content';
+import { useCustomer } from '../../context/CustomerContext';
 
 function formatInlineText(text) {
   if (!text) return text;
@@ -164,6 +165,7 @@ function renderMarkdownContent(text) {
 export default function PlaybookDetail() {
   const router = useRouter();
   const { id } = router.query;
+  const { customerPath } = useCustomer();
   
   const playbook = id ? playbooks.find(p => p.id === id) : null;
   const content = id ? playbookContent[id] : null;
@@ -186,7 +188,7 @@ export default function PlaybookDetail() {
           <p style={{ color: '#666', marginBottom: '2rem' }}>
             The playbook you're looking for doesn't exist or has been moved.
           </p>
-          <Link href="/why-leanscale/services" className="btn btn-primary">
+          <Link href={customerPath('/why-leanscale/services')} className="btn btn-primary">
             Browse All Services
           </Link>
         </div>
@@ -199,7 +201,7 @@ export default function PlaybookDetail() {
       <div className="container" style={{ maxWidth: 900 }}>
         <div style={{ marginBottom: '2rem' }}>
           <Link 
-            href="/why-leanscale/services" 
+            href={customerPath('/why-leanscale/services')} 
             style={{ 
               color: '#7c3aed', 
               textDecoration: 'none',
@@ -379,7 +381,7 @@ export default function PlaybookDetail() {
             Start GTM Diagnostic
           </Link>
           <Link 
-            href="/why-leanscale/services" 
+            href={customerPath('/why-leanscale/services')} 
             className="btn"
             style={{ 
               background: 'white', 

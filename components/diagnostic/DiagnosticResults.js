@@ -299,7 +299,7 @@ function HealthOverviewCard({ label, stats }) {
  */
 export default function DiagnosticResults({ diagnosticType }) {
   const router = useRouter();
-  const { customer, isDemo } = useCustomer();
+  const { customer, isDemo, customerPath } = useCustomer();
   const config = diagnosticRegistry[diagnosticType];
 
   // --- Edit mode & customer data state ---
@@ -604,7 +604,7 @@ export default function DiagnosticResults({ diagnosticType }) {
                       });
                       const json = await res.json();
                       if (json.success && json.data?.id) {
-                        router.push(`/sow/${json.data.id}/build`);
+                        router.push(customerPath(`/sow/${json.data.id}/build`));
                       }
                     } catch (err) {
                       console.error('Error creating SOW from diagnostic:', err);

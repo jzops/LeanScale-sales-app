@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Layout from '../../components/Layout';
+import { useCustomer } from '../../context/CustomerContext';
 
 const claybooks = [
   { id: 1, name: 'Market Map', price: 45000, prereqs: 'None', description: 'Builds your complete ICP/TAM database in Clay, enriches every account, scores for fit, assigns tiers, and pushes to CRM.', complexity: 'High', scope: 'Up to 50,000 accounts' },
@@ -75,6 +76,7 @@ const whatClayIsNot = [
 ];
 
 export default function ClayPartnership() {
+  const { customerPath } = useCustomer();
   return (
     <Layout title="Clay x LeanScale">
       <div style={{ background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)', color: 'white', padding: '4rem 0' }}>
@@ -433,12 +435,12 @@ export default function ClayPartnership() {
                 View on Clay Directory
               </button>
             </a>
-            <Link href="/buy-leanscale/one-time-projects" style={{ textDecoration: 'none' }}>
+            <Link href={customerPath('/buy-leanscale/one-time-projects')} style={{ textDecoration: 'none' }}>
               <button className="btn" style={{ background: 'white', border: '1px solid #e5e7eb' }}>
                 Custom Enrichment Project
               </button>
             </Link>
-            <Link href="/buy-leanscale/clay-intake" style={{ textDecoration: 'none' }}>
+            <Link href={customerPath('/buy-leanscale/clay-intake')} style={{ textDecoration: 'none' }}>
               <button className="btn btn-primary">
                 Start Clay Project Intake
               </button>

@@ -1,12 +1,14 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
+import { useCustomer } from '../../context/CustomerContext';
 
 export default function ProcessHealthRedirect() {
   const router = useRouter();
+  const { customerPath } = useCustomer();
 
   useEffect(() => {
-    router.replace('/try-leanscale/diagnostic?tab=processes');
-  }, [router]);
+    router.replace(customerPath('/try-leanscale/diagnostic?tab=processes'));
+  }, [router, customerPath]);
 
   return (
     <div style={{

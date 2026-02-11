@@ -1,12 +1,14 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
+import { useCustomer } from '../../context/CustomerContext';
 
 export default function GTMToolHealthRedirect() {
   const router = useRouter();
+  const { customerPath } = useCustomer();
 
   useEffect(() => {
-    router.replace('/try-leanscale/diagnostic?tab=tools');
-  }, [router]);
+    router.replace(customerPath('/try-leanscale/diagnostic?tab=tools'));
+  }, [router, customerPath]);
 
   return (
     <div style={{

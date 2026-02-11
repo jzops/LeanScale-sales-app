@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Layout from '../../components/Layout';
+import { useCustomer } from '../../context/CustomerContext';
 
 const diagnosticFeatures = [
   { icon: '⚙️', label: '63 Process Inspection Points', desc: 'Marketing, Sales, CS, Partnerships' },
@@ -8,6 +9,7 @@ const diagnosticFeatures = [
 ];
 
 export default function TryLeanScale() {
+  const { customerPath } = useCustomer();
   return (
     <Layout title="Try LeanScale">
       <div className="container">
@@ -22,7 +24,7 @@ export default function TryLeanScale() {
 
         {/* CTA Cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', marginBottom: '2.5rem' }}>
-          <Link href="/try-leanscale/start" style={{ textDecoration: 'none' }}>
+          <Link href={customerPath('/try-leanscale/start')} style={{ textDecoration: 'none' }}>
             <div className="card" style={{
               padding: '2rem',
               background: 'linear-gradient(135deg, var(--ls-lime-green) 0%, #d9f99d 100%)',
@@ -51,7 +53,7 @@ export default function TryLeanScale() {
             </div>
           </Link>
 
-          <Link href="/try-leanscale/diagnostic" style={{ textDecoration: 'none' }}>
+          <Link href={customerPath('/try-leanscale/diagnostic')} style={{ textDecoration: 'none' }}>
             <div className="card" style={{
               padding: '2rem',
               cursor: 'pointer',
@@ -173,10 +175,10 @@ export default function TryLeanScale() {
             Take the diagnostic to identify your highest-impact GTM improvements.
           </p>
           <div className="cta-buttons">
-            <Link href="/try-leanscale/start" className="btn cta-btn-primary">
+            <Link href={customerPath('/try-leanscale/start')} className="btn cta-btn-primary">
               Start Diagnostic
             </Link>
-            <Link href="/why-leanscale/services" className="btn cta-btn-secondary">
+            <Link href={customerPath('/why-leanscale/services')} className="btn cta-btn-secondary">
               Browse Services
             </Link>
           </div>

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 /**
  * Customer Context
@@ -91,17 +91,37 @@ export function CustomerProvider({ children, initialCustomer = null }) {
     loadCustomer();
   }, [initialCustomer]);
 
+  const isDemo = customer.slug === 'demo' || customer.customerName === 'Demo' || customer.isDemo;
+
+  /**
+   * Prefix a path with /c/slug/ when viewing a real customer.
+   * Demo customers and admin routes stay unprefixed.
+   * @param {string} path - e.g. '/try-leanscale/diagnostic'
+   * @returns {string} - e.g. '/c/cassidy/try-leanscale/diagnostic'
+   */
+  const customerPath = useCallback((path) => {
+    if (isDemo || !customer.slug) return path;
+    // Don't double-prefix
+    if (path.startsWith('/c/')) return path;
+    // Don't prefix admin routes
+    if (path.startsWith('/admin')) return path;
+    // Don't prefix API routes
+    if (path.startsWith('/api')) return path;
+    return `/c/${customer.slug}${path}`;
+  }, [isDemo, customer.slug]);
+
   const value = {
     customer,
     availability,
     loading,
     error,
-    // Helper to check if we have real customer data vs demo
-    isDemo: customer.slug === 'demo' || customer.customerName === 'Demo' || customer.isDemo,
+    isDemo,
     // Helper to get customer name for display (returns null for demo)
     displayName: customer.customerName && customer.customerName !== 'Demo' ? customer.customerName : null,
     // Customer type: 'prospect' (default), 'active', or 'churned'
     customerType: customer.customerType || 'prospect',
+    // Prefix paths with /c/slug/ for real customers
+    customerPath,
   };
 
   return (

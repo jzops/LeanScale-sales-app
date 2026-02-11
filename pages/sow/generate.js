@@ -31,7 +31,7 @@ const TOTAL_STEPS = 4;
 
 export default function SowGenerate() {
   const router = useRouter();
-  const { customer } = useCustomer();
+  const { customer, customerPath } = useCustomer();
 
   const [step, setStep] = useState(1);
   const [sowType, setSowType] = useState('');
@@ -75,7 +75,7 @@ export default function SowGenerate() {
 
       const json = await res.json();
       if (json.success && json.data?.id) {
-        router.push(`/sow/${json.data.id}`);
+        router.push(customerPath(`/sow/${json.data.id}`));
       } else {
         setError('Generation failed. Please try again.');
         setGenerating(false);

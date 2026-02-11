@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useCustomer } from '../context/CustomerContext';
 
@@ -46,38 +46,61 @@ const prospectSections = [
   },
 ];
 
-// Active customer navigation sections (Diagnostics / Projects / Documents)
-const customerSections = [
-  {
-    name: 'diagnostics',
-    label: 'Diagnostics',
-    links: [
-      { href: '/try-leanscale/diagnostic', label: 'GTM Diagnostic' },
-      { href: '/try-leanscale/clay-diagnostic', label: 'Clay Diagnostic' },
-      { href: '/try-leanscale/cpq-diagnostic', label: 'Q2C Diagnostic' },
-    ],
-  },
-  {
-    name: 'projects',
-    label: 'Projects',
-    links: [
-      { href: '/buy-leanscale/clay-intake', label: 'Clay Project Intake' },
-      { href: '/buy-leanscale/q2c-intake', label: 'Q2C Assessment' },
-    ],
-  },
-  {
-    name: 'documents',
-    label: 'Documents',
-    links: [
-      { href: '/sow', label: 'Statements of Work' },
-    ],
-  },
-];
+// Diagnostic type → nav link config
+const diagnosticConfig = {
+  gtm: { href: '/try-leanscale/diagnostic', label: 'GTM Diagnostic' },
+  clay: { href: '/try-leanscale/clay-diagnostic', label: 'Clay Diagnostic' },
+  cpq: { href: '/try-leanscale/cpq-diagnostic', label: 'Q2C Diagnostic' },
+};
+
+// Diagnostic type → intake form link
+const intakeConfig = {
+  gtm: { href: '/try-leanscale/start', label: 'Diagnostic Intake' },
+  clay: { href: '/buy-leanscale/clay-intake', label: 'Clay Project Intake' },
+  cpq: { href: '/buy-leanscale/q2c-intake', label: 'Q2C Assessment' },
+};
+
+/**
+ * Build customer-specific nav sections based on their configured diagnostic type.
+ * Each customer sees: their diagnostic, their intake form, engagement, SOWs.
+ */
+function buildCustomerSections(diagnosticType) {
+  const diagLink = diagnosticConfig[diagnosticType] || diagnosticConfig.gtm;
+  const intake = intakeConfig[diagnosticType] || intakeConfig.gtm;
+
+  return [
+    {
+      name: 'diagnostic',
+      label: diagLink.label,
+      links: [
+        diagLink,
+        { href: '/try-leanscale/engagement', label: 'Engagement Overview' },
+      ],
+    },
+    {
+      name: 'projects',
+      label: 'Projects',
+      links: [
+        intake,
+        { href: '/sow', label: 'Statements of Work' },
+      ],
+    },
+    {
+      name: 'resources',
+      label: 'Resources',
+      links: [
+        { href: '/why-leanscale/services', label: 'Services Catalog' },
+        { href: '/buy-leanscale/team', label: 'Your Team' },
+        { href: '/buy-leanscale/security', label: 'Security' },
+      ],
+    },
+  ];
+}
 
 export default function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null);
-  const { customer, isDemo, displayName, customerType } = useCustomer();
+  const { customer, isDemo, displayName, customerType, customerPath } = useCustomer();
 
   const toggleDropdown = (name) => {
     setOpenDropdown(openDropdown === name ? null : name);
@@ -90,11 +113,15 @@ export default function Navigation() {
 
   const showCustomerBranding = !isDemo && displayName;
   const isActive = customerType === 'active';
-  const sections = isActive ? customerSections : prospectSections;
+  const diagnosticType = customer.diagnosticType || 'gtm';
+  const sections = useMemo(
+    () => isActive ? buildCustomerSections(diagnosticType) : prospectSections,
+    [isActive, diagnosticType]
+  );
 
   return (
     <nav className="nav">
-      <Link href="/" className="nav-logo" onClick={closeMenu}>
+      <Link href={customerPath('/')} className="nav-logo" onClick={closeMenu}>
         {showCustomerBranding && customer.customerLogo ? (
           <>
             <img src="/leanscale-logo.png" alt="LeanScale" />
@@ -135,7 +162,7 @@ export default function Navigation() {
             </button>
             <div className={`nav-dropdown ${openDropdown === section.name ? 'nav-dropdown-open' : ''}`}>
               {section.links.map((link) => (
-                <Link href={link.href} onClick={closeMenu} key={link.href}>
+                <Link href={customerPath(link.href)} onClick={closeMenu} key={link.href}>
                   {link.label}
                 </Link>
               ))}
@@ -144,11 +171,11 @@ export default function Navigation() {
         ))}
 
         {isActive ? (
-          <Link href="/dashboard" className="nav-cta" onClick={closeMenu}>
+          <Link href={customerPath('/dashboard')} className="nav-cta" onClick={closeMenu}>
             Dashboard
           </Link>
         ) : (
-          <Link href="/buy-leanscale" className="nav-cta" onClick={closeMenu}>
+          <Link href={customerPath('/buy-leanscale')} className="nav-cta" onClick={closeMenu}>
             Get Started
           </Link>
         )}
