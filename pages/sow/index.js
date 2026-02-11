@@ -3,6 +3,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Layout from '../../components/Layout';
 import { useCustomer } from '../../context/CustomerContext';
+import { getCustomerServerSideProps } from '../../lib/getCustomer';
+
+export const getServerSideProps = getCustomerServerSideProps;
 
 const STATUS_COLORS = {
   draft: { bg: '#EDF2F7', color: '#4A5568' },

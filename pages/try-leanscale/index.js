@@ -1,6 +1,9 @@
 import Link from 'next/link';
 import Layout from '../../components/Layout';
 import { useCustomer } from '../../context/CustomerContext';
+import { getCustomerServerSideProps } from '../../lib/getCustomer';
+
+export const getServerSideProps = getCustomerServerSideProps;
 
 const diagnosticFeatures = [
   { icon: '⚙️', label: '63 Process Inspection Points', desc: 'Marketing, Sales, CS, Partnerships' },
