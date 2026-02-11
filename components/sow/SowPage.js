@@ -416,7 +416,7 @@ export default function SowPage({
             animate="show"
             style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
           >
-            {localSections.map((section) => (
+            {localSections.map((section, idx) => (
               <SowScopeSection
                 key={section.id}
                 section={section}
@@ -427,6 +427,9 @@ export default function SowPage({
                 customerSlug={customerSlug}
                 customerPath={customerPath}
                 onDeleteSection={readOnly ? undefined : handleDeleteSection}
+                onMoveSection={readOnly ? undefined : handleMoveSection}
+                isFirst={idx === 0}
+                isLast={idx === localSections.length - 1}
               />
             ))}
 

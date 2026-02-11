@@ -27,6 +27,7 @@ export default function SowScopeSection({
   diagnosticProcesses = [],
   diagnosticResult,
   customerSlug,
+  customerPath,
   onDeleteSection,
   onMoveSection,
   isFirst = false,
@@ -66,11 +67,12 @@ export default function SowScopeSection({
 
   // Build diagnostic link URL
   const diagType = diagnosticResult?.diagnostic_type;
-  const diagUrl = diagType && customerSlug
-    ? `/c/${customerSlug}/try-leanscale/${diagType === 'gtm' ? 'diagnostic' : `${diagType}-diagnostic`}`
-    : diagType
-      ? `/try-leanscale/${diagType === 'gtm' ? 'diagnostic' : `${diagType}-diagnostic`}`
-      : null;
+  const diagPath = diagType
+    ? `/try-leanscale/${diagType === 'gtm' ? 'diagnostic' : `${diagType}-diagnostic`}`
+    : null;
+  const diagUrl = diagPath
+    ? (customerPath ? customerPath(diagPath) : diagPath)
+    : null;
 
   return (
     <motion.div
@@ -84,12 +86,13 @@ export default function SowScopeSection({
       }}
     >
       {/* Section header row */}
-      <div style={{
+      <div className="sow-section-header" style={{
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'flex-start',
         padding: '1.25rem 1.5rem',
         gap: '1rem',
+        flexWrap: 'wrap',
       }}>
         <div style={{ flex: 1, display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
           {/* Purple accent bar */}
@@ -136,7 +139,7 @@ export default function SowScopeSection({
         </div>
 
         {/* Right side: hours, rate, subtotal */}
-        <div style={{
+        <div className="sow-section-metrics" style={{
           display: 'flex',
           gap: '1rem',
           alignItems: 'center',
