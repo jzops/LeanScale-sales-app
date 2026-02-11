@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import Layout from '../../components/Layout';
 import { useCustomer } from '../../context/CustomerContext';
 
@@ -30,14 +31,18 @@ function StatusBadge({ status }) {
   );
 }
 
+const DIAG_TYPE_TO_SOW_TYPE = { gtm: 'embedded', clay: 'clay', cpq: 'q2c' };
+
 export default function SowIndex() {
-  const { customer, customerPath } = useCustomer();
+  const { customer, customerPath, isDemo } = useCustomer();
+  const router = useRouter();
   const [sows, setSows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [autoCreating, setAutoCreating] = useState(false);
 
   useEffect(() => {
-    async function fetchSows() {
+    async function fetchAndAutoCreate() {
       try {
         const customerId = customer?.id;
         const url = customerId
@@ -52,7 +57,41 @@ export default function SowIndex() {
         }
 
         const json = await res.json();
-        setSows(json.data || []);
+        const existingSows = json.data || [];
+
+        // Auto-create SOW if: real customer, no SOWs, and diagnostic exists
+        if (existingSows.length === 0 && customerId && !isDemo) {
+          setAutoCreating(true);
+          const diagType = customer.diagnosticType || 'gtm';
+
+          // Check if diagnostic result exists
+          const diagRes = await fetch(`/api/diagnostics/${diagType}?customerId=${customerId}`);
+          const diagJson = await diagRes.json();
+
+          if (diagJson.success && diagJson.data) {
+            // Auto-create SOW from diagnostic
+            const sowRes = await fetch('/api/sow/from-diagnostic', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                customerId,
+                diagnosticResultId: diagJson.data.id,
+                diagnosticType: diagType,
+                customerName: customer.customerName,
+                sowType: DIAG_TYPE_TO_SOW_TYPE[diagType] || 'custom',
+                createdBy: 'auto',
+              }),
+            });
+            const sowJson = await sowRes.json();
+            if (sowJson.success && sowJson.data?.id) {
+              router.replace(customerPath(`/sow/${sowJson.data.id}`));
+              return;
+            }
+          }
+          setAutoCreating(false);
+        }
+
+        setSows(existingSows);
       } catch (err) {
         console.error('Error fetching SOWs:', err);
         setError('An error occurred while loading statements of work.');
@@ -61,8 +100,14 @@ export default function SowIndex() {
       }
     }
 
-    fetchSows();
+    fetchAndAutoCreate();
   }, [customer?.id]);
+
+  const diagnosticHref = {
+    gtm: '/try-leanscale/diagnostic',
+    clay: '/try-leanscale/clay-diagnostic',
+    cpq: '/try-leanscale/cpq-diagnostic',
+  }[customer?.diagnosticType || 'gtm'] || '/try-leanscale/diagnostic';
 
   return (
     <Layout title="Statements of Work">
@@ -98,7 +143,7 @@ export default function SowIndex() {
           }}>
             All SOWs
           </h2>
-          <Link href={customerPath('/sow/generate')} style={{
+          <Link href={customerPath(diagnosticHref)} style={{
             display: 'inline-block',
             padding: '0.6rem 1.25rem',
             background: '#6C5CE7',
@@ -108,14 +153,14 @@ export default function SowIndex() {
             fontWeight: 600,
             textDecoration: 'none',
           }}>
-            Generate New SOW
+            New SOW from Diagnostic
           </Link>
         </div>
 
-        {/* Loading State */}
-        {loading && (
+        {/* Loading / Auto-creating State */}
+        {(loading || autoCreating) && (
           <div style={{ textAlign: 'center', padding: '3rem 1rem', color: '#718096' }}>
-            <p>Loading statements of work...</p>
+            <p>{autoCreating ? 'Generating SOW from your diagnostic...' : 'Loading statements of work...'}</p>
           </div>
         )}
 
@@ -134,7 +179,7 @@ export default function SowIndex() {
         )}
 
         {/* Empty State */}
-        {!loading && !error && sows.length === 0 && (
+        {!loading && !autoCreating && !error && sows.length === 0 && (
           <div style={{
             textAlign: 'center',
             padding: '3rem 1rem',
@@ -143,9 +188,9 @@ export default function SowIndex() {
             borderRadius: '0.75rem',
           }}>
             <p style={{ fontSize: '1rem', color: '#4A5568', marginBottom: '1rem' }}>
-              No statements of work yet.
+              No statements of work yet. Complete a diagnostic to auto-generate your SOW.
             </p>
-            <Link href={customerPath('/sow/generate')} style={{
+            <Link href={customerPath(diagnosticHref)} style={{
               display: 'inline-block',
               padding: '0.6rem 1.25rem',
               background: '#6C5CE7',
@@ -155,7 +200,7 @@ export default function SowIndex() {
               fontWeight: 600,
               textDecoration: 'none',
             }}>
-              Generate your first SOW
+              Go to Diagnostic
             </Link>
           </div>
         )}

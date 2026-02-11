@@ -1,7 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import Layout from '../../components/Layout';
-import { processes, managedServicesHealth, statusToLabel } from '../../data/diagnostic-data';
+import { processes as staticProcesses, managedServicesHealth, statusToLabel } from '../../data/diagnostic-data';
 import { strategicProjects, managedServices } from '../../data/services-catalog';
 import { useCustomer } from '../../context/CustomerContext';
 
@@ -20,6 +20,8 @@ const allManagedServices = [
   ...(managedServices.customerSuccess || []),
   ...(managedServices.partnerships || []),
 ];
+
+const DIAG_TYPE_TO_SOW_TYPE = { gtm: 'embedded', clay: 'clay', cpq: 'q2c' };
 
 const functionColors = {
   'Cross Functional': { bg: '#e0e7ff', border: '#818cf8' },
@@ -48,31 +50,100 @@ function getServiceDetails(serviceId, serviceType) {
 }
 
 export default function EngagementOverview() {
-  const { customerPath } = useCustomer();
+  const { customer, customerPath, isDemo } = useCustomer();
+  const [dbProcesses, setDbProcesses] = useState(null);
+  const [catalogMap, setCatalogMap] = useState(null);
+  const [existingSowId, setExistingSowId] = useState(null);
+  const [dataLoading, setDataLoading] = useState(true);
+
+  // Fetch diagnostic data and service catalog from DB for real customers
+  useEffect(() => {
+    async function fetchData() {
+      const customerId = customer?.id;
+      if (!customerId || isDemo) {
+        setDataLoading(false);
+        return;
+      }
+
+      try {
+        const diagType = customer.diagnosticType || 'gtm';
+
+        // Fetch diagnostic result and SOW list in parallel
+        const [diagRes, sowRes] = await Promise.all([
+          fetch(`/api/diagnostics/${diagType}?customerId=${customerId}`),
+          fetch(`/api/sow?customerId=${customerId}`),
+        ]);
+
+        const diagJson = await diagRes.json();
+        const sowJson = await sowRes.json();
+
+        if (diagJson.success && diagJson.data?.processes) {
+          setDbProcesses(diagJson.data.processes);
+
+          // Collect unique serviceId slugs and fetch catalog entries
+          const slugs = [...new Set(
+            diagJson.data.processes.filter(p => p.serviceId).map(p => p.serviceId)
+          )];
+          if (slugs.length > 0) {
+            const catalogRes = await fetch('/api/service-catalog?' + new URLSearchParams({ slugs: slugs.join(',') }));
+            const catalogJson = await catalogRes.json();
+            if (catalogJson.success && catalogJson.data) {
+              const map = {};
+              for (const svc of catalogJson.data) {
+                if (svc.slug) map[svc.slug] = svc;
+              }
+              setCatalogMap(map);
+            }
+          }
+        }
+
+        // Check for existing SOW
+        const sows = sowJson.data || [];
+        if (sows.length > 0) {
+          setExistingSowId(sows[0].id);
+        }
+      } catch (err) {
+        console.error('Error fetching engagement data:', err);
+      } finally {
+        setDataLoading(false);
+      }
+    }
+
+    fetchData();
+  }, [customer?.id, isDemo]);
+
+  // Use DB processes if available, otherwise fall back to static
+  const processes = dbProcesses || staticProcesses;
+
   const engagementItems = useMemo(() => {
     const priorityProcesses = processes
       .filter(p => p.addToEngagement)
       .map((p, idx) => {
         const service = getServiceDetails(p.serviceId, p.serviceType);
+        // Use catalog hours from DB if available, otherwise fall back to static estimates
+        const catEntry = catalogMap && p.serviceId ? catalogMap[p.serviceId] : null;
+        const lowHours = catEntry?.hours_low || (service?.hours_low) || (20 + (idx * 8));
+        const highHours = catEntry?.hours_high || (service?.hours_high) || (40 + (idx * 12));
         return {
           ...p,
           type: 'strategic',
           icon: service?.icon || '📋',
           description: service?.description || '',
           hasPlaybook: service?.hasPlaybook || false,
-          lowHours: 20 + (idx * 8),
-          highHours: 40 + (idx * 12),
+          lowHours,
+          highHours,
           startWeek: idx + 1,
           durationWeeks: 3 + Math.floor(idx / 3),
           priority: idx < 5 ? 'High' : 'Medium',
         };
       });
-    
+
     const priorityManaged = managedServicesHealth
       .filter(m => m.addToEngagement)
       .map((m, idx) => {
         const service = allManagedServices.find(s => s.id === m.serviceId);
-        const hoursPerMonth = m.hoursPerMonth || 8;
+        const catEntry = catalogMap && m.serviceId ? catalogMap[m.serviceId] : null;
+        const hoursPerMonth = catEntry?.hours_low || m.hoursPerMonth || 8;
         return {
           ...m,
           type: 'managed',
@@ -80,7 +151,7 @@ export default function EngagementOverview() {
           description: service?.description || '',
           hasPlaybook: false,
           lowHours: hoursPerMonth,
-          highHours: hoursPerMonth * 1.5,
+          highHours: catEntry?.hours_high || hoursPerMonth * 1.5,
           startWeek: 1,
           durationWeeks: 52,
           priority: 'Ongoing',
@@ -88,11 +159,16 @@ export default function EngagementOverview() {
       });
 
     return [...priorityProcesses, ...priorityManaged];
-  }, []);
+  }, [processes, catalogMap]);
 
-  const [selectedItems, setSelectedItems] = useState(
-    engagementItems.reduce((acc, item) => ({ ...acc, [item.name]: true }), {})
-  );
+  const [selectedItems, setSelectedItems] = useState({});
+
+  // Initialize selectedItems when engagementItems changes
+  useEffect(() => {
+    setSelectedItems(
+      engagementItems.reduce((acc, item) => ({ ...acc, [item.name]: true }), {})
+    );
+  }, [engagementItems]);
 
   const hourTiers = [
     { hours: 50, label: 'Starter', price: 15000, color: '#10b981' },
@@ -451,8 +527,15 @@ export default function EngagementOverview() {
           <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.25rem' }}>Ready to Get Started?</h3>
           <p style={{ margin: '0 0 1rem 0', opacity: 0.9 }}>Let's discuss your engagement plan and timeline.</p>
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+            {existingSowId && (
+              <Link href={customerPath(`/sow/${existingSowId}`)}>
+                <button className="btn" style={{ background: 'white', color: '#7c3aed', border: 'none', padding: '0.75rem 1.5rem' }}>
+                  View Statement of Work
+                </button>
+              </Link>
+            )}
             <Link href={customerPath('/buy-leanscale/availability')}>
-              <button className="btn" style={{ background: 'white', color: '#7c3aed', border: 'none', padding: '0.75rem 1.5rem' }}>
+              <button className="btn" style={{ background: existingSowId ? 'transparent' : 'white', color: existingSowId ? 'white' : '#7c3aed', border: existingSowId ? '2px solid white' : 'none', padding: '0.75rem 1.5rem' }}>
                 Check Cohort Availability
               </button>
             </Link>

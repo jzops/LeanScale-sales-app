@@ -27,10 +27,11 @@ jest.mock('next/link', () => {
 });
 
 // Mock next/router
-const mockPush = jest.fn();
+const mockReplace = jest.fn();
 jest.mock('next/router', () => ({
   useRouter: () => ({
-    push: mockPush,
+    push: jest.fn(),
+    replace: mockReplace,
     query: {},
     pathname: '/sow',
   }),
@@ -90,10 +91,11 @@ describe('SOW Dashboard Page', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockUseCustomer.mockReturnValue({
-      customer: { id: 'cust-123', slug: 'acme', customerName: 'Acme Corp' },
+      customer: { id: 'cust-123', slug: 'acme', customerName: 'Acme Corp', diagnosticType: 'gtm' },
       isDemo: false,
       displayName: 'Acme Corp',
       customerType: 'active',
+      customerPath: (p) => p,
       loading: false,
     });
     global.fetch = jest.fn();
@@ -190,22 +192,28 @@ describe('SOW Dashboard Page', () => {
     expect(screen.getByText('custom')).toBeInTheDocument();
   });
 
-  test('shows "Generate New SOW" button linking to /sow/generate', async () => {
+  test('shows "New SOW from Diagnostic" button linking to diagnostic page', async () => {
     global.fetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({ success: true, data: mockSows }),
     });
 
     render(<SowIndex />);
-    const link = screen.getByText('Generate New SOW');
+    const link = screen.getByText('New SOW from Diagnostic');
     expect(link).toBeInTheDocument();
-    expect(link.closest('a')).toHaveAttribute('href', '/sow/generate');
+    expect(link.closest('a')).toHaveAttribute('href', '/try-leanscale/diagnostic');
   });
 
-  test('shows empty state when no SOWs exist', async () => {
+  test('shows empty state when no SOWs and no diagnostic exists', async () => {
+    // First fetch: SOW list returns empty
     global.fetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({ success: true, data: [] }),
+    });
+    // Second fetch: diagnostic check returns no data (triggers empty state)
+    global.fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ success: true, data: null }),
     });
 
     render(<SowIndex />);
@@ -215,18 +223,24 @@ describe('SOW Dashboard Page', () => {
     });
   });
 
-  test('empty state includes CTA to generate', async () => {
+  test('empty state includes CTA to diagnostic', async () => {
+    // First fetch: SOW list returns empty
     global.fetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({ success: true, data: [] }),
+    });
+    // Second fetch: diagnostic check returns no data
+    global.fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ success: true, data: null }),
     });
 
     render(<SowIndex />);
 
     await waitFor(() => {
-      const cta = screen.getByText(/generate your first/i);
+      const cta = screen.getByText('Go to Diagnostic');
       expect(cta).toBeInTheDocument();
-      expect(cta.closest('a')).toHaveAttribute('href', '/sow/generate');
+      expect(cta.closest('a')).toHaveAttribute('href', '/try-leanscale/diagnostic');
     });
   });
 

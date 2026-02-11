@@ -598,13 +598,13 @@ export default function DiagnosticResults({ diagnosticType }) {
                           diagnosticResultId,
                           diagnosticType,
                           customerName: customer.customerName,
-                          sowType: diagnosticType === 'clay' ? 'clay' : diagnosticType === 'cpq' ? 'q2c' : 'custom',
+                          sowType: diagnosticType === 'clay' ? 'clay' : diagnosticType === 'cpq' ? 'q2c' : 'embedded',
                           createdBy: 'sales-app',
                         }),
                       });
                       const json = await res.json();
                       if (json.success && json.data?.id) {
-                        router.push(customerPath(`/sow/${json.data.id}/build`));
+                        router.push(customerPath(`/sow/${json.data.id}`));
                       }
                     } catch (err) {
                       console.error('Error creating SOW from diagnostic:', err);
