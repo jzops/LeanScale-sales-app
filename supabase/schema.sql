@@ -96,11 +96,13 @@ ALTER TABLE availability_dates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE form_submissions ENABLE ROW LEVEL SECURITY;
 
 -- Customers: Anyone can read, only service_role can write
+DROP POLICY IF EXISTS "Allow public read on customers" ON customers;
 CREATE POLICY "Allow public read on customers"
   ON customers FOR SELECT
   TO anon, authenticated
   USING (true);
 
+DROP POLICY IF EXISTS "Allow service_role full access on customers" ON customers;
 CREATE POLICY "Allow service_role full access on customers"
   ON customers FOR ALL
   TO service_role
@@ -108,11 +110,13 @@ CREATE POLICY "Allow service_role full access on customers"
   WITH CHECK (true);
 
 -- Availability: Anyone can read, only service_role can write
+DROP POLICY IF EXISTS "Allow public read on availability_dates" ON availability_dates;
 CREATE POLICY "Allow public read on availability_dates"
   ON availability_dates FOR SELECT
   TO anon, authenticated
   USING (true);
 
+DROP POLICY IF EXISTS "Allow service_role full access on availability_dates" ON availability_dates;
 CREATE POLICY "Allow service_role full access on availability_dates"
   ON availability_dates FOR ALL
   TO service_role
@@ -120,6 +124,7 @@ CREATE POLICY "Allow service_role full access on availability_dates"
   WITH CHECK (true);
 
 -- Form submissions: Only service_role can read/write
+DROP POLICY IF EXISTS "Allow service_role full access on form_submissions" ON form_submissions;
 CREATE POLICY "Allow service_role full access on form_submissions"
   ON form_submissions FOR ALL
   TO service_role
